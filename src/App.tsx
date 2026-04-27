@@ -12,9 +12,9 @@ export default function App() {
           <h1 className="text-4xl font-bold text-text mb-1">PivotCSV</h1>
           <p className="text-muted text-sm">Design system — aperçu des composants</p>
         </div>
-        <div className="flex items-center gap-1.5 opacity-30 hover:opacity-60 transition-opacity">
-          <img src="/finex-icon-light.svg" alt="Finex" className="h-4 w-auto" />
-          <span className="text-text text-xs font-medium">Finex</span>
+        <div className="flex items-center gap-2 opacity-50 hover:opacity-90 transition-opacity">
+          <img src="/finex-icon-light.svg" alt="Finex" className="h-7 w-auto" />
+          <span className="text-text text-base font-semibold tracking-tight">Finex</span>
         </div>
       </div>
 
