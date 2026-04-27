@@ -12,7 +12,7 @@ export default function App() {
           <h1 className="text-4xl font-bold text-text mb-1">PivotCSV</h1>
           <p className="text-muted text-sm">Design system — aperçu des composants</p>
         </div>
-        <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-7 w-auto opacity-50 hover:opacity-90 transition-opacity" />
+        <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-10 w-auto opacity-50 hover:opacity-90 transition-opacity" />
       </div>
 
       <section className="flex flex-col gap-4">
