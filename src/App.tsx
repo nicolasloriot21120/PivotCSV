@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { Plus, Upload, Trash2, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Card }   from '@/components/ui/Card'
-import { Badge }  from '@/components/ui/Badge'
+import { Button }       from '@/components/ui/Button'
+import { Card }         from '@/components/ui/Card'
+import { Badge }        from '@/components/ui/Badge'
+import { FileDropzone } from '@/components/ui/FileDropzone'
 
 export default function App() {
+  const [files, setFiles] = useState<File[]>([])
+
   return (
     <div className="min-h-screen p-10 flex flex-col gap-10">
 
@@ -54,6 +58,22 @@ export default function App() {
           <Badge variant="warning" dot>Attention</Badge>
           <Badge variant="danger"  dot>Erreur</Badge>
           <Badge variant="neutral">Neutre</Badge>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs uppercase tracking-widest text-muted font-semibold">FileDropzone</h2>
+        <div className="max-w-lg">
+          <FileDropzone
+            accept=".csv"
+            multiple
+            onFiles={setFiles}
+          />
+          {files.length > 0 && (
+            <p className="text-muted text-xs mt-3">
+              {files.length} fichier{files.length > 1 ? 's' : ''} prêt{files.length > 1 ? 's' : ''}
+            </p>
+          )}
         </div>
       </section>
 
