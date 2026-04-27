@@ -1,12 +1,24 @@
 import { useState } from 'react'
 import { Plus, Upload, Trash2, ChevronRight } from 'lucide-react'
-import { Button }       from '@/components/ui/Button'
-import { Card }         from '@/components/ui/Card'
-import { Badge }        from '@/components/ui/Badge'
-import { FileDropzone } from '@/components/ui/FileDropzone'
+import { Button }            from '@/components/ui/Button'
+import { Card }              from '@/components/ui/Card'
+import { Badge }             from '@/components/ui/Badge'
+import { FileDropzone }      from '@/components/ui/FileDropzone'
+import { GenericCSVLoader }  from '@/lib/csv'
+import type { RawRow, LoadResult } from '@/lib/csv'
+
+const loader = new GenericCSVLoader()
 
 export default function App() {
-  const [files, setFiles] = useState<File[]>([])
+  const [_files, setFiles]  = useState<File[]>([])
+  const [result, setResult] = useState<LoadResult<RawRow> | null>(null)
+
+  async function handleFiles(newFiles: File[]) {
+    setFiles(newFiles)
+    if (newFiles.length === 0) { setResult(null); return }
+    const res = await loader.load(newFiles[0])
+    setResult(res)
+  }
 
   return (
     <div className="min-h-screen p-10 flex flex-col gap-10">
@@ -62,17 +74,56 @@ export default function App() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs uppercase tracking-widest text-muted font-semibold">FileDropzone</h2>
-        <div className="max-w-lg">
-          <FileDropzone
-            accept=".csv"
-            multiple
-            onFiles={setFiles}
-          />
-          {files.length > 0 && (
-            <p className="text-muted text-xs mt-3">
-              {files.length} fichier{files.length > 1 ? 's' : ''} prêt{files.length > 1 ? 's' : ''}
-            </p>
+        <h2 className="text-xs uppercase tracking-widest text-muted font-semibold">FileDropzone + CSVLoader</h2>
+        <div className="max-w-lg flex flex-col gap-4">
+          <FileDropzone accept=".csv" multiple onFiles={handleFiles} />
+
+          {result && (
+            <Card elevated>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm text-text font-semibold">
+                  {result.data.length} lignes — {Object.keys(result.data[0] ?? {}).length} colonnes
+                </p>
+                <Badge variant={result.ok ? 'success' : 'danger'} dot>
+                  {result.ok ? 'Valide' : 'Erreurs'}
+                </Badge>
+              </div>
+
+              {result.errors.length > 0 && (
+                <ul className="flex flex-col gap-1 mb-3">
+                  {result.errors.map((e, i) => (
+                    <li key={i} className="text-xs text-warning">
+                      {e.row ? `Ligne ${e.row} : ` : ''}{e.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="overflow-x-auto rounded-[var(--radius-md)] border border-border">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-elevated border-b border-border">
+                      {Object.keys(result.data[0] ?? {}).map(h => (
+                        <th key={h} className="px-3 py-2 text-left text-muted font-medium whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.data.slice(0, 5).map((row, i) => (
+                      <tr key={i} className="border-b border-border/50 last:border-0">
+                        {Object.values(row).map((v, j) => (
+                          <td key={j} className="px-3 py-1.5 text-text/80 whitespace-nowrap">{String(v ?? '')}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {result.data.length > 5 && (
+                <p className="text-subtle text-xs mt-2">+{result.data.length - 5} lignes masquées</p>
+              )}
+            </Card>
           )}
         </div>
       </section>
