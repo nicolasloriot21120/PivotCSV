@@ -82,57 +82,56 @@ export default function App() {
           <FileDropzone accept=".csv" multiple onFiles={handleFiles} />
 
           {result && (
-            <Card elevated>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-text font-semibold">
-                  {result.data.length} lignes — {Object.keys(result.data[0] ?? {}).length} colonnes
-                </p>
+            <Card elevated padding="none">
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors rounded-[var(--radius-lg)]"
+              >
+                <div className="flex items-center gap-3">
+                  <ChevronsUpDown size={14} className="text-muted flex-shrink-0" />
+                  <span className="text-sm text-text font-semibold">
+                    {result.data.length.toLocaleString('fr-FR')} lignes
+                    — {Object.keys(result.data[0] ?? {}).length} colonnes
+                  </span>
+                </div>
                 <Badge variant={result.ok ? 'success' : 'danger'} dot>
                   {result.ok ? 'Valide' : 'Erreurs'}
                 </Badge>
-              </div>
+              </button>
 
-              {result.errors.length > 0 && (
-                <ul className="flex flex-col gap-1 mb-3">
-                  {result.errors.map((e, i) => (
-                    <li key={i} className="text-xs text-warning">
-                      {e.row ? `Ligne ${e.row} : ` : ''}{e.message}
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <div className="overflow-x-auto rounded-[var(--radius-md)] border border-border">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="bg-elevated border-b border-border">
-                      {Object.keys(result.data[0] ?? {}).map(h => (
-                        <th key={h} className="px-3 py-2 text-left text-muted font-medium whitespace-nowrap">{h}</th>
+              {expanded && (
+                <div className="px-4 pb-4 flex flex-col gap-3">
+                  {result.errors.length > 0 && (
+                    <ul className="flex flex-col gap-1">
+                      {result.errors.map((e, i) => (
+                        <li key={i} className="text-xs text-warning">
+                          {e.row ? `Ligne ${e.row} : ` : ''}{e.message}
+                        </li>
                       ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.data.slice(0, expanded ? undefined : PREVIEW_ROWS).map((row, i) => (
-                      <tr key={i} className="border-b border-border/50 last:border-0">
-                        {Object.values(row).map((v, j) => (
-                          <td key={j} className="px-3 py-1.5 text-text/80 whitespace-nowrap">{String(v ?? '')}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </ul>
+                  )}
 
-              {result.data.length > PREVIEW_ROWS && (
-                <button
-                  onClick={() => setExpanded(e => !e)}
-                  className="mt-2 flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors"
-                >
-                  <ChevronsUpDown size={13} />
-                  {expanded
-                    ? 'Replier'
-                    : `Voir les ${result.data.length - PREVIEW_ROWS} lignes restantes`}
-                </button>
+                  <div className="overflow-x-auto rounded-[var(--radius-md)] border border-border">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-elevated border-b border-border">
+                          {Object.keys(result.data[0] ?? {}).map(h => (
+                            <th key={h} className="px-3 py-2 text-left text-muted font-medium whitespace-nowrap">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {result.data.slice(0, PREVIEW_ROWS).map((row, i) => (
+                          <tr key={i} className="border-b border-border/50 last:border-0">
+                            {Object.values(row).map((v, j) => (
+                              <td key={j} className="px-3 py-1.5 text-text/80 whitespace-nowrap">{String(v ?? '')}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
             </Card>
           )}
