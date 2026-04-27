@@ -7,9 +7,15 @@ export default function App() {
   return (
     <div className="min-h-screen p-10 flex flex-col gap-10">
 
-      <div>
-        <h1 className="text-4xl font-bold text-text mb-1">PivotCSV</h1>
-        <p className="text-muted text-sm">Design system — aperçu des composants</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-text mb-1">PivotCSV</h1>
+          <p className="text-muted text-sm">Design system — aperçu des composants</p>
+        </div>
+        <div className="flex items-center gap-1.5 opacity-30 hover:opacity-60 transition-opacity">
+          <img src="/finex-icon-light.svg" alt="Finex" className="h-4 w-auto" />
+          <span className="text-text text-xs font-medium">Finex</span>
+        </div>
       </div>
 
       <section className="flex flex-col gap-4">
