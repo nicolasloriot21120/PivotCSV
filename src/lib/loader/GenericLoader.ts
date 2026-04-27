@@ -1,4 +1,4 @@
-import type { ValidationResult, LoadResult } from './types'
+import type { ValidationResult, LoadResult } from './csv/types'
 
 /**
  * Contrat générique pour tout chargeur de fichier.
