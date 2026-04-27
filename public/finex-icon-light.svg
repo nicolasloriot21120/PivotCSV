@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 104">
+  <path d="M10,66 L26,54 L43,40 L62,24 L80,10 L80,78 L10,78 Z" fill="#67ACB5" opacity="0.18"/>
+  <polygon points="10,66 2,78 18,78" fill="#4A7365"/>
+  <rect x="7" y="78" width="6" height="6" fill="#4A7365"/>
+  <polygon points="26,54 16,78 36,78" fill="#4A7365"/>
+  <rect x="23" y="78" width="6" height="6" fill="#4A7365"/>
+  <polygon points="43,40 31,78 55,78" fill="#1C3A2A"/>
+  <rect x="40" y="78" width="6" height="6" fill="#1C3A2A"/>
+  <polygon points="62,24 48,78 76,78" fill="#1C3A2A"/>
+  <rect x="59" y="78" width="6" height="6" fill="#1C3A2A"/>
+  <polygon points="80,10 64,78 96,78" fill="#1C3A2A"/>
+  <rect x="77" y="78" width="6" height="6" fill="#1C3A2A"/>
+  <polyline points="10,66 26,54 43,40 62,24 80,10" stroke="#67ACB5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="10" cy="66" r="2" fill="#67ACB5"/>
+  <circle cx="26" cy="54" r="2" fill="#67ACB5"/>
+  <circle cx="43" cy="40" r="2" fill="#67ACB5"/>
+  <circle cx="62" cy="24" r="2" fill="#67ACB5"/>
+  <circle cx="80" cy="10" r="2" fill="#67ACB5"/>
+  <text x="50" y="100" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="700" letter-spacing="4" text-anchor="middle" fill="#1C3A2A">FINEX</text>
+</svg>
