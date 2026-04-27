@@ -53,8 +53,12 @@ export function FileDropzone({
     const valid = validate(files)
     if (!valid) { setState('error'); return }
     setState('idle')
-    setDropped(valid)
-    onFiles(valid)
+    setDropped(prev => {
+      const existing = new Set(prev.map(f => f.name))
+      const next = [...prev, ...valid.filter(f => !existing.has(f.name))]
+      onFiles(next)
+      return next
+    })
   }, [validate, onFiles])
 
   const onDragOver  = (e: DragEvent) => { e.preventDefault(); setState('hover') }
@@ -68,8 +72,11 @@ export function FileDropzone({
   }
 
   const removeFile = (name: string) => {
-    const next = dropped.filter(f => f.name !== name)
-    setDropped(next)
+    setDropped(prev => {
+      const next = prev.filter(f => f.name !== name)
+      onFiles(next)
+      return next
+    })
     setError(null)
     setState('idle')
   }
