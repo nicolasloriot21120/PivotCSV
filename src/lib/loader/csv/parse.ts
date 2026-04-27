@@ -10,18 +10,28 @@ function inferType(raw: string): CellValue {
   return raw
 }
 
-/** Découpe une ligne en tenant compte des champs entre guillemets. */
+const QUOTE_CHARS = new Set(['"', "'", '`'])
+
+/** Découpe une ligne en tenant compte des champs entre guillemets (", ', `). */
 function splitLine(line: string, delimiter: Delimiter): string[] {
   const result: string[] = []
-  let current  = ''
-  let inQuotes = false
+  let current   = ''
+  let quoteChar = ''
 
   for (let i = 0; i < line.length; i++) {
     const ch = line[i]
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++ }
-      else inQuotes = !inQuotes
-    } else if (ch === delimiter && !inQuotes) {
+    if (quoteChar) {
+      if (ch === quoteChar) {
+        // Quote doublée = caractère littéral (ex: "don""t" → don"t)
+        if (line[i + 1] === quoteChar) { current += quoteChar; i++ }
+        else quoteChar = ''
+      } else {
+        current += ch
+      }
+    } else if (QUOTE_CHARS.has(ch) && current === '') {
+      // Quote d'ouverture uniquement en début de champ
+      quoteChar = ch
+    } else if (ch === delimiter) {
       result.push(current.trim())
       current = ''
     } else {
