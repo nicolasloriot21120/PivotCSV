@@ -53,9 +53,12 @@ export function parseCSV(text: string): CSVParseResult {
     const cells = splitLine(lines[i], delimiter)
 
     if (cells.length !== headers.length) {
+      const hint = delimiter === ','
+        ? ` — vérifiez que vos nombres décimaux utilisent "." ou exportez avec ";" comme délimiteur`
+        : ''
       errors.push({
         row:      i + 1,
-        message:  `${cells.length} colonnes trouvées, ${headers.length} attendues`,
+        message:  `${cells.length} colonnes trouvées, ${headers.length} attendues${hint}`,
         severity: 'warning',
       })
     }
