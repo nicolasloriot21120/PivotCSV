@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@/context/ThemeContext'
-import { ReportPage }   from '@/pages/ReportPage'
+import { ReportPage }   from '@/pages/ReportPage/ReportPage'
 
 export default function App() {
   return (
