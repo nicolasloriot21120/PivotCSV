@@ -1,13 +1,15 @@
-import { X }                  from 'lucide-react'
+import { useDraggable }        from '@dnd-kit/core'
+import { CSS }                 from '@dnd-kit/utilities'
+import { GripVertical, X }     from 'lucide-react'
 import type { AggregationType } from '@/lib/pivot/types'
 import type { ValueField }      from './types'
 
 const AGGS: { id: AggregationType; label: string }[] = [
-  { id: 'sum',   label: 'Σ'   },
-  { id: 'count', label: '#'   },
-  { id: 'avg',   label: 'Ø'   },
-  { id: 'min',   label: '▼'   },
-  { id: 'max',   label: '▲'   },
+  { id: 'sum',   label: 'Σ' },
+  { id: 'count', label: '#' },
+  { id: 'avg',   label: 'Ø' },
+  { id: 'min',   label: '▼' },
+  { id: 'max',   label: '▲' },
 ]
 
 type Props = {
@@ -17,9 +19,31 @@ type Props = {
 }
 
 export function ValueChip({ field, onRemove, onAggChange }: Props) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id:   `values::${field.field}`,
+    data: { field: field.field, type: field.type },
+  })
+
+  const style = { transform: CSS.Translate.toString(transform) }
+
   return (
-    <div className="flex flex-col gap-1 bg-elevated border border-border rounded-[var(--radius-md)] px-2.5 py-1.5">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={[
+        'flex flex-col gap-1 bg-elevated border border-border rounded-[var(--radius-md)] px-2.5 py-1.5',
+        'transition-opacity duration-150',
+        isDragging ? 'opacity-40' : '',
+      ].join(' ')}
+    >
       <div className="flex items-center gap-1.5">
+        <span
+          {...attributes}
+          {...listeners}
+          className="text-subtle hover:text-muted cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
+        >
+          <GripVertical size={12} />
+        </span>
         <span className="text-xs font-medium text-accent-hi truncate max-w-[100px]">{field.field}</span>
         <button
           onClick={onRemove}
@@ -28,7 +52,7 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
           <X size={11} />
         </button>
       </div>
-      <div className="flex gap-0.5">
+      <div className="flex gap-0.5 pl-4">
         {AGGS.map(a => (
           <button
             key={a.id}
