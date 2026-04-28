@@ -1,5 +1,8 @@
 import { useState }             from 'react'
-import type { DraggableAttributes, SyntheticListenerMap } from '@dnd-kit/core'
+import { useSortable }           from '@dnd-kit/sortable'
+import type { DraggableAttributes } from '@dnd-kit/core'
+
+type SortableListeners = ReturnType<typeof useSortable>['listeners']
 import {
   GripVertical, ChevronDown, ChevronRight,
   Settings2, X, FileText,
@@ -15,7 +18,7 @@ type Props = {
   headers:             string[]
   preview:             RawRow[]
   dragHandleAttrs:     DraggableAttributes
-  dragHandleListeners: SyntheticListenerMap | undefined
+  dragHandleListeners: SortableListeners
   isDragging:          boolean
   onLabelChange:       (label: string) => void
   onToggleCollapse:    () => void
