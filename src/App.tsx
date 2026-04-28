@@ -10,9 +10,9 @@ import {
   verticalListSortingStrategy, arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS }                    from '@dnd-kit/utilities'
-import { ChevronRight, LayoutGrid } from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 
-import { Sidebar }              from '@/components/ui/Sidebar'
+import { AppSidebar }           from '@/components/AppSidebar'
 import { PivotSection }         from '@/components/PivotSection'
 import { ThemePicker }          from '@/components/ui/ThemePicker'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
@@ -242,31 +242,14 @@ export default function App() {
     <div className="flex h-screen overflow-hidden bg-base">
 
       {/* Sidebar */}
-      <div className="relative flex-shrink-0 h-full">
-        <Sidebar
-          open={sidebarOpen}
-          onToggle={() => setSidebarOpen(o => !o)}
-          fileEntries={fileEntries}
-          onFiles={handleFiles}
-          onFileSelect={handleFileSelect}
-          onAddPivot={handleAddPivot}
-        />
-        {!sidebarOpen && (
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className={[
-              'absolute top-4 left-2 z-10',
-              'w-7 h-7 rounded-full flex items-center justify-center',
-              'bg-elevated border border-border text-muted',
-              'hover:text-text hover:border-border-strong transition-all duration-150',
-              'shadow-[var(--shadow-card)]',
-            ].join(' ')}
-            title="Ouvrir"
-          >
-            <ChevronRight size={13} />
-          </button>
-        )}
-      </div>
+      <AppSidebar
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen(o => !o)}
+        fileEntries={fileEntries}
+        onFiles={handleFiles}
+        onFileSelect={handleFileSelect}
+        onAddPivot={handleAddPivot}
+      />
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
