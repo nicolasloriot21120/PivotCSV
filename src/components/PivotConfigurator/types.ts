@@ -29,6 +29,10 @@ export type ConfiguratorState = {
 
 export type ZoneId = 'rows' | 'columns' | 'values' | 'filters'
 
+export function emptyConfiguratorState(): ConfiguratorState {
+  return { rows: [], columns: [], values: [], filters: [] }
+}
+
 export function toPivotFilters(filters: FilterField[]): PivotFilter[] {
   return filters.flatMap(f => {
     if (f.type === 'string') {

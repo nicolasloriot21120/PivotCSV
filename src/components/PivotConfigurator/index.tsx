@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState } from 'react'
 import {
   DndContext, DragOverlay,
   PointerSensor, useSensor, useSensors,
@@ -6,18 +6,23 @@ import {
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
 import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
 
-import type { RawRow }         from '@/lib/loader/csv/types'
-import type { PivotConfig }    from '@/lib/pivot/types'
+import type { RawRow }          from '@/lib/loader/csv/types'
+import type { PivotConfig }     from '@/lib/pivot/types'
 import type { AggregationType } from '@/lib/pivot/types'
 
 import { FieldChip }  from './FieldChip'
 import { DropZone }   from './DropZone'
 import { ValueChip }  from './ValueChip'
 import { FilterZone } from './FilterZone'
-import type { ConfiguratorState, FieldType, FilterField, PlacedField, ValueField, ZoneId } from './types'
+import type {
+  ConfiguratorState, FieldType,
+  FilterField, PlacedField, ValueField, ZoneId,
+} from './types'
 import { toPivotFilters } from './types'
 
 type Props = {
+  value:      ConfiguratorState
+  onChange:   (s: ConfiguratorState) => void
   headers:    string[]
   preview:    RawRow[]
   status:     'idle' | 'computing' | 'done' | 'error'
@@ -44,61 +49,55 @@ function distinctValues(rows: RawRow[], field: string): string[] {
 
 const EXCLUSIVE_ZONES: ZoneId[] = ['rows', 'columns', 'values']
 
-export function PivotConfigurator({ headers, preview, status, progress, onCompute, onCancel }: Props) {
+export function PivotConfigurator({ value, onChange, headers, preview, status, progress, onCompute, onCancel }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: { distance: 4 },
   }))
 
+  const [dragging, setDragging] = useState<{ field: string; type: FieldType } | null>(null)
+
   const fieldTypes: Record<string, FieldType> = {}
   for (const h of headers) fieldTypes[h] = inferType(preview, h)
 
-  const [state, setState] = useState<ConfiguratorState>({
-    rows: [], columns: [], values: [], filters: [],
-  })
-  const [dragging, setDragging] = useState<{ field: string; type: FieldType } | null>(null)
-
   const placedInExclusive = new Set(
-    [...state.rows, ...state.columns, ...state.values].map(f => f.field)
+    [...value.rows, ...value.columns, ...value.values].map(f => f.field)
   )
 
   const available = headers
     .filter(h => !placedInExclusive.has(h))
     .map(h => ({ field: h, type: fieldTypes[h] }))
 
-  const removeFromZone = useCallback((zone: keyof ConfiguratorState, field: string) => {
-    setState(s => ({ ...s, [zone]: (s[zone] as PlacedField[]).filter(f => f.field !== field) }))
-  }, [])
+  const removeFromZone = (zone: keyof ConfiguratorState, field: string) => {
+    onChange({ ...value, [zone]: (value[zone] as PlacedField[]).filter(f => f.field !== field) })
+  }
 
-  const addToZone = useCallback((zone: ZoneId, field: string, type: FieldType) => {
-    setState(s => {
-      // Retirer des zones exclusives si on y va
-      let next = { ...s }
-      if (EXCLUSIVE_ZONES.includes(zone)) {
-        for (const z of EXCLUSIVE_ZONES) {
-          next = { ...next, [z]: (next[z] as PlacedField[]).filter(f => f.field !== field) }
-        }
+  const addToZone = (zone: ZoneId, field: string, type: FieldType) => {
+    let next = { ...value }
+
+    if (EXCLUSIVE_ZONES.includes(zone)) {
+      for (const z of EXCLUSIVE_ZONES) {
+        next = { ...next, [z]: (next[z] as PlacedField[]).filter(f => f.field !== field) }
       }
+    }
 
-      if (zone === 'values') {
-        const already = (next.values as ValueField[]).find(f => f.field === field)
-        if (already) return next
-        return { ...next, values: [...next.values, { field, type, aggregation: 'sum' as AggregationType }] }
-      }
+    if (zone === 'values') {
+      if ((next.values as ValueField[]).find(f => f.field === field)) return
+      onChange({ ...next, values: [...next.values, { field, type, aggregation: 'sum' as AggregationType }] })
+      return
+    }
 
-      if (zone === 'filters') {
-        const already = (next.filters as FilterField[]).find(f => f.field === field)
-        if (already) return next
-        const newFilter: FilterField = type === 'string'
-          ? { field, type, distinctValues: distinctValues(preview, field), selectedValues: [] }
-          : { field, type, min: '', max: '' }
-        return { ...next, filters: [...next.filters, newFilter] }
-      }
+    if (zone === 'filters') {
+      if ((next.filters as FilterField[]).find(f => f.field === field)) return
+      const newFilter: FilterField = type === 'string'
+        ? { field, type, distinctValues: distinctValues(preview, field), selectedValues: [] }
+        : { field, type, min: '', max: '' }
+      onChange({ ...next, filters: [...next.filters, newFilter] })
+      return
+    }
 
-      const already = (next[zone] as PlacedField[]).find(f => f.field === field)
-      if (already) return next
-      return { ...next, [zone]: [...(next[zone] as PlacedField[]), { field, type }] }
-    })
-  }, [preview])
+    if ((next[zone] as PlacedField[]).find(f => f.field === field)) return
+    onChange({ ...next, [zone]: [...(next[zone] as PlacedField[]), { field, type }] })
+  }
 
   const onDragStart = (e: DragStartEvent) => {
     const { field, type } = e.active.data.current as { field: string; type: FieldType }
@@ -114,22 +113,21 @@ export function PivotConfigurator({ headers, preview, status, progress, onComput
 
   const handleCompute = () => {
     const config: PivotConfig = {
-      rows:    state.rows.map(f => f.field),
-      columns: state.columns.map(f => f.field),
-      values:  state.values.map(f => ({ field: f.field, aggregation: (f as ValueField).aggregation })),
-      filters: toPivotFilters(state.filters),
+      rows:    value.rows.map(f => f.field),
+      columns: value.columns.map(f => f.field),
+      values:  value.values.map(f => ({ field: f.field, aggregation: (f as ValueField).aggregation })),
+      filters: toPivotFilters(value.filters),
     }
     onCompute(config)
   }
 
-  const canCompute = state.rows.length > 0 && state.values.length > 0
+  const canCompute = value.rows.length > 0 && value.values.length > 0
   const computing  = status === 'computing'
 
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <div className="flex flex-col gap-6">
 
-        {/* Champs disponibles */}
         <div className="flex flex-col gap-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-muted">
             Champs disponibles
@@ -149,10 +147,9 @@ export function PivotConfigurator({ headers, preview, status, progress, onComput
           </div>
         </div>
 
-        {/* Zones de configuration */}
         <div className="grid grid-cols-2 gap-4">
           <DropZone id="rows" label="Lignes" icon={<Rows3 size={12} />} placeholder="Glissez un champ ici">
-            {state.rows.map(f => (
+            {value.rows.map(f => (
               <FieldChip
                 key={f.field}
                 field={f.field}
@@ -164,7 +161,7 @@ export function PivotConfigurator({ headers, preview, status, progress, onComput
           </DropZone>
 
           <DropZone id="columns" label="Colonnes" icon={<Columns3 size={12} />} placeholder="Glissez un champ ici">
-            {state.columns.map(f => (
+            {value.columns.map(f => (
               <FieldChip
                 key={f.field}
                 field={f.field}
@@ -176,34 +173,33 @@ export function PivotConfigurator({ headers, preview, status, progress, onComput
           </DropZone>
 
           <DropZone id="values" label="Valeurs" icon={<Hash size={12} />} placeholder="Champs numériques">
-            {state.values.map(f => (
+            {value.values.map(f => (
               <ValueChip
                 key={f.field}
                 field={f}
                 onRemove={() => removeFromZone('values', f.field)}
                 onAggChange={agg =>
-                  setState(s => ({
-                    ...s,
-                    values: s.values.map(v => v.field === f.field ? { ...v, aggregation: agg } : v),
-                  }))
+                  onChange({
+                    ...value,
+                    values: value.values.map(v => v.field === f.field ? { ...v, aggregation: agg } : v),
+                  })
                 }
               />
             ))}
           </DropZone>
 
           <FilterZone
-            filters={state.filters}
+            filters={value.filters}
             onRemove={field => removeFromZone('filters', field)}
             onUpdate={(field, patch) =>
-              setState(s => ({
-                ...s,
-                filters: s.filters.map(f => f.field === field ? { ...f, ...patch } : f),
-              }))
+              onChange({
+                ...value,
+                filters: value.filters.map(f => f.field === field ? { ...f, ...patch } : f),
+              })
             }
           />
         </div>
 
-        {/* Bouton calculer */}
         <div className="flex items-center gap-3">
           <button
             onClick={computing ? onCancel : handleCompute}
@@ -243,7 +239,6 @@ export function PivotConfigurator({ headers, preview, status, progress, onComput
 
       </div>
 
-      {/* Ghost pendant le drag */}
       <DragOverlay>
         {dragging && (
           <FieldChip
