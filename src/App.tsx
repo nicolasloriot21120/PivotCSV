@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState }            from 'react'
 import { Plus, Upload, Trash2, ChevronRight, ChevronsUpDown } from 'lucide-react'
-import { Button }       from '@/components/ui/Button'
-import { Card }         from '@/components/ui/Card'
-import { Badge }        from '@/components/ui/Badge'
-import { FileDropzone } from '@/components/ui/FileDropzone'
-import { CSVLoader }    from '@/lib/loader'
+import { Button }              from '@/components/ui/Button'
+import { Card }                from '@/components/ui/Card'
+import { Badge }               from '@/components/ui/Badge'
+import { FileDropzone }        from '@/components/ui/FileDropzone'
+import { ThemePicker }         from '@/components/ui/ThemePicker'
+import { PivotConfigurator }   from '@/components/PivotConfigurator'
+import { CSVLoader }           from '@/lib/loader'
+import { usePivotWorker }      from '@/hooks/usePivotWorker'
 import type { RawRow, LoadResult } from '@/lib/loader'
 
 const loader = new CSVLoader()
@@ -14,6 +17,8 @@ export default function App() {
   const [result,       setResult]       = useState<LoadResult<RawRow> | null>(null)
   const [rowCount,     setRowCount]     = useState<number | null>(null)
   const [expanded,     setExpanded]     = useState(false)
+
+  const { compute, cancel, status, progress, result: pivotResult } = usePivotWorker()
 
   async function handleFiles(newFiles: File[]) {
     if (newFiles.length === 0) { setSelectedFile(undefined); setResult(null); setRowCount(null) }
@@ -31,6 +36,8 @@ export default function App() {
     setRowCount(count)
   }
 
+  const headers = result?.data[0] ? Object.keys(result.data[0]) : []
+
   return (
     <div className="min-h-screen p-10 flex flex-col gap-10">
 
@@ -39,7 +46,10 @@ export default function App() {
           <h1 className="text-4xl font-bold text-text mb-1">PivotCSV</h1>
           <p className="text-muted text-sm">Design system — aperçu des composants</p>
         </div>
-        <img src="/finex-icon-dark.svg" alt="Finex" className="h-15 w-auto opacity-65 hover:opacity-90 transition-opacity" />
+        <div className="flex items-center gap-3">
+          <ThemePicker />
+          <img src="/finex-icon-dark.svg" alt="Finex" className="h-15 w-auto opacity-65 hover:opacity-90 transition-opacity" />
+        </div>
       </div>
 
       <section className="flex flex-col gap-4">
@@ -151,6 +161,30 @@ export default function App() {
           )}
         </div>
       </section>
+
+      {selectedFile && headers.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-xs uppercase tracking-widest text-muted font-semibold">Pivot</h2>
+          <Card elevated>
+            <PivotConfigurator
+              headers={headers}
+              preview={result?.data ?? []}
+              status={status}
+              progress={progress}
+              onCompute={config => compute(selectedFile, config)}
+              onCancel={cancel}
+            />
+          </Card>
+
+          {pivotResult && (
+            <Card elevated>
+              <p className="text-xs text-muted">
+                {pivotResult.rowKeys.length} ligne(s) × {pivotResult.colKeys.length} colonne(s)
+              </p>
+            </Card>
+          )}
+        </section>
+      )}
 
     </div>
   )
