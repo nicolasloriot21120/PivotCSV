@@ -3,47 +3,45 @@ import type { DragEvent, ChangeEvent } from 'react'
 import { Upload, File, X, AlertCircle } from 'lucide-react'
 
 export type FileDropzoneProps = {
-  accept?:    string
-  multiple?:  boolean
-  maxSizeMb?: number
-  onFiles:    (files: File[]) => void
-  label?:     string
-  hint?:      string
+  accept?:        string
+  multiple?:      boolean
+  maxSizeMb?:     number
+  onFiles:        (files: File[]) => void
+  onFileSelect?:  (file: File) => void
+  selectedFile?:  File
+  label?:         string
+  hint?:          string
 }
 
 type DropState = 'idle' | 'hover' | 'error'
 
 export function FileDropzone({
-  accept     = '.csv',
-  multiple   = false,
-  maxSizeMb  = 10,
+  accept        = '.csv',
+  multiple      = false,
+  maxSizeMb     = 10,
   onFiles,
-  label      = 'Déposez votre fichier ici',
+  onFileSelect,
+  selectedFile,
+  label         = 'Déposez votre fichier ici',
   hint,
 }: FileDropzoneProps) {
-  const inputRef             = useRef<HTMLInputElement>(null)
-  const [state, setState]    = useState<DropState>('idle')
-  const [error, setError]    = useState<string | null>(null)
+  const inputRef              = useRef<HTMLInputElement>(null)
+  const [state, setState]     = useState<DropState>('idle')
+  const [error, setError]     = useState<string | null>(null)
   const [dropped, setDropped] = useState<File[]>([])
 
   const validate = useCallback((files: File[]): File[] | null => {
-    const maxBytes = maxSizeMb * 1024 * 1024
+    const maxBytes     = maxSizeMb * 1024 * 1024
     const acceptedExts = accept.split(',').map(s => s.trim().toLowerCase())
 
     const invalid = files.find(f => {
       const ext = '.' + f.name.split('.').pop()?.toLowerCase()
       return !acceptedExts.includes(ext)
     })
-    if (invalid) {
-      setError(`Format non accepté : ${invalid.name}`)
-      return null
-    }
+    if (invalid) { setError(`Format non accepté : ${invalid.name}`); return null }
 
     const tooBig = files.find(f => f.size > maxBytes)
-    if (tooBig) {
-      setError(`Fichier trop lourd (max ${maxSizeMb} Mo) : ${tooBig.name}`)
-      return null
-    }
+    if (tooBig) { setError(`Fichier trop lourd (max ${maxSizeMb} Mo) : ${tooBig.name}`); return null }
 
     return files
   }, [accept, maxSizeMb])
@@ -55,26 +53,26 @@ export function FileDropzone({
     setState('idle')
     setDropped(prev => {
       const existing = new Set(prev.map(f => f.name))
-      const next = [...prev, ...valid.filter(f => !existing.has(f.name))]
+      const newFiles = valid.filter(f => !existing.has(f.name))
+      const next     = [...prev, ...newFiles]
       onFiles(next)
       return next
     })
-  }, [validate, onFiles])
+    // Auto-sélectionne le premier fichier nouvellement ajouté
+    onFileSelect?.(valid[0])
+  }, [validate, onFiles, onFileSelect])
 
   const onDragOver  = (e: DragEvent) => { e.preventDefault(); setState('hover') }
   const onDragLeave = ()             => setState('idle')
-  const onDrop      = (e: DragEvent) => {
-    e.preventDefault()
-    handle(Array.from(e.dataTransfer.files))
-  }
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) handle(Array.from(e.target.files))
-  }
+  const onDrop      = (e: DragEvent) => { e.preventDefault(); handle(Array.from(e.dataTransfer.files)) }
+  const onChange    = (e: ChangeEvent<HTMLInputElement>) => { if (e.target.files) handle(Array.from(e.target.files)) }
 
   const removeFile = (name: string) => {
     setDropped(prev => {
       const next = prev.filter(f => f.name !== name)
       onFiles(next)
+      // Si le fichier supprimé était sélectionné, sélectionne le suivant disponible
+      if (selectedFile?.name === name) onFileSelect?.(next[0])
       return next
     })
     setError(null)
@@ -148,23 +146,38 @@ export function FileDropzone({
 
       {dropped.length > 0 && (
         <ul className="flex flex-col gap-1.5">
-          {dropped.map(f => (
-            <li key={f.name}
-              className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-elevated border border-border">
-              <File size={14} className="text-accent flex-shrink-0" />
-              <span className="text-text text-xs font-medium truncate flex-1">{f.name}</span>
-              <span className="text-muted text-xs flex-shrink-0">
-                {(f.size / 1024).toFixed(0)} Ko
-              </span>
-              <button
-                onClick={e => { e.stopPropagation(); removeFile(f.name) }}
-                className="text-subtle hover:text-danger transition-colors flex-shrink-0"
-                aria-label={`Retirer ${f.name}`}
+          {dropped.map(f => {
+            const isSelected = selectedFile?.name === f.name
+            return (
+              <li
+                key={f.name}
+                onClick={() => onFileSelect?.(f)}
+                className={[
+                  'flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border',
+                  'cursor-pointer transition-all duration-150',
+                  isSelected
+                    ? 'bg-accent/10 border-accent/40'
+                    : 'bg-elevated border-border hover:border-border-strong',
+                ].join(' ')}
               >
-                <X size={13} />
-              </button>
-            </li>
-          ))}
+                <File size={14} className={isSelected ? 'text-accent-hi' : 'text-accent'} />
+                <span className={[
+                  'text-xs font-medium truncate flex-1',
+                  isSelected ? 'text-accent-hi' : 'text-text',
+                ].join(' ')}>{f.name}</span>
+                <span className="text-muted text-xs flex-shrink-0">
+                  {(f.size / 1024).toFixed(0)} Ko
+                </span>
+                <button
+                  onClick={e => { e.stopPropagation(); removeFile(f.name) }}
+                  className="text-subtle hover:text-danger transition-colors flex-shrink-0"
+                  aria-label={`Retirer ${f.name}`}
+                >
+                  <X size={13} />
+                </button>
+              </li>
+            )
+          })}
         </ul>
       )}
 
