@@ -18,6 +18,24 @@ export abstract class GenericLoader<T, R = unknown> {
   }
 
   /**
+   * Compte les lignes de données en scannant les bytes bruts (0x0A).
+   * Très rapide — pas de parsing. Limitation : les champs contenant un \n
+   * entre guillemets (ex : cellules Excel multi-lignes) seront surcomptés.
+   */
+  async countRows(file: File): Promise<number> {
+    const reader = file.stream().getReader()
+    let newlines = 0
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      for (const byte of value) {
+        if (byte === 0x0A) newlines++
+      }
+    }
+    return Math.max(0, newlines - 1)
+  }
+
+  /**
    * Traitement en streaming : émet chaque ligne au fur et à mesure sans
    * stocker l'ensemble des lignes en mémoire.
    * Implémentation par défaut = fallback batch — les sous-classes surchargent
