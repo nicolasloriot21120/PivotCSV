@@ -6,27 +6,34 @@ export type PivotValueConfig = {
   label?:      string
 }
 
+export type FilterCategorical = {
+  field:  string
+  type:   'categorical'
+  values: string[]  // valeurs sélectionnées (ligne incluse si présente dans cette liste)
+}
+
+export type FilterRange = {
+  field: string
+  type:  'range'
+  min?:  number
+  max?:  number
+}
+
+export type PivotFilter = FilterCategorical | FilterRange
+
 export type PivotConfig = {
   rows:    string[]
   columns: string[]
   values:  PivotValueConfig[]
+  filters: PivotFilter[]
 }
 
 export type PivotData = {
   config:     PivotConfig
-  /** Combinaisons uniques de valeurs pour les champs "lignes", triées. */
   rowKeys:    string[][]
-  /** Combinaisons uniques de valeurs pour les champs "colonnes", triées. */
   colKeys:    string[][]
-  /**
-   * Cellule individuelle.
-   * Clé = JSON.stringify([rowKeyStr, colKeyStr])
-   * Valeur = tableau de nombres (un par PivotValueConfig), null si absent.
-   */
   cells:      Record<string, (number | null)[]>
-  /** Total par ligne — clé = rowKeyStr */
   rowTotals:  Record<string, (number | null)[]>
-  /** Total par colonne — clé = colKeyStr */
   colTotals:  Record<string, (number | null)[]>
   grandTotal: (number | null)[]
 }

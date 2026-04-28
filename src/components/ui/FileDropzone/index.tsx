@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
-import { Upload, File, X, AlertCircle } from 'lucide-react'
+import { Upload, File, X, AlertCircle, Plus } from 'lucide-react'
 
 export type FileDropzoneProps = {
   accept?:        string
@@ -8,6 +8,7 @@ export type FileDropzoneProps = {
   maxSizeMb?:     number
   onFiles:        (files: File[]) => void
   onFileSelect?:  (file: File) => void
+  onAddPivot?:    (file: File) => void
   selectedFile?:  File
   label?:         string
   hint?:          string
@@ -21,6 +22,7 @@ export function FileDropzone({
   maxSizeMb     = 10,
   onFiles,
   onFileSelect,
+  onAddPivot,
   selectedFile,
   label         = 'Déposez votre fichier ici',
   hint,
@@ -168,6 +170,16 @@ export function FileDropzone({
                 <span className="text-muted text-xs flex-shrink-0">
                   {(f.size / 1024).toFixed(0)} Ko
                 </span>
+                {onAddPivot && (
+                  <button
+                    onClick={e => { e.stopPropagation(); onAddPivot(f) }}
+                    className="text-subtle hover:text-accent transition-colors flex-shrink-0"
+                    aria-label={`Nouveau pivot pour ${f.name}`}
+                    title="Ajouter un pivot"
+                  >
+                    <Plus size={13} />
+                  </button>
+                )}
                 <button
                   onClick={e => { e.stopPropagation(); removeFile(f.name) }}
                   className="text-subtle hover:text-danger transition-colors flex-shrink-0"

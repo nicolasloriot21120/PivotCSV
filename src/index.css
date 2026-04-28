@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Couleurs ── */
+  /* ── Couleurs (thème par défaut : Nova Dark) ── */
   --color-base:          #08080F;
   --color-surface:       #0F0F1A;
   --color-elevated:      #16162A;
@@ -34,6 +34,110 @@
 
   /* ── Typo ── */
   --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Thème : Nova Light ── */
+[data-theme="light"] {
+  --color-base:          #F8F9FC;
+  --color-surface:       #FFFFFF;
+  --color-elevated:      #F1F3F9;
+  --color-border:        #00000012;
+  --color-border-strong: #00000022;
+
+  --color-accent:    #4F46E5;
+  --color-accent-hi: #6366F1;
+  --color-accent-lo: #3730A3;
+  --color-violet:    #7C3AED;
+
+  --color-text:   #0F172A;
+  --color-muted:  #64748B;
+  --color-subtle: #CBD5E1;
+
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger:  #DC2626;
+
+  --shadow-glow:     0 0 24px #4F46E520;
+  --shadow-card:     0 4px 24px #00000014, 0 1px 0 #ffffff80 inset;
+  --shadow-elevated: 0 8px 40px #00000020, 0 1px 0 #ffffff inset;
+}
+
+/* ── Thème : Ocean ── */
+[data-theme="ocean"] {
+  --color-base:          #040D18;
+  --color-surface:       #071525;
+  --color-elevated:      #0C1F35;
+  --color-border:        #ffffff10;
+  --color-border-strong: #ffffff20;
+
+  --color-accent:    #0EA5E9;
+  --color-accent-hi: #38BDF8;
+  --color-accent-lo: #0284C7;
+  --color-violet:    #6366F1;
+
+  --color-text:   #E0F2FE;
+  --color-muted:  #64748B;
+  --color-subtle: #1E3A5F;
+
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger:  #EF4444;
+
+  --shadow-glow:     0 0 24px #0EA5E940;
+  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #0EA5E910 inset;
+  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #0EA5E918 inset;
+}
+
+/* ── Thème : Ember ── */
+[data-theme="ember"] {
+  --color-base:          #0F0800;
+  --color-surface:       #1A1000;
+  --color-elevated:      #261800;
+  --color-border:        #ffffff10;
+  --color-border-strong: #ffffff20;
+
+  --color-accent:    #F97316;
+  --color-accent-hi: #FB923C;
+  --color-accent-lo: #EA580C;
+  --color-violet:    #F59E0B;
+
+  --color-text:   #FEF3E2;
+  --color-muted:  #78716C;
+  --color-subtle: #3D2B0A;
+
+  --color-success: #22C55E;
+  --color-warning: #FBBF24;
+  --color-danger:  #EF4444;
+
+  --shadow-glow:     0 0 24px #F9731640;
+  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #F9731610 inset;
+  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #F9731618 inset;
+}
+
+/* ── Thème : Forest ── */
+[data-theme="forest"] {
+  --color-base:          #030A04;
+  --color-surface:       #071209;
+  --color-elevated:      #0C1D0F;
+  --color-border:        #ffffff10;
+  --color-border-strong: #ffffff20;
+
+  --color-accent:    #22C55E;
+  --color-accent-hi: #4ADE80;
+  --color-accent-lo: #16A34A;
+  --color-violet:    #A3E635;
+
+  --color-text:   #ECFDF5;
+  --color-muted:  #6B7280;
+  --color-subtle: #14381E;
+
+  --color-success: #4ADE80;
+  --color-warning: #F59E0B;
+  --color-danger:  #EF4444;
+
+  --shadow-glow:     0 0 24px #22C55E40;
+  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #22C55E10 inset;
+  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #22C55E18 inset;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
