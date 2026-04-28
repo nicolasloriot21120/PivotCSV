@@ -1,6 +1,5 @@
 import { useState }             from 'react'
-import type { DraggableAttributes } from '@dnd-kit/core'
-import type { SyntheticListeners } from '@dnd-kit/core/dist/hooks/utilities'
+import type { DraggableAttributes, SyntheticListenerMap } from '@dnd-kit/core'
 import {
   GripVertical, ChevronDown, ChevronRight,
   Settings2, X, FileText,
@@ -16,7 +15,7 @@ type Props = {
   headers:             string[]
   preview:             RawRow[]
   dragHandleAttrs:     DraggableAttributes
-  dragHandleListeners: SyntheticListeners
+  dragHandleListeners: SyntheticListenerMap | undefined
   isDragging:          boolean
   onLabelChange:       (label: string) => void
   onToggleCollapse:    () => void

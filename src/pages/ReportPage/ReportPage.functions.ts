@@ -4,7 +4,6 @@ import {
 } from '@dnd-kit/core'
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove }           from '@dnd-kit/sortable'
-
 import { useTheme, THEMES }    from '@/context/ThemeContext'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }           from '@/lib/loader'
