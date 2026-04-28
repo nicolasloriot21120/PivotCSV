@@ -79,8 +79,22 @@ export function parseCSV(text: string): CSVParseResult {
 
 /** Lit uniquement les premiers octets du fichier pour un aperçu rapide. */
 export async function parsePreview(file: File, maxRows = 3): Promise<CSVParseResult> {
-  const slice  = file.slice(0, 20 * 1024)
-  const text   = await slice.text()
+  const CHUNK  = 20 * 1024
+  let text     = ''
+  let offset   = 0
+  const needed = maxRows + 1  // header + lignes de données
+
+  // Lit par chunks jusqu'à avoir assez de lignes complètes
+  while (offset < file.size) {
+    text   += await file.slice(offset, offset + CHUNK).text()
+    offset += CHUNK
+    if (text.split('\n').filter(l => l.trim() !== '').length >= needed) break
+  }
+
+  // Tronque après le dernier \n pour ne pas parser une ligne partielle
+  const lastNL = text.lastIndexOf('\n')
+  if (lastNL !== -1) text = text.slice(0, lastNL)
+
   const result = parseCSV(text)
   return { ...result, rows: result.rows.slice(0, maxRows) }
 }
