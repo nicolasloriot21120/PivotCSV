@@ -1,6 +1,6 @@
 import { GenericLoader }                                        from '../GenericLoader'
 import { detectDelimiter }                                       from './detect'
-import { parseCSV, parsePreview, splitLine, inferType }          from './parse'
+import { parseCSV, parsePreview, countRows, splitLine, inferType } from './parse'
 import type { CSVParseResult, Delimiter, RawRow,
               StreamResult, ValidationResult }                   from './types'
 
@@ -30,6 +30,11 @@ export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
   /** Aperçu rapide : lit seulement les premiers octets, jamais le fichier entier. */
   parsePreview(file: File, maxRows = 3): Promise<CSVParseResult> {
     return parsePreview(file, maxRows)
+  }
+
+  /** Compte les lignes en bytes bruts — pas de parsing, très rapide. */
+  countRows(file: File): Promise<number> {
+    return countRows(file)
   }
 
   /**

@@ -77,6 +77,24 @@ export function parseCSV(text: string): CSVParseResult {
   }
 }
 
+/**
+ * Compte les lignes de données en lisant les bytes bruts (pas de parsing).
+ * Très rapide — cherche uniquement le caractère 0x0A dans le stream.
+ */
+export async function countRows(file: File): Promise<number> {
+  const reader = file.stream().getReader()
+  let newlines = 0
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    for (const byte of value) {
+      if (byte === 0x0A) newlines++
+    }
+  }
+  // -1 pour l'en-tête, on ignore une éventuelle ligne vide finale
+  return Math.max(0, newlines - 1)
+}
+
 /** Lit uniquement les premiers octets du fichier pour un aperçu rapide. */
 export async function parsePreview(file: File, maxRows = 3): Promise<CSVParseResult> {
   const CHUNK  = 20 * 1024
