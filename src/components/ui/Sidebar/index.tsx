@@ -18,7 +18,7 @@ export function Sidebar({ open, onToggle, width = 288, header, footer, children 
       <button
         onClick={onToggle}
         className={[
-          'absolute top-[13px] z-20',
+          'absolute top-1/2 -translate-y-1/2 z-20',
           'w-7 h-7 rounded-full flex items-center justify-center',
           'bg-elevated border border-border text-muted',
           'hover:text-text hover:border-border-strong transition-all duration-150',
@@ -40,7 +40,7 @@ export function Sidebar({ open, onToggle, width = 288, header, footer, children 
       >
         <div className="flex flex-col h-full" style={{ width }}>
           {header && (
-            <div className="px-4 py-3 border-b border-border flex-shrink-0">
+            <div className="px-4 h-12 flex items-center border-b border-border flex-shrink-0">
               {header}
             </div>
           )}

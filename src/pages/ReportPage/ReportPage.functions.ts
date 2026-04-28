@@ -81,18 +81,15 @@ export function useReportPage() {
   }
 
   const handleAddPivot = (file: File) => {
-    setFileEntries(prev => {
-      const entry = prev.find(e => e.file.name === file.name)
-      if (!entry) return prev
+    const entry = fileEntries.find(e => e.file.name === file.name)
+    if (!entry) return
 
-      const pivotIndex = sections.filter(s => s.fileId === entry.id).length + 1
-      const section    = makeSection(entry.id, file.name, pivotIndex)
+    const pivotIndex = sections.filter(s => s.fileId === entry.id).length + 1
+    const section    = makeSection(entry.id, file.name, pivotIndex)
 
-      setSections(ss => [...ss, section])
-      if (entry.headers.length === 0) loadPreview(entry.id, file)
-
-      return prev.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e)
-    })
+    setSections(ss => [...ss, section])
+    setFileEntries(fs => fs.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e))
+    if (entry.headers.length === 0) loadPreview(entry.id, file)
   }
 
   // ── Sections ──────────────────────────────────────────────────────────────

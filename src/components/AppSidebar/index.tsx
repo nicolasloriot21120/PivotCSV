@@ -18,10 +18,10 @@ export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect,
       open={open}
       onToggle={onToggle}
       header={
-        <>
+        <div className="flex items-baseline gap-2">
           <h1 className="text-base font-bold text-text">PivotCSV</h1>
-          <p className="text-[11px] text-subtle mt-0.5">Analyse de données CSV</p>
-        </>
+          <span className="text-[11px] text-subtle">Analyse CSV</span>
+        </div>
       }
       footer={
         <div className="px-3 py-3">
@@ -31,6 +31,7 @@ export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect,
             onFiles={onFiles}
             onFileSelect={onFileSelect}
             label="Importer un CSV"
+            hideList
           />
         </div>
       }

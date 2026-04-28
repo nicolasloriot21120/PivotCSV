@@ -12,6 +12,7 @@ export type FileDropzoneProps = {
   selectedFile?:  File
   label?:         string
   hint?:          string
+  hideList?:      boolean
 }
 
 type DropState = 'idle' | 'hover' | 'error'
@@ -26,6 +27,7 @@ export function FileDropzone({
   selectedFile,
   label         = 'Déposez votre fichier ici',
   hint,
+  hideList      = false,
 }: FileDropzoneProps) {
   const inputRef              = useRef<HTMLInputElement>(null)
   const [state, setState]     = useState<DropState>('idle')
@@ -146,7 +148,7 @@ export function FileDropzone({
         </div>
       )}
 
-      {dropped.length > 0 && (
+      {!hideList && dropped.length > 0 && (
         <ul className="flex flex-col gap-1.5">
           {dropped.map(f => {
             const isSelected = selectedFile?.name === f.name
