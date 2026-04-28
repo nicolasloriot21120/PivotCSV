@@ -1,7 +1,7 @@
 import type { CellValue, CSVParseResult, Delimiter, ParseError, RawRow } from './types'
 import { detectDelimiter } from './detect'
 
-function inferType(raw: string): CellValue {
+export function inferType(raw: string): CellValue {
   if (raw === '') return null
   if (raw === 'true')  return true
   if (raw === 'false') return false
@@ -12,8 +12,7 @@ function inferType(raw: string): CellValue {
 
 const QUOTE_CHARS = new Set(['"', "'", '`'])
 
-/** Découpe une ligne en tenant compte des champs entre guillemets (", ', `). */
-function splitLine(line: string, delimiter: Delimiter): string[] {
+export function splitLine(line: string, delimiter: Delimiter): string[] {
   const result: string[] = []
   let current   = ''
   let quoteChar = ''
@@ -22,14 +21,12 @@ function splitLine(line: string, delimiter: Delimiter): string[] {
     const ch = line[i]
     if (quoteChar) {
       if (ch === quoteChar) {
-        // Quote doublée = caractère littéral (ex: "don""t" → don"t)
         if (line[i + 1] === quoteChar) { current += quoteChar; i++ }
         else quoteChar = ''
       } else {
         current += ch
       }
     } else if (QUOTE_CHARS.has(ch) && current === '') {
-      // Quote d'ouverture uniquement en début de champ
       quoteChar = ch
     } else if (ch === delimiter) {
       result.push(current.trim())
@@ -61,18 +58,12 @@ export function parseCSV(text: string): CSVParseResult {
 
   for (let i = 1; i < lines.length; i++) {
     const cells = splitLine(lines[i], delimiter)
-
     if (cells.length !== headers.length) {
       const hint = delimiter === ','
         ? ` — vérifiez que vos nombres décimaux utilisent "." ou exportez avec ";" comme délimiteur`
         : ''
-      errors.push({
-        row:      i + 1,
-        message:  `${cells.length} colonnes trouvées, ${headers.length} attendues${hint}`,
-        severity: 'warning',
-      })
+      errors.push({ row: i + 1, message: `${cells.length} colonnes trouvées, ${headers.length} attendues${hint}`, severity: 'warning' })
     }
-
     const row: RawRow = {}
     headers.forEach((h, j) => { row[h] = inferType(cells[j] ?? '') })
     rows.push(row)
@@ -84,4 +75,12 @@ export function parseCSV(text: string): CSVParseResult {
     meta: { delimiter, hasHeader: true, rowCount: rows.length, columnCount: headers.length },
     errors,
   }
+}
+
+/** Lit uniquement les premiers octets du fichier pour un aperçu rapide. */
+export async function parsePreview(file: File, maxRows = 3): Promise<CSVParseResult> {
+  const slice  = file.slice(0, 20 * 1024)
+  const text   = await slice.text()
+  const result = parseCSV(text)
+  return { ...result, rows: result.rows.slice(0, maxRows) }
 }

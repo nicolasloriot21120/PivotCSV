@@ -19,8 +19,9 @@ export default function App() {
     setFiles(newFiles)
     setExpanded(false)
     if (newFiles.length === 0) { setResult(null); return }
-    const res = await loader.load(newFiles[0])
-    setResult(res)
+    // parsePreview lit seulement les premiers octets — safe sur gros fichiers
+    const preview = await loader.parsePreview(newFiles[0])
+    setResult({ ok: preview.errors.filter(e => e.severity === 'error').length === 0, data: preview.rows, errors: preview.errors })
   }
 
   return (
