@@ -15,6 +15,7 @@ import { LayoutGrid } from 'lucide-react'
 import { AppSidebar }           from '@/components/AppSidebar'
 import { PivotSection }         from '@/components/PivotSection'
 import { ThemePicker }          from '@/components/ui/ThemePicker'
+import { useTheme, THEMES }     from '@/context/ThemeContext'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }            from '@/lib/loader'
@@ -88,6 +89,7 @@ function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, 
 // ── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const { theme, setTheme } = useTheme()
   const [sidebarOpen,  setSidebarOpen]  = useState(true)
   const [fileEntries,  setFileEntries]  = useState<FileEntry[]>([])
   const [sections,     setSections]     = useState<Section[]>([])
@@ -266,7 +268,7 @@ export default function App() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <ThemePicker />
+            <ThemePicker themes={THEMES} value={theme} onChange={setTheme} />
             <img
               src="/finex-icon-dark.svg"
               alt="Finex"
