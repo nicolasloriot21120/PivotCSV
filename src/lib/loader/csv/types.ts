@@ -21,6 +21,11 @@ export type LoadResult<T> = {
   errors: ParseError[]
 }
 
+export type StreamResult = {
+  rowCount: number
+  errors:   ParseError[]
+}
+
 // ── CSV-specific ─────────────────────────────────────────────────────────────
 
 export type Delimiter = ',' | ';' | '\t' | '|'

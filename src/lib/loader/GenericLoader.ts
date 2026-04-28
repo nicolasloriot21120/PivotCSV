@@ -1,4 +1,4 @@
-import type { ValidationResult, LoadResult } from './csv/types'
+import type { ValidationResult, LoadResult, StreamResult } from './csv/types'
 
 /**
  * Contrat générique pour tout chargeur de fichier.
@@ -6,22 +6,35 @@ import type { ValidationResult, LoadResult } from './csv/types'
  * T = type de sortie métier
  */
 export abstract class GenericLoader<T, R = unknown> {
-  /** Lit le fichier et retourne sa forme brute. */
   abstract parse(file: File): Promise<R>
-
-  /** Vérifie la cohérence métier du résultat brut. */
   abstract validate(raw: R): ValidationResult<T>
-
-  /** Convertit le résultat brut en objets typés. */
   abstract transform(raw: R): T[]
-
-  /** Retourne un exemple de fichier valide (contenu texte). */
   abstract getTemplate(): string
 
-  /** Orchestre parse → validate → transform. Point d'entrée principal. */
   async load(file: File): Promise<LoadResult<T>> {
     const raw                    = await this.parse(file)
     const { valid, data, errors } = this.validate(raw)
     return { ok: valid, data, errors }
+  }
+
+  /**
+   * Traitement en streaming : émet chaque ligne au fur et à mesure sans
+   * stocker l'ensemble des lignes en mémoire.
+   * Implémentation par défaut = fallback batch — les sous-classes surchargent
+   * pour un vrai streaming ligne à ligne.
+   */
+  async stream(
+    file: File,
+    onRow: (row: T) => void,
+    onProgress?: (percent: number) => void,
+  ): Promise<StreamResult> {
+    const result = await this.load(file)
+    result.data.forEach((row, i) => {
+      onRow(row)
+      if (onProgress && i % 1000 === 0)
+        onProgress(Math.round((i / result.data.length) * 100))
+    })
+    onProgress?.(100)
+    return { rowCount: result.data.length, errors: result.errors }
   }
 }

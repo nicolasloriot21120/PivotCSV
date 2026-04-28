@@ -7,20 +7,28 @@ import { FileDropzone } from '@/components/ui/FileDropzone'
 import { CSVLoader }    from '@/lib/loader'
 import type { RawRow, LoadResult } from '@/lib/loader'
 
-const PREVIEW_ROWS = 3
 const loader = new CSVLoader()
 
 export default function App() {
-  const [_files,   setFiles]   = useState<File[]>([])
-  const [result,   setResult]  = useState<LoadResult<RawRow> | null>(null)
-  const [expanded, setExpanded] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | undefined>()
+  const [result,       setResult]       = useState<LoadResult<RawRow> | null>(null)
+  const [rowCount,     setRowCount]     = useState<number | null>(null)
+  const [expanded,     setExpanded]     = useState(false)
 
   async function handleFiles(newFiles: File[]) {
-    setFiles(newFiles)
+    if (newFiles.length === 0) { setSelectedFile(undefined); setResult(null); setRowCount(null) }
+  }
+
+  async function handleFileSelect(file: File) {
+    setSelectedFile(file)
     setExpanded(false)
-    if (newFiles.length === 0) { setResult(null); return }
-    const res = await loader.load(newFiles[0])
-    setResult(res)
+    setRowCount(null)
+    const [preview, count] = await Promise.all([
+      loader.parsePreview(file),
+      loader.countRows(file),
+    ])
+    setResult({ ok: preview.errors.filter(e => e.severity === 'error').length === 0, data: preview.rows, errors: preview.errors })
+    setRowCount(count)
   }
 
   return (
@@ -79,7 +87,13 @@ export default function App() {
       <section className="flex flex-col gap-4">
         <h2 className="text-xs uppercase tracking-widest text-muted font-semibold">FileDropzone</h2>
         <div className="max-w-lg flex flex-col gap-4">
-          <FileDropzone accept=".csv" multiple onFiles={handleFiles} />
+          <FileDropzone
+            accept=".csv"
+            multiple
+            onFiles={handleFiles}
+            onFileSelect={handleFileSelect}
+            selectedFile={selectedFile}
+          />
 
           {result && (
             <Card elevated padding="none">
@@ -90,7 +104,7 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <ChevronsUpDown size={14} className="text-muted flex-shrink-0" />
                   <span className="text-sm text-text font-semibold">
-                    {result.data.length.toLocaleString('fr-FR')} lignes
+                    {rowCount === null ? '…' : rowCount.toLocaleString('fr-FR')} lignes
                     — {Object.keys(result.data[0] ?? {}).length} colonnes
                   </span>
                 </div>
@@ -121,7 +135,7 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody>
-                        {result.data.slice(0, PREVIEW_ROWS).map((row, i) => (
+                        {result.data.map((row, i) => (
                           <tr key={i} className="border-b border-border/50 last:border-0">
                             {Object.values(row).map((v, j) => (
                               <td key={j} className="px-3 py-1.5 text-text/80 whitespace-nowrap">{String(v ?? '')}</td>
