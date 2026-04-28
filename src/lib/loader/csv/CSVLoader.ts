@@ -1,6 +1,6 @@
 import { GenericLoader }                                        from '../GenericLoader'
 import { detectDelimiter }                                       from './detect'
-import { parseCSV, parsePreview, countRows, splitLine, inferType } from './parse'
+import { parseCSV, parsePreview, splitLine, inferType } from './parse'
 import type { CSVParseResult, Delimiter, RawRow,
               StreamResult, ValidationResult }                   from './types'
 
@@ -32,13 +32,11 @@ export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
     return parsePreview(file, maxRows)
   }
 
-  /** Compte les lignes en bytes bruts — pas de parsing, très rapide. */
-  countRows(file: File): Promise<number> {
-    return countRows(file)
-  }
-
   /**
    * Streaming réel : lecture par chunks via ReadableStream.
+   * Limitation : les champs multi-lignes entre guillemets (ex : cellules Excel
+   * avec saut de ligne) ne sont pas supportés — le \n interne est traité comme
+   * séparateur de ligne.
    * Les lignes sont parsées et émises une à une — aucun RawRow[] n'est stocké.
    */
   override async stream(
