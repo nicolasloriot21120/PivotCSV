@@ -12,7 +12,7 @@ import {
 import { CSS }                    from '@dnd-kit/utilities'
 import { ChevronRight, LayoutGrid } from 'lucide-react'
 
-import { Sidebar }              from '@/components/Sidebar'
+import { Sidebar }              from '@/components/ui/Sidebar'
 import { PivotSection }         from '@/components/PivotSection'
 import { ThemePicker }          from '@/components/ui/ThemePicker'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
