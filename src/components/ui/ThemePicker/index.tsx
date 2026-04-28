@@ -1,19 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { Palette, Check }              from 'lucide-react'
 
-export type ThemeOption = {
-  id:       string
+export type ThemeOption<T extends string = string> = {
+  id:       T
   label:    string
   swatches: [string, string, string]
 }
 
-export type ThemePickerProps = {
-  themes:   ThemeOption[]
-  value:    string
-  onChange: (id: string) => void
+export type ThemePickerProps<T extends string = string> = {
+  themes:   ThemeOption<T>[]
+  value:    T
+  onChange: (id: T) => void
 }
 
-export function ThemePicker({ themes, value, onChange }: ThemePickerProps) {
+export function ThemePicker<T extends string>({ themes, value, onChange }: ThemePickerProps<T>) {
   const [open, setOpen] = useState(false)
   const ref             = useRef<HTMLDivElement>(null)
 
