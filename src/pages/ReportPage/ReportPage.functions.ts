@@ -34,17 +34,31 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
 export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
 
-  const restored                            = useRef(loadState())
-  const [sidebarOpen,  setSidebarOpen]      = useState(restored.current?.sidebarOpen ?? true)
-  const [fileEntries,  setFileEntries]      = useState<FileEntry[]>(restored.current?.fileEntries ?? [])
-  const [sections,     setSections]         = useState<Section[]>(restored.current?.sections ?? [])
+  const [sidebarOpen,  setSidebarOpen]      = useState(true)
+  const [fileEntries,  setFileEntries]      = useState<FileEntry[]>([])
+  const [sections,     setSections]         = useState<Section[]>([])
   const [draggingId,   setDraggingId]       = useState<string | null>(null)
 
   const workerRef    = useRef<Worker | null>(null)
   const computingRef = useRef<{ sectionId: string } | null>(null)
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const restoredRef  = useRef(false)
 
+  // Restauration initiale (async — IndexedDB)
   useEffect(() => {
+    loadState().then(state => {
+      if (state) {
+        setSidebarOpen(state.sidebarOpen)
+        setFileEntries(state.fileEntries)
+        setSections(state.sections)
+      }
+      restoredRef.current = true
+    })
+  }, [])
+
+  // Sauvegarde debounced — uniquement après la restauration initiale
+  useEffect(() => {
+    if (!restoredRef.current) return
     if (saveTimer.current) clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => saveState(fileEntries, sections, sidebarOpen), 500)
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
