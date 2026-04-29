@@ -1,4 +1,4 @@
-import { useRef, useState }   from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -7,6 +7,7 @@ import { arrayMove }           from '@dnd-kit/sortable'
 import { useTheme, THEMES }    from '@/context/ThemeContext'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }           from '@/lib/loader'
+import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
 import type { WorkerResponse } from '@/lib/pivot/worker'
 import type { FileEntry, Section } from '@/types/app'
@@ -32,13 +33,22 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
 
 export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
-  const [sidebarOpen,  setSidebarOpen]      = useState(true)
-  const [fileEntries,  setFileEntries]      = useState<FileEntry[]>([])
-  const [sections,     setSections]         = useState<Section[]>([])
+
+  const restored                            = useRef(loadState())
+  const [sidebarOpen,  setSidebarOpen]      = useState(restored.current?.sidebarOpen ?? true)
+  const [fileEntries,  setFileEntries]      = useState<FileEntry[]>(restored.current?.fileEntries ?? [])
+  const [sections,     setSections]         = useState<Section[]>(restored.current?.sections ?? [])
   const [draggingId,   setDraggingId]       = useState<string | null>(null)
 
   const workerRef    = useRef<Worker | null>(null)
   const computingRef = useRef<{ sectionId: string } | null>(null)
+  const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => saveState(fileEntries, sections, sidebarOpen), 500)
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
+  }, [fileEntries, sections, sidebarOpen])
 
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: { distance: 8 },
