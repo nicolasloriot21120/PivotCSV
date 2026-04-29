@@ -1,18 +1,19 @@
-import { FileText, Plus }  from 'lucide-react'
-import { Sidebar }         from '@/components/ui/Sidebar'
-import { FileDropzone }    from '@/components/ui/FileDropzone'
-import type { FileEntry }  from '@/types/app'
+import { FileText, Plus, X } from 'lucide-react'
+import { Sidebar }           from '@/components/ui/Sidebar'
+import { FileDropzone }      from '@/components/ui/FileDropzone'
+import type { FileEntry }    from '@/types/app'
 
 type Props = {
-  open:         boolean
-  onToggle:     () => void
-  fileEntries:  FileEntry[]
-  onFiles:      (files: File[]) => void
-  onFileSelect: (file: File) => void
-  onAddPivot:   (file: File) => void
+  open:           boolean
+  onToggle:       () => void
+  fileEntries:    FileEntry[]
+  onFiles:        (files: File[]) => void
+  onFileSelect:   (file: File) => void
+  onAddPivot:     (file: File) => void
+  onRemoveFile:   (file: File) => void
 }
 
-export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot }: Props) {
+export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile }: Props) {
   return (
     <Sidebar
       open={open}
@@ -58,17 +59,22 @@ export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect,
                 {entry.pivotCount > 0 && ` · ${entry.pivotCount} pivot${entry.pivotCount > 1 ? 's' : ''}`}
               </span>
             </div>
-            <button
-              onClick={e => { e.stopPropagation(); onAddPivot(entry.file) }}
-              className={[
-                'flex-shrink-0 w-5 h-5 rounded flex items-center justify-center',
-                'text-subtle hover:text-accent hover:bg-accent/10 transition-all duration-150',
-                'opacity-0 group-hover:opacity-100',
-              ].join(' ')}
-              title="Nouveau pivot"
-            >
-              <Plus size={12} />
-            </button>
+            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100">
+              <button
+                onClick={e => { e.stopPropagation(); onAddPivot(entry.file) }}
+                className="w-5 h-5 rounded flex items-center justify-center text-subtle hover:text-accent hover:bg-accent/10 transition-all duration-150"
+                title="Nouveau pivot"
+              >
+                <Plus size={12} />
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); onRemoveFile(entry.file) }}
+                className="w-5 h-5 rounded flex items-center justify-center text-subtle hover:text-danger hover:bg-danger/10 transition-all duration-150"
+                title="Retirer le fichier"
+              >
+                <X size={12} />
+              </button>
+            </div>
           </div>
         ))}
       </div>

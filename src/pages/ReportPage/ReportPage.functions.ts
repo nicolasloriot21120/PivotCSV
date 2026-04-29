@@ -80,6 +80,13 @@ export function useReportPage() {
     })
   }
 
+  const handleRemoveFile = (file: File) => {
+    const entry = fileEntries.find(e => e.file.name === file.name)
+    if (!entry) return
+    setSections(ss => ss.filter(s => s.fileId !== entry.id))
+    setFileEntries(fs => fs.filter(e => e.id !== entry.id))
+  }
+
   const handleAddPivot = (file: File) => {
     const entry = fileEntries.find(e => e.file.name === file.name)
     if (!entry) return
@@ -133,7 +140,7 @@ export function useReportPage() {
       } else if (msg.type === 'result') {
         updateSection(ctx.sectionId, {
           status: 'done', result: msg.data, errors: msg.errors,
-          progress: 100, configuratorOpen: false,
+          progress: 100,
         })
         computingRef.current = null
         worker.terminate()
@@ -184,7 +191,7 @@ export function useReportPage() {
     // sensors
     sensors,
     // handlers — fichiers
-    handleFiles, handleFileSelect, handleAddPivot,
+    handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     // handlers — sections
     updateSection, deleteSection, computeSection, cancelSection,
     // handlers — dnd

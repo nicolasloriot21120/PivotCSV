@@ -1,11 +1,11 @@
-import { useState }             from 'react'
+import { useState, useEffect }  from 'react'
 import { useSortable }           from '@dnd-kit/sortable'
 import type { DraggableAttributes } from '@dnd-kit/core'
 
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
 import {
   GripVertical, ChevronDown, ChevronRight,
-  Settings2, X, FileText,
+  X, FileText,
 } from 'lucide-react'
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import type { Section }         from '@/types/app'
@@ -22,7 +22,6 @@ type Props = {
   isDragging:          boolean
   onLabelChange:       (label: string) => void
   onToggleCollapse:    () => void
-  onToggleConfigurator:() => void
   onConfigChange:      (state: ConfiguratorState) => void
   onCompute:           (config: PivotConfig) => void
   onCancel:            () => void
@@ -32,10 +31,17 @@ type Props = {
 export function PivotSection({
   section, headers, preview,
   dragHandleAttrs, dragHandleListeners, isDragging,
-  onLabelChange, onToggleCollapse, onToggleConfigurator,
+  onLabelChange, onToggleCollapse,
   onConfigChange, onCompute, onCancel, onDelete,
 }: Props) {
   const [editingLabel, setEditingLabel] = useState(false)
+  const [activeTab,    setActiveTab]    = useState<'config' | 'result'>('config')
+
+  useEffect(() => {
+    if (section.status === 'done') setActiveTab('result')
+  }, [section.status])
+
+  const hasResult = section.result !== null
 
   return (
     <div
@@ -45,10 +51,9 @@ export function PivotSection({
         isDragging ? 'shadow-[var(--shadow-elevated)] opacity-80' : 'shadow-[var(--shadow-card)]',
       ].join(' ')}
     >
-      {/* Header de section */}
+      {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
 
-        {/* Poignée de drag */}
         <button
           {...dragHandleAttrs}
           {...dragHandleListeners}
@@ -57,10 +62,8 @@ export function PivotSection({
           <GripVertical size={15} />
         </button>
 
-        {/* Icône fichier source */}
         <FileText size={13} className="text-accent/60 flex-shrink-0" />
 
-        {/* Titre éditable */}
         {editingLabel ? (
           <input
             autoFocus
@@ -87,43 +90,17 @@ export function PivotSection({
           {section.fileName}
         </span>
 
-        {/* Statut */}
-        {section.status === 'done' && (
-          <span className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0" />
-        )}
-        {section.status === 'computing' && (
-          <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse flex-shrink-0" />
-        )}
-        {section.status === 'error' && (
-          <span className="w-1.5 h-1.5 rounded-full bg-danger flex-shrink-0" />
-        )}
+        {section.status === 'done'      && <span className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0" />}
+        {section.status === 'computing' && <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse flex-shrink-0" />}
+        {section.status === 'error'     && <span className="w-1.5 h-1.5 rounded-full bg-danger flex-shrink-0" />}
 
-        {/* Contrôles */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button
-            onClick={onToggleConfigurator}
-            title="Configurateur"
-            className={[
-              'flex items-center gap-1 px-2 py-1 rounded-[var(--radius-sm)]',
-              'text-[11px] font-medium transition-all duration-150',
-              section.configuratorOpen
-                ? 'bg-accent/10 text-accent-hi'
-                : 'text-subtle hover:text-text hover:bg-elevated',
-            ].join(' ')}
-          >
-            <Settings2 size={12} />
-            <span className="hidden sm:inline">Config</span>
-          </button>
-
           <button
             onClick={onToggleCollapse}
             className="p-1 rounded text-subtle hover:text-text hover:bg-elevated transition-all duration-150"
             title={section.collapsed ? 'Déplier' : 'Replier'}
           >
-            {section.collapsed
-              ? <ChevronRight size={14} />
-              : <ChevronDown size={14} />
-            }
+            {section.collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
           </button>
 
           <button
@@ -136,13 +113,33 @@ export function PivotSection({
         </div>
       </div>
 
-      {/* Corps — masqué si replié */}
+      {/* Corps */}
       {!section.collapsed && (
         <div className="flex flex-col">
 
-          {/* Configurateur */}
-          {section.configuratorOpen && (
-            <div className="px-5 py-4 border-b border-border bg-elevated/30">
+          {/* Onglets */}
+          <div className="flex border-b border-border px-4">
+            {(['config', 'result'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => { if (tab === 'config' || hasResult) setActiveTab(tab) }}
+                className={[
+                  'px-3 py-2 text-[11px] font-medium border-b-2 -mb-px transition-all duration-150',
+                  activeTab === tab
+                    ? 'border-accent text-accent-hi'
+                    : tab === 'result' && !hasResult
+                      ? 'border-transparent text-subtle cursor-default'
+                      : 'border-transparent text-muted hover:text-text',
+                ].join(' ')}
+              >
+                {tab === 'config' ? 'Configuration' : 'Résultats'}
+              </button>
+            ))}
+          </div>
+
+          {/* Contenu */}
+          {activeTab === 'config' && (
+            <div className="px-5 py-4">
               <PivotConfigurator
                 value={section.configuratorState}
                 onChange={onConfigChange}
@@ -156,24 +153,17 @@ export function PivotSection({
             </div>
           )}
 
-          {/* Résultats */}
-          <div className="px-5 py-4">
-            {section.result ? (
-              <p className="text-xs text-muted">
-                Tableau : {section.result.rowKeys.length} ligne(s) × {section.result.colKeys.length} colonne(s)
-                {/* Le composant PivotTable sera câblé ici */}
-              </p>
-            ) : (
-              <p className="text-xs text-subtle italic">
-                {section.status === 'idle'
-                  ? 'Configurez le pivot puis cliquez sur Calculer.'
-                  : section.status === 'error'
-                    ? 'Une erreur est survenue lors du calcul.'
-                    : null
-                }
-              </p>
-            )}
-          </div>
+          {activeTab === 'result' && (
+            <div className="px-5 py-4">
+              {section.result ? (
+                <p className="text-xs text-muted">
+                  Tableau : {section.result.rowKeys.length} ligne(s) × {section.result.colKeys.length} colonne(s)
+                </p>
+              ) : (
+                <p className="text-xs text-subtle italic">Aucun résultat pour le moment.</p>
+              )}
+            </div>
+          )}
 
         </div>
       )}

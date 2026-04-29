@@ -12,10 +12,10 @@ import { LayoutGrid }    from 'lucide-react'
 import { AppSidebar }    from '@/components/AppSidebar'
 import { PivotSection }  from '@/components/PivotSection'
 import { ThemePicker }   from '@/components/ui/ThemePicker'
-import type { RawRow }   from '@/lib/loader'
-import type { PivotConfig } from '@/lib/pivot/types'
-import type { Section }  from '@/types/app'
-import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
+import type { RawRow }             from '@/lib/loader'
+import type { PivotConfig }        from '@/lib/pivot/types'
+import type { Section }            from '@/types/app'
+import type { ConfiguratorState }  from '@/components/PivotConfigurator/types'
 
 import { useReportPage } from './ReportPage.functions'
 
@@ -43,9 +43,8 @@ function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, 
         dragHandleAttrs={attributes}
         dragHandleListeners={listeners}
         isDragging={isDragging}
-        onLabelChange={label     => onUpdate({ label })}
-        onToggleCollapse={()     => onUpdate({ collapsed: !section.collapsed })}
-        onToggleConfigurator={() => onUpdate({ configuratorOpen: !section.configuratorOpen })}
+        onLabelChange={label => onUpdate({ label })}
+        onToggleCollapse={() => onUpdate({ collapsed: !section.collapsed })}
         onConfigChange={(s: ConfiguratorState) => onUpdate({ configuratorState: s })}
         onCompute={onCompute}
         onCancel={onCancel}
@@ -63,7 +62,7 @@ export function ReportPage() {
     sidebarOpen, setSidebarOpen,
     fileEntries, sections, draggingSection,
     sensors,
-    handleFiles, handleFileSelect, handleAddPivot,
+    handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     updateSection, deleteSection, computeSection, cancelSection,
     onDragStart, onDragEnd,
   } = useReportPage()
@@ -78,6 +77,7 @@ export function ReportPage() {
         onFiles={handleFiles}
         onFileSelect={handleFileSelect}
         onAddPivot={handleAddPivot}
+        onRemoveFile={handleRemoveFile}
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
