@@ -1,11 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
 import { Palette, Check }              from 'lucide-react'
-import { useTheme, THEMES }            from '@/context/ThemeContext'
 
-export function ThemePicker() {
-  const { theme, setTheme } = useTheme()
-  const [open, setOpen]     = useState(false)
-  const ref                 = useRef<HTMLDivElement>(null)
+export type ThemeOption<T extends string = string> = {
+  id:       T
+  label:    string
+  swatches: [string, string, string]
+}
+
+export type ThemePickerProps<T extends string = string> = {
+  themes:   ThemeOption<T>[]
+  value:    T
+  onChange: (id: T) => void
+}
+
+export function ThemePicker<T extends string>({ themes, value, onChange }: ThemePickerProps<T>) {
+  const [open, setOpen] = useState(false)
+  const ref             = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -14,6 +24,8 @@ export function ThemePicker() {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  const current = themes.find(t => t.id === value)
 
   return (
     <div ref={ref} className="relative">
@@ -28,7 +40,7 @@ export function ThemePicker() {
         ].join(' ')}
       >
         <Palette size={13} />
-        <span>{THEMES.find(t => t.id === theme)?.label}</span>
+        <span>{current?.label ?? '—'}</span>
       </button>
 
       {open && (
@@ -38,14 +50,14 @@ export function ThemePicker() {
           'bg-surface shadow-[var(--shadow-elevated)]',
           'p-1.5 flex flex-col gap-0.5',
         ].join(' ')}>
-          {THEMES.map(t => (
+          {themes.map(t => (
             <button
               key={t.id}
-              onClick={() => { setTheme(t.id); setOpen(false) }}
+              onClick={() => { onChange(t.id); setOpen(false) }}
               className={[
                 'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)]',
                 'text-xs font-medium transition-all duration-150 text-left w-full',
-                theme === t.id
+                value === t.id
                   ? 'bg-accent/10 text-accent-hi'
                   : 'text-muted hover:bg-elevated hover:text-text',
               ].join(' ')}
@@ -60,7 +72,7 @@ export function ThemePicker() {
                 ))}
               </div>
               <span className="flex-1">{t.label}</span>
-              {theme === t.id && <Check size={12} className="text-accent flex-shrink-0" />}
+              {value === t.id && <Check size={12} className="text-accent flex-shrink-0" />}
             </button>
           ))}
         </div>
