@@ -5,7 +5,7 @@ import { ThemePicker }        from '@/components/ui/ThemePicker'
 import type { ThemeOption }   from '@/components/ui/ThemePicker'
 import type { FileEntry }     from '@/types/app'
 
-type Props = {
+type Props<T extends string = string> = {
   open:           boolean
   onToggle:       () => void
   fileEntries:    FileEntry[]
@@ -13,12 +13,12 @@ type Props = {
   onFileSelect:   (file: File) => void
   onAddPivot:     (file: File) => void
   onRemoveFile:   (file: File) => void
-  themes:         ThemeOption[]
-  theme:          string
-  onThemeChange:  (id: string) => void
+  themes:         ThemeOption<T>[]
+  theme:          T
+  onThemeChange:  (id: T) => void
 }
 
-export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile, themes, theme, onThemeChange }: Props) {
+export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile, themes, theme, onThemeChange }: Props<T>) {
   return (
     <Sidebar
       open={open}
