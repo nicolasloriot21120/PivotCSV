@@ -22,6 +22,7 @@ export type Section = {
   configuratorState: ConfiguratorState
   result:            PivotData | null
   errors:            ParseError[]
+  errorMessage:      string | null
   status:            'idle' | 'computing' | 'done' | 'error'
   progress:          number
   config:            PivotConfig | null

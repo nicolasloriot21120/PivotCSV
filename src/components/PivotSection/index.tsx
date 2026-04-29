@@ -5,7 +5,7 @@ import type { DraggableAttributes } from '@dnd-kit/core'
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
 import {
   GripVertical, ChevronDown, ChevronRight,
-  X, FileText,
+  X, FileText, AlertCircle,
 } from 'lucide-react'
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import { PivotTable }           from '@/components/ui/PivotTable'
@@ -142,7 +142,13 @@ export function PivotSection({
 
           {/* Contenu */}
           {activeTab === 'config' && (
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 flex flex-col gap-3">
+              {section.status === 'error' && section.errorMessage && (
+                <div className="flex items-start gap-2 px-3 py-2.5 rounded-[var(--radius-md)] bg-danger/10 border border-danger/30">
+                  <AlertCircle size={14} className="text-danger flex-shrink-0 mt-0.5" />
+                  <p className="text-danger text-xs">{section.errorMessage}</p>
+                </div>
+              )}
               <PivotConfigurator
                 value={section.configuratorState}
                 onChange={onConfigChange}
@@ -155,6 +161,7 @@ export function PivotSection({
               />
             </div>
           )}
+
 
           {activeTab === 'result' && (
             <div className="px-5 py-4 flex flex-col gap-3">

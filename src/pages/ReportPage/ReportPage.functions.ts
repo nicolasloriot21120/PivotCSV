@@ -25,6 +25,7 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
     configuratorState: emptyConfiguratorState(),
     result:            null,
     errors:            [],
+    errorMessage:      null,
     status:            'idle',
     progress:          0,
     config:            null,
@@ -169,7 +170,7 @@ export function useReportPage() {
         computingRef.current = null
         worker.terminate()
       } else if (msg.type === 'error') {
-        updateSection(ctx.sectionId, { status: 'error' })
+        updateSection(ctx.sectionId, { status: 'error', errorMessage: msg.message })
         computingRef.current = null
         worker.terminate()
       }
