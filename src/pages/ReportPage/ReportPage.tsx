@@ -11,7 +11,6 @@ import { LayoutGrid }    from 'lucide-react'
 
 import { AppSidebar }    from '@/components/AppSidebar'
 import { PivotSection }  from '@/components/PivotSection'
-import { ThemePicker }   from '@/components/ui/ThemePicker'
 import type { RawRow }             from '@/lib/loader'
 import type { PivotConfig }        from '@/lib/pivot/types'
 import type { Section }            from '@/types/app'
@@ -78,6 +77,9 @@ export function ReportPage() {
         onFileSelect={handleFileSelect}
         onAddPivot={handleAddPivot}
         onRemoveFile={handleRemoveFile}
+        themes={THEMES}
+        theme={theme}
+        onThemeChange={setTheme}
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -92,10 +94,7 @@ export function ReportPage() {
               }
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemePicker themes={THEMES} value={theme} onChange={setTheme} />
-            <img src="/finex-icon-dark.svg" alt="Finex" className="h-7 w-auto opacity-50 hover:opacity-80 transition-opacity" />
-          </div>
+          <img src="/finex-icon-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
         </header>
 
         <main className="flex-1 overflow-y-auto px-6 py-6">

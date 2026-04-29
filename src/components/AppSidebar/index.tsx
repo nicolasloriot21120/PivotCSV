@@ -1,7 +1,9 @@
-import { FileText, Plus, X } from 'lucide-react'
-import { Sidebar }           from '@/components/ui/Sidebar'
-import { FileDropzone }      from '@/components/ui/FileDropzone'
-import type { FileEntry }    from '@/types/app'
+import { FileText, Plus, X }  from 'lucide-react'
+import { Sidebar }            from '@/components/ui/Sidebar'
+import { FileDropzone }       from '@/components/ui/FileDropzone'
+import { ThemePicker }        from '@/components/ui/ThemePicker'
+import type { ThemeOption }   from '@/components/ui/ThemePicker'
+import type { FileEntry }     from '@/types/app'
 
 type Props = {
   open:           boolean
@@ -11,17 +13,23 @@ type Props = {
   onFileSelect:   (file: File) => void
   onAddPivot:     (file: File) => void
   onRemoveFile:   (file: File) => void
+  themes:         ThemeOption[]
+  theme:          string
+  onThemeChange:  (id: string) => void
 }
 
-export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile }: Props) {
+export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile, themes, theme, onThemeChange }: Props) {
   return (
     <Sidebar
       open={open}
       onToggle={onToggle}
       header={
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-base font-bold text-text">PivotCSV</h1>
-          <span className="text-[11px] text-subtle">Analyse CSV</span>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-base font-bold text-text">PivotCSV</h1>
+            <span className="text-[11px] text-subtle">Analyse CSV</span>
+          </div>
+          <ThemePicker themes={themes} value={theme} onChange={onThemeChange} />
         </div>
       }
       footer={
