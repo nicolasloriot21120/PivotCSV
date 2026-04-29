@@ -1,4 +1,4 @@
-import { useRef, useState }   from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -7,6 +7,7 @@ import { arrayMove }           from '@dnd-kit/sortable'
 import { useTheme, THEMES }    from '@/context/ThemeContext'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }           from '@/lib/loader'
+import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
 import type { WorkerResponse } from '@/lib/pivot/worker'
 import type { FileEntry, Section } from '@/types/app'
@@ -32,6 +33,7 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
 
 export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
+
   const [sidebarOpen,  setSidebarOpen]      = useState(true)
   const [fileEntries,  setFileEntries]      = useState<FileEntry[]>([])
   const [sections,     setSections]         = useState<Section[]>([])
@@ -39,6 +41,28 @@ export function useReportPage() {
 
   const workerRef    = useRef<Worker | null>(null)
   const computingRef = useRef<{ sectionId: string } | null>(null)
+  const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const restoredRef  = useRef(false)
+
+  // Restauration initiale (async — IndexedDB)
+  useEffect(() => {
+    loadState().then(state => {
+      if (state) {
+        setSidebarOpen(state.sidebarOpen)
+        setFileEntries(state.fileEntries)
+        setSections(state.sections)
+      }
+      restoredRef.current = true
+    })
+  }, [])
+
+  // Sauvegarde debounced — uniquement après la restauration initiale
+  useEffect(() => {
+    if (!restoredRef.current) return
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => saveState(fileEntries, sections, sidebarOpen), 500)
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
+  }, [fileEntries, sections, sidebarOpen])
 
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: { distance: 8 },
@@ -80,19 +104,23 @@ export function useReportPage() {
     })
   }
 
+  const handleRemoveFile = (file: File) => {
+    const entry = fileEntries.find(e => e.file.name === file.name)
+    if (!entry) return
+    setSections(ss => ss.filter(s => s.fileId !== entry.id))
+    setFileEntries(fs => fs.filter(e => e.id !== entry.id))
+  }
+
   const handleAddPivot = (file: File) => {
-    setFileEntries(prev => {
-      const entry = prev.find(e => e.file.name === file.name)
-      if (!entry) return prev
+    const entry = fileEntries.find(e => e.file.name === file.name)
+    if (!entry) return
 
-      const pivotIndex = sections.filter(s => s.fileId === entry.id).length + 1
-      const section    = makeSection(entry.id, file.name, pivotIndex)
+    const pivotIndex = sections.filter(s => s.fileId === entry.id).length + 1
+    const section    = makeSection(entry.id, file.name, pivotIndex)
 
-      setSections(ss => [...ss, section])
-      if (entry.headers.length === 0) loadPreview(entry.id, file)
-
-      return prev.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e)
-    })
+    setSections(ss => [...ss, section])
+    setFileEntries(fs => fs.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e))
+    if (entry.headers.length === 0) loadPreview(entry.id, file)
   }
 
   // ── Sections ──────────────────────────────────────────────────────────────
@@ -136,7 +164,7 @@ export function useReportPage() {
       } else if (msg.type === 'result') {
         updateSection(ctx.sectionId, {
           status: 'done', result: msg.data, errors: msg.errors,
-          progress: 100, configuratorOpen: false,
+          progress: 100,
         })
         computingRef.current = null
         worker.terminate()
@@ -187,7 +215,7 @@ export function useReportPage() {
     // sensors
     sensors,
     // handlers — fichiers
-    handleFiles, handleFileSelect, handleAddPivot,
+    handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     // handlers — sections
     updateSection, deleteSection, computeSection, cancelSection,
     // handlers — dnd

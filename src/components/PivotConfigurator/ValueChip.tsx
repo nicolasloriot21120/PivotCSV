@@ -4,12 +4,12 @@ import { GripVertical, X }     from 'lucide-react'
 import type { AggregationType } from '@/lib/pivot/types'
 import type { ValueField }      from './types'
 
-const AGGS: { id: AggregationType; label: string }[] = [
-  { id: 'sum',   label: 'Σ' },
-  { id: 'count', label: '#' },
-  { id: 'avg',   label: 'Ø' },
-  { id: 'min',   label: '▼' },
-  { id: 'max',   label: '▲' },
+const AGGS: { id: AggregationType; label: string; title: string }[] = [
+  { id: 'sum',   label: 'Σ', title: 'Somme'   },
+  { id: 'count', label: '#', title: 'Nombre'  },
+  { id: 'avg',   label: 'Ø', title: 'Moyenne' },
+  { id: 'min',   label: '▼', title: 'Minimum' },
+  { id: 'max',   label: '▲', title: 'Maximum' },
 ]
 
 type Props = {
@@ -57,6 +57,7 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
           <button
             key={a.id}
             onClick={() => onAggChange(a.id)}
+            title={a.title}
             className={[
               'px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all duration-100',
               field.aggregation === a.id

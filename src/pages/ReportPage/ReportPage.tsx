@@ -11,11 +11,10 @@ import { LayoutGrid }    from 'lucide-react'
 
 import { AppSidebar }    from '@/components/AppSidebar'
 import { PivotSection }  from '@/components/PivotSection'
-import { ThemePicker }   from '@/components/ui/ThemePicker'
-import type { RawRow }   from '@/lib/loader'
-import type { PivotConfig } from '@/lib/pivot/types'
-import type { Section }  from '@/types/app'
-import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
+import type { RawRow }             from '@/lib/loader'
+import type { PivotConfig }        from '@/lib/pivot/types'
+import type { Section }            from '@/types/app'
+import type { ConfiguratorState }  from '@/components/PivotConfigurator/types'
 
 import { useReportPage } from './ReportPage.functions'
 
@@ -43,9 +42,8 @@ function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, 
         dragHandleAttrs={attributes}
         dragHandleListeners={listeners}
         isDragging={isDragging}
-        onLabelChange={label     => onUpdate({ label })}
-        onToggleCollapse={()     => onUpdate({ collapsed: !section.collapsed })}
-        onToggleConfigurator={() => onUpdate({ configuratorOpen: !section.configuratorOpen })}
+        onLabelChange={label => onUpdate({ label })}
+        onToggleCollapse={() => onUpdate({ collapsed: !section.collapsed })}
         onConfigChange={(s: ConfiguratorState) => onUpdate({ configuratorState: s })}
         onCompute={onCompute}
         onCancel={onCancel}
@@ -63,7 +61,7 @@ export function ReportPage() {
     sidebarOpen, setSidebarOpen,
     fileEntries, sections, draggingSection,
     sensors,
-    handleFiles, handleFileSelect, handleAddPivot,
+    handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     updateSection, deleteSection, computeSection, cancelSection,
     onDragStart, onDragEnd,
   } = useReportPage()
@@ -78,11 +76,15 @@ export function ReportPage() {
         onFiles={handleFiles}
         onFileSelect={handleFileSelect}
         onAddPivot={handleAddPivot}
+        onRemoveFile={handleRemoveFile}
+        themes={THEMES}
+        theme={theme}
+        onThemeChange={setTheme}
       />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-surface flex-shrink-0">
+        <header className="flex items-center justify-between px-6 h-12 border-b border-border bg-surface flex-shrink-0">
           <div className="flex items-center gap-2 text-muted">
             <LayoutGrid size={14} />
             <span className="text-xs font-medium">
@@ -92,10 +94,7 @@ export function ReportPage() {
               }
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemePicker themes={THEMES} value={theme} onChange={setTheme} />
-            <img src="/finex-icon-dark.svg" alt="Finex" className="h-7 w-auto opacity-50 hover:opacity-80 transition-opacity" />
-          </div>
+          <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
         </header>
 
         <main className="flex-1 overflow-y-auto px-6 py-6">
