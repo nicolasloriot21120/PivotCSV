@@ -94,7 +94,7 @@ export function ReportPage() {
               }
             </span>
           </div>
-          <img src="/finex-icon-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
+          <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
         </header>
 
         <main className="flex-1 overflow-y-auto px-6 py-6">
