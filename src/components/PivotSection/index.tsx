@@ -18,6 +18,7 @@ type Props = {
   section:             Section
   headers:             string[]
   preview:             RawRow[]
+  distinctValues:      Record<string, string[]>
   dragHandleAttrs:     DraggableAttributes
   dragHandleListeners: SortableListeners
   isDragging:          boolean
@@ -27,13 +28,19 @@ type Props = {
   onCompute:           (config: PivotConfig) => void
   onCancel:            () => void
   onDelete:            () => void
+  onToggleRowGroup:    (pk: string) => void
+  onToggleColGroup:    (pk: string) => void
+  onSetCollapsedRows:  (pks: string[]) => void
+  onSetCollapsedCols:  (pks: string[]) => void
 }
 
 export function PivotSection({
-  section, headers, preview,
+  section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
   onLabelChange, onToggleCollapse,
   onConfigChange, onCompute, onCancel, onDelete,
+  onToggleRowGroup, onToggleColGroup,
+  onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
   const [editingLabel,   setEditingLabel]   = useState(false)
   const [activeTab,      setActiveTab]      = useState<'config' | 'result'>('config')
@@ -154,6 +161,7 @@ export function PivotSection({
                 onChange={onConfigChange}
                 headers={headers}
                 preview={preview}
+                distinctValues={distinctValues}
                 status={section.status}
                 progress={section.progress}
                 onCompute={onCompute}
@@ -197,6 +205,12 @@ export function PivotSection({
                     data={section.result}
                     showRowTotals={showRowTotals}
                     showColTotals={showColTotals}
+                    collapsedRowGroups={section.collapsedRowGroups}
+                    collapsedColGroups={section.collapsedColGroups}
+                    onToggleRowGroup={onToggleRowGroup}
+                    onToggleColGroup={onToggleColGroup}
+                    onSetCollapsedRows={onSetCollapsedRows}
+                    onSetCollapsedCols={onSetCollapsedCols}
                   />
                 </>
               ) : (

@@ -28,7 +28,9 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
     errorMessage:      null,
     status:            'idle',
     progress:          0,
-    config:            null,
+    config:             null,
+    collapsedRowGroups: [],
+    collapsedColGroups: [],
   }
 }
 
@@ -51,7 +53,25 @@ export function useReportPage() {
       if (state) {
         setSidebarOpen(state.sidebarOpen)
         setFileEntries(state.fileEntries)
-        setSections(state.sections)
+        setSections(state.sections.map(s => ({
+          ...s,
+          collapsedRowGroups: s.collapsedRowGroups ?? [],
+          collapsedColGroups: s.collapsedColGroups ?? [],
+        })))
+        // Rescanner les valeurs distinctes pour les fichiers restaurés (non persistées).
+        // Met aussi à jour les FilterField des sections associées.
+        for (const entry of state.fileEntries) {
+          loader.scanDistinctValues(entry.file).then(dv => {
+            setFileEntries(fs => fs.map(f => f.id === entry.id ? { ...f, distinctValues: dv } : f))
+            setSections(ss => ss.map(s => {
+              if (s.fileId !== entry.id) return s
+              const updatedFilters = s.configuratorState.filters.map(f =>
+                f.type === 'string' ? { ...f, distinctValues: dv[f.field] ?? f.distinctValues } : f
+              )
+              return { ...s, configuratorState: { ...s.configuratorState, filters: updatedFilters } }
+            }))
+          })
+        }
       }
       restoredRef.current = true
     })
@@ -85,6 +105,19 @@ export function useReportPage() {
       parseErrors: preview.errors,
       rowCount:    count,
     })
+    // Scan des valeurs distinctes en arrière-plan — non-bloquant.
+    // Met à jour FileEntry ET les FilterField des sections qui utilisent ce fichier,
+    // pour que les filtres ajoutés avant la fin du scan voient toutes les valeurs.
+    loader.scanDistinctValues(file).then(dv => {
+      updateFileEntry(fileId, { distinctValues: dv })
+      setSections(ss => ss.map(s => {
+        if (s.fileId !== fileId) return s
+        const updatedFilters = s.configuratorState.filters.map(f =>
+          f.type === 'string' ? { ...f, distinctValues: dv[f.field] ?? f.distinctValues } : f
+        )
+        return { ...s, configuratorState: { ...s.configuratorState, filters: updatedFilters } }
+      }))
+    })
   }
 
   const handleFiles = (newFiles: File[]) => {
@@ -93,6 +126,7 @@ export function useReportPage() {
       return newFiles.map(f => prevMap.get(f.name) ?? {
         id: crypto.randomUUID(), file: f,
         headers: [], preview: [], parseErrors: [], rowCount: null, pivotCount: 0,
+        distinctValues: {},
       })
     })
   }

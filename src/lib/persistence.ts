@@ -54,7 +54,7 @@ async function idbKeys(): Promise<string[]> {
 
 const STATE_KEY = 'pivotcsv-state'
 
-type StoredEntry = Omit<FileEntry, 'file'> & { fileName: string }
+type StoredEntry = Omit<FileEntry, 'file' | 'distinctValues'> & { fileName: string }
 type StoredState = {
   entries:     StoredEntry[]
   sections:    Omit<Section, 'result' | 'status' | 'progress'>[]
@@ -85,7 +85,7 @@ export async function saveState(
     }
 
     const state: StoredState = {
-      entries:  fileEntries.map(({ file, ...rest }) => ({ ...rest, fileName: file.name })),
+      entries:  fileEntries.map(({ file, distinctValues: _dv, ...rest }) => ({ ...rest, fileName: file.name })),
       sections: sections.map(({ result: _r, status: _s, progress: _p, ...rest }) => rest),
       sidebarOpen,
     }
@@ -110,6 +110,7 @@ export async function loadState(): Promise<{
         const buf = await idbGet(rest.id)
         return {
           ...rest,
+          distinctValues: {},  // rescané en arrière-plan après restauration
           file: new File([buf ?? new ArrayBuffer(0)], fileName, { type: 'text/csv' }),
         }
       })

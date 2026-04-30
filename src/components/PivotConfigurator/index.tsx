@@ -21,14 +21,15 @@ import type {
 import { toPivotFilters } from './types'
 
 type Props = {
-  value:      ConfiguratorState
-  onChange:   (s: ConfiguratorState) => void
-  headers:    string[]
-  preview:    RawRow[]
-  status:     'idle' | 'computing' | 'done' | 'error'
-  progress:   number
-  onCompute:  (config: PivotConfig) => void
-  onCancel:   () => void
+  value:          ConfiguratorState
+  onChange:       (s: ConfiguratorState) => void
+  headers:        string[]
+  preview:        RawRow[]
+  distinctValues: Record<string, string[]>  // toutes valeurs distinctes (scan arrière-plan)
+  status:         'idle' | 'computing' | 'done' | 'error'
+  progress:       number
+  onCompute:      (config: PivotConfig) => void
+  onCancel:       () => void
 }
 
 function inferType(rows: RawRow[], field: string): FieldType {
@@ -41,7 +42,7 @@ function inferType(rows: RawRow[], field: string): FieldType {
   return 'string'
 }
 
-function distinctValues(rows: RawRow[], field: string): string[] {
+function previewDistinctValues(rows: RawRow[], field: string): string[] {
   const seen = new Set<string>()
   for (const row of rows) seen.add(String(row[field] ?? ''))
   return [...seen].sort()
@@ -49,7 +50,7 @@ function distinctValues(rows: RawRow[], field: string): string[] {
 
 const EXCLUSIVE_ZONES: ZoneId[] = ['rows', 'columns', 'values']
 
-export function PivotConfigurator({ value, onChange, headers, preview, status, progress, onCompute, onCancel }: Props) {
+export function PivotConfigurator({ value, onChange, headers, preview, distinctValues, status, progress, onCompute, onCancel }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: { distance: 4 },
   }))
@@ -89,7 +90,7 @@ export function PivotConfigurator({ value, onChange, headers, preview, status, p
     if (zone === 'filters') {
       if ((next.filters as FilterField[]).find(f => f.field === field)) return
       const newFilter: FilterField = type === 'string'
-        ? { field, type, distinctValues: distinctValues(preview, field), selectedValues: [] }
+        ? { field, type, distinctValues: distinctValues[field] ?? previewDistinctValues(preview, field), selectedValues: [] }
         : { field, type, min: '', max: '' }
       onChange({ ...next, filters: [...next.filters, newFilter] })
       return

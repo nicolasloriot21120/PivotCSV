@@ -21,16 +21,17 @@ import { useReportPage } from './ReportPage.functions'
 // ── Sortable wrapper ──────────────────────────────────────────────────────────
 
 type SortableProps = {
-  section:   Section
-  headers:   string[]
-  preview:   RawRow[]
-  onUpdate:  (patch: Partial<Section>) => void
-  onCompute: (config: PivotConfig) => void
-  onCancel:  () => void
-  onDelete:  () => void
+  section:        Section
+  headers:        string[]
+  preview:        RawRow[]
+  distinctValues: Record<string, string[]>
+  onUpdate:       (patch: Partial<Section>) => void
+  onCompute:      (config: PivotConfig) => void
+  onCancel:       () => void
+  onDelete:       () => void
 }
 
-function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, onCancel, onDelete }: SortableProps) {
+function SortablePivotSection({ section, headers, preview, distinctValues, onUpdate, onCompute, onCancel, onDelete }: SortableProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id })
 
   return (
@@ -39,6 +40,7 @@ function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, 
         section={section}
         headers={headers}
         preview={preview}
+        distinctValues={distinctValues}
         dragHandleAttrs={attributes}
         dragHandleListeners={listeners}
         isDragging={isDragging}
@@ -48,6 +50,18 @@ function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, 
         onCompute={onCompute}
         onCancel={onCancel}
         onDelete={onDelete}
+        onToggleRowGroup={pk => onUpdate({
+          collapsedRowGroups: section.collapsedRowGroups.includes(pk)
+            ? section.collapsedRowGroups.filter(k => k !== pk)
+            : [...section.collapsedRowGroups, pk],
+        })}
+        onToggleColGroup={pk => onUpdate({
+          collapsedColGroups: section.collapsedColGroups.includes(pk)
+            ? section.collapsedColGroups.filter(k => k !== pk)
+            : [...section.collapsedColGroups, pk],
+        })}
+        onSetCollapsedRows={pks => onUpdate({ collapsedRowGroups: pks })}
+        onSetCollapsedCols={pks => onUpdate({ collapsedColGroups: pks })}
       />
     </div>
   )
@@ -119,6 +133,7 @@ export function ReportPage() {
                         section={section}
                         headers={entry?.headers ?? []}
                         preview={entry?.preview ?? []}
+                        distinctValues={entry?.distinctValues ?? {}}
                         onUpdate={patch => updateSection(section.id, patch)}
                         onCompute={config => computeSection(section.id, config)}
                         onCancel={() => cancelSection(section.id)}
