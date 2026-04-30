@@ -1,128 +1,37 @@
-import { useState } from 'react'
 import {
   DndContext, DragOverlay,
-  PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
 import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
 
-import type { RawRow }          from '@/lib/loader/csv/types'
-import type { PivotConfig }     from '@/lib/pivot/types'
-import type { AggregationType } from '@/lib/pivot/types'
+import type { RawRow }      from '@/lib/loader'
+import type { PivotConfig } from '@/lib/pivot/types'
 
 import { FieldChip }  from './FieldChip'
 import { DropZone }   from './DropZone'
 import { ValueChip }  from './ValueChip'
 import { FilterZone } from './FilterZone'
-import type {
-  ConfiguratorState, FieldType,
-  FilterField, PlacedField, ValueField, ZoneId,
-} from './types'
-import { toPivotFilters } from './types'
+import type { ConfiguratorState, ValueField } from './types'
+import { usePivotConfigurator }               from './usePivotConfigurator'
 
 type Props = {
-  value:      ConfiguratorState
-  onChange:   (s: ConfiguratorState) => void
-  headers:    string[]
-  preview:    RawRow[]
-  status:     'idle' | 'computing' | 'done' | 'error'
-  progress:   number
-  onCompute:  (config: PivotConfig) => void
-  onCancel:   () => void
+  value:          ConfiguratorState
+  onChange:       (s: ConfiguratorState) => void
+  headers:        string[]
+  preview:        RawRow[]
+  distinctValues: Record<string, string[]>
+  status:         'idle' | 'computing' | 'done' | 'error'
+  progress:       number
+  onCompute:      (config: PivotConfig) => void
+  onCancel:       () => void
 }
 
-function inferType(rows: RawRow[], field: string): FieldType {
-  for (const row of rows) {
-    const v = row[field]
-    if (v !== null && v !== undefined && v !== '') {
-      return typeof v === 'number' ? 'number' : 'string'
-    }
-  }
-  return 'string'
-}
-
-function distinctValues(rows: RawRow[], field: string): string[] {
-  const seen = new Set<string>()
-  for (const row of rows) seen.add(String(row[field] ?? ''))
-  return [...seen].sort()
-}
-
-const EXCLUSIVE_ZONES: ZoneId[] = ['rows', 'columns', 'values']
-
-export function PivotConfigurator({ value, onChange, headers, preview, status, progress, onCompute, onCancel }: Props) {
-  const sensors = useSensors(useSensor(PointerSensor, {
-    activationConstraint: { distance: 4 },
-  }))
-
-  const [dragging, setDragging] = useState<{ field: string; type: FieldType } | null>(null)
-
-  const fieldTypes: Record<string, FieldType> = {}
-  for (const h of headers) fieldTypes[h] = inferType(preview, h)
-
-  const placedInExclusive = new Set(
-    [...value.rows, ...value.columns, ...value.values].map(f => f.field)
-  )
-
-  const available = headers
-    .filter(h => !placedInExclusive.has(h))
-    .map(h => ({ field: h, type: fieldTypes[h] }))
-
-  const removeFromZone = (zone: keyof ConfiguratorState, field: string) => {
-    onChange({ ...value, [zone]: (value[zone] as PlacedField[]).filter(f => f.field !== field) })
-  }
-
-  const addToZone = (zone: ZoneId, field: string, type: FieldType) => {
-    let next = { ...value }
-
-    if (EXCLUSIVE_ZONES.includes(zone)) {
-      for (const z of EXCLUSIVE_ZONES) {
-        next = { ...next, [z]: (next[z] as PlacedField[]).filter(f => f.field !== field) }
-      }
-    }
-
-    if (zone === 'values') {
-      if ((next.values as ValueField[]).find(f => f.field === field)) return
-      onChange({ ...next, values: [...next.values, { field, type, aggregation: 'sum' as AggregationType }] })
-      return
-    }
-
-    if (zone === 'filters') {
-      if ((next.filters as FilterField[]).find(f => f.field === field)) return
-      const newFilter: FilterField = type === 'string'
-        ? { field, type, distinctValues: distinctValues(preview, field), selectedValues: [] }
-        : { field, type, min: '', max: '' }
-      onChange({ ...next, filters: [...next.filters, newFilter] })
-      return
-    }
-
-    if ((next[zone] as PlacedField[]).find(f => f.field === field)) return
-    onChange({ ...next, [zone]: [...(next[zone] as PlacedField[]), { field, type }] })
-  }
-
-  const onDragStart = (e: DragStartEvent) => {
-    const { field, type } = e.active.data.current as { field: string; type: FieldType }
-    setDragging({ field, type })
-  }
-
-  const onDragEnd = (e: DragEndEvent) => {
-    setDragging(null)
-    if (!e.over) return
-    const { field, type } = e.active.data.current as { field: string; type: FieldType }
-    addToZone(e.over.id as ZoneId, field, type)
-  }
-
-  const handleCompute = () => {
-    const config: PivotConfig = {
-      rows:    value.rows.map(f => f.field),
-      columns: value.columns.map(f => f.field),
-      values:  value.values.map(f => ({ field: f.field, aggregation: (f as ValueField).aggregation })),
-      filters: toPivotFilters(value.filters),
-    }
-    onCompute(config)
-  }
-
-  const canCompute = value.rows.length > 0 && value.values.length > 0
-  const computing  = status === 'computing'
+export function PivotConfigurator({ value, onChange, headers, preview, distinctValues, status, progress, onCompute, onCancel }: Props) {
+  const {
+    sensors, dragging, available,
+    canCompute, computing,
+    removeFromZone, addToZone,
+    onDragStart, onDragEnd, handleCompute,
+  } = usePivotConfigurator({ value, onChange, headers, preview, distinctValues, status, onCompute })
 
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>

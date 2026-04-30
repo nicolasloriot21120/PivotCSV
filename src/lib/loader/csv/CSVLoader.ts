@@ -3,6 +3,7 @@ import { detectDelimiter }                                       from './detect'
 import { parseCSV, parsePreview, splitLine, inferType } from './parse'
 import type { CSVParseResult, Delimiter, RawRow,
               StreamResult, ValidationResult }                   from './types'
+import { collectDistinctStringValues }                          from '@/lib/utils/records'
 
 export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
 
@@ -30,6 +31,13 @@ export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
   /** Aperçu rapide : lit seulement les premiers octets, jamais le fichier entier. */
   parsePreview(file: File, maxRows = 3): Promise<CSVParseResult> {
     return parsePreview(file, maxRows)
+  }
+
+  /** Lit le fichier entier et retourne toutes les valeurs distinctes par colonne string.
+   *  À appeler en arrière-plan (non-bloquant) après le chargement du fichier. */
+  async scanDistinctValues(file: File): Promise<Record<string, string[]>> {
+    const { rows } = parseCSV(await file.text())
+    return collectDistinctStringValues(rows)
   }
 
   /**

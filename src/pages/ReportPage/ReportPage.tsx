@@ -3,55 +3,14 @@ import {
   closestCenter,
 } from '@dnd-kit/core'
 import {
-  SortableContext, useSortable,
+  SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { CSS }           from '@dnd-kit/utilities'
-import { LayoutGrid }    from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 
-import { AppSidebar }    from '@/components/AppSidebar'
-import { PivotSection }  from '@/components/PivotSection'
-import type { RawRow }             from '@/lib/loader'
-import type { PivotConfig }        from '@/lib/pivot/types'
-import type { Section }            from '@/types/app'
-import type { ConfiguratorState }  from '@/components/PivotConfigurator/types'
-
-import { useReportPage } from './ReportPage.functions'
-
-// ── Sortable wrapper ──────────────────────────────────────────────────────────
-
-type SortableProps = {
-  section:   Section
-  headers:   string[]
-  preview:   RawRow[]
-  onUpdate:  (patch: Partial<Section>) => void
-  onCompute: (config: PivotConfig) => void
-  onCancel:  () => void
-  onDelete:  () => void
-}
-
-function SortablePivotSection({ section, headers, preview, onUpdate, onCompute, onCancel, onDelete }: SortableProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id })
-
-  return (
-    <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }}>
-      <PivotSection
-        section={section}
-        headers={headers}
-        preview={preview}
-        dragHandleAttrs={attributes}
-        dragHandleListeners={listeners}
-        isDragging={isDragging}
-        onLabelChange={label => onUpdate({ label })}
-        onToggleCollapse={() => onUpdate({ collapsed: !section.collapsed })}
-        onConfigChange={(s: ConfiguratorState) => onUpdate({ configuratorState: s })}
-        onCompute={onCompute}
-        onCancel={onCancel}
-        onDelete={onDelete}
-      />
-    </div>
-  )
-}
+import { AppSidebar }         from '@/components/AppSidebar'
+import { SortablePivotSection } from './components/SortablePivotSection'
+import { useReportPage }      from './useReportPage'
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -119,6 +78,7 @@ export function ReportPage() {
                         section={section}
                         headers={entry?.headers ?? []}
                         preview={entry?.preview ?? []}
+                        distinctValues={entry?.distinctValues ?? {}}
                         onUpdate={patch => updateSection(section.id, patch)}
                         onCompute={config => computeSection(section.id, config)}
                         onCancel={() => cancelSection(section.id)}

@@ -5,9 +5,10 @@ import type { DraggableAttributes } from '@dnd-kit/core'
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
 import {
   GripVertical, ChevronDown, ChevronRight,
-  X, FileText,
+  X, FileText, AlertCircle,
 } from 'lucide-react'
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
+import { PivotTable }           from '@/components/ui/PivotTable'
 import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
@@ -17,6 +18,7 @@ type Props = {
   section:             Section
   headers:             string[]
   preview:             RawRow[]
+  distinctValues:      Record<string, string[]>
   dragHandleAttrs:     DraggableAttributes
   dragHandleListeners: SortableListeners
   isDragging:          boolean
@@ -26,16 +28,24 @@ type Props = {
   onCompute:           (config: PivotConfig) => void
   onCancel:            () => void
   onDelete:            () => void
+  onToggleRowGroup:    (pk: string) => void
+  onToggleColGroup:    (pk: string) => void
+  onSetCollapsedRows:  (pks: string[]) => void
+  onSetCollapsedCols:  (pks: string[]) => void
 }
 
 export function PivotSection({
-  section, headers, preview,
+  section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
   onLabelChange, onToggleCollapse,
   onConfigChange, onCompute, onCancel, onDelete,
+  onToggleRowGroup, onToggleColGroup,
+  onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
-  const [editingLabel, setEditingLabel] = useState(false)
-  const [activeTab,    setActiveTab]    = useState<'config' | 'result'>('config')
+  const [editingLabel,   setEditingLabel]   = useState(false)
+  const [activeTab,      setActiveTab]      = useState<'config' | 'result'>('config')
+  const [showRowTotals,  setShowRowTotals]  = useState(true)
+  const [showColTotals,  setShowColTotals]  = useState(true)
 
   useEffect(() => {
     if (section.status === 'done') setActiveTab('result')
@@ -139,12 +149,19 @@ export function PivotSection({
 
           {/* Contenu */}
           {activeTab === 'config' && (
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 flex flex-col gap-3">
+              {section.status === 'error' && section.errorMessage && (
+                <div className="flex items-start gap-2 px-3 py-2.5 rounded-[var(--radius-md)] bg-danger/10 border border-danger/30">
+                  <AlertCircle size={14} className="text-danger flex-shrink-0 mt-0.5" />
+                  <p className="text-danger text-xs">{section.errorMessage}</p>
+                </div>
+              )}
               <PivotConfigurator
                 value={section.configuratorState}
                 onChange={onConfigChange}
                 headers={headers}
                 preview={preview}
+                distinctValues={distinctValues}
                 status={section.status}
                 progress={section.progress}
                 onCompute={onCompute}
@@ -153,12 +170,49 @@ export function PivotSection({
             </div>
           )}
 
+
           {activeTab === 'result' && (
-            <div className="px-5 py-4">
+            <div className="px-5 py-4 flex flex-col gap-3">
               {section.result ? (
-                <p className="text-xs text-muted">
-                  Tableau : {section.result.rowKeys.length} ligne(s) × {section.result.colKeys.length} colonne(s)
-                </p>
+                <>
+                  {/* Toggles */}
+                  <div className="flex items-center gap-3">
+                    {([
+                      { label: 'Totaux lignes',    value: showRowTotals, set: setShowRowTotals },
+                      { label: 'Totaux colonnes',  value: showColTotals, set: setShowColTotals },
+                    ] as const).map(({ label, value, set }) => (
+                      <button
+                        key={label}
+                        onClick={() => set(v => !v)}
+                        className={[
+                          'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
+                          'text-[11px] font-medium border transition-all duration-150',
+                          value
+                            ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                            : 'bg-elevated border-border text-subtle hover:text-text',
+                        ].join(' ')}
+                      >
+                        <span className={[
+                          'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                          value ? 'bg-accent' : 'bg-border-strong',
+                        ].join(' ')} />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <PivotTable
+                    data={section.result}
+                    showRowTotals={showRowTotals}
+                    showColTotals={showColTotals}
+                    collapsedRowGroups={section.collapsedRowGroups}
+                    collapsedColGroups={section.collapsedColGroups}
+                    onToggleRowGroup={onToggleRowGroup}
+                    onToggleColGroup={onToggleColGroup}
+                    onSetCollapsedRows={onSetCollapsedRows}
+                    onSetCollapsedCols={onSetCollapsedCols}
+                  />
+                </>
               ) : (
                 <p className="text-xs text-subtle italic">Aucun résultat pour le moment.</p>
               )}
