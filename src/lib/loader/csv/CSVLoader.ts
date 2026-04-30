@@ -3,6 +3,7 @@ import { detectDelimiter }                                       from './detect'
 import { parseCSV, parsePreview, splitLine, inferType } from './parse'
 import type { CSVParseResult, Delimiter, RawRow,
               StreamResult, ValidationResult }                   from './types'
+import { collectDistinctStringValues }                          from '@/lib/utils/records'
 
 export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
 
@@ -35,20 +36,8 @@ export class CSVLoader<T = RawRow> extends GenericLoader<T, CSVParseResult> {
   /** Lit le fichier entier et retourne toutes les valeurs distinctes par colonne string.
    *  À appeler en arrière-plan (non-bloquant) après le chargement du fichier. */
   async scanDistinctValues(file: File): Promise<Record<string, string[]>> {
-    const text = await file.text()
-    const { rows } = parseCSV(text)
-    const seen: Record<string, Set<string>> = {}
-    for (const row of rows) {
-      for (const [key, val] of Object.entries(row)) {
-        if (!seen[key]) seen[key] = new Set()
-        if (typeof val === 'string' && val !== '') seen[key].add(val)
-      }
-    }
-    const out: Record<string, string[]> = {}
-    for (const [key, set] of Object.entries(seen)) {
-      out[key] = [...set].sort()
-    }
-    return out
+    const { rows } = parseCSV(await file.text())
+    return collectDistinctStringValues(rows)
   }
 
   /**
