@@ -1,14 +1,19 @@
 import { useState, useEffect }  from 'react'
 import { useSortable }           from '@dnd-kit/sortable'
 import type { DraggableAttributes } from '@dnd-kit/core'
-
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
+
 import {
   GripVertical, ChevronDown, ChevronRight,
   X, FileText, AlertCircle,
+  BarChart2, LineChart, PieChart,
+  Columns2, Rows2,
 } from 'lucide-react'
+
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import { PivotTable }           from '@/components/ui/PivotTable'
+import { PivotChart }           from '@/components/ui/PivotChart'
+import type { ChartType }       from '@/components/ui/PivotChart'
 import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
@@ -22,6 +27,7 @@ type Props = {
   dragHandleAttrs:     DraggableAttributes
   dragHandleListeners: SortableListeners
   isDragging:          boolean
+  onUpdate:            (patch: Partial<Section>) => void
   onLabelChange:       (label: string) => void
   onToggleCollapse:    () => void
   onConfigChange:      (state: ConfiguratorState) => void
@@ -34,36 +40,68 @@ type Props = {
   onSetCollapsedCols:  (pks: string[]) => void
 }
 
+// ─── Stepper flex ──────────────────────────────────────────────────────────
+
+function FlexStepper({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  const btnCls = 'w-4 h-4 flex items-center justify-center rounded text-subtle hover:text-text hover:bg-elevated transition-colors text-[11px]'
+  return (
+    <div className="flex items-center gap-0.5">
+      <span className="text-[10px] text-subtle mr-0.5">{label}</span>
+      <button className={btnCls} onClick={() => onChange(Math.max(1, value - 1))}>−</button>
+      <span className="w-4 text-center tabular-nums text-[11px] text-muted">{value}</span>
+      <button className={btnCls} onClick={() => onChange(Math.min(20, value + 1))}>+</button>
+    </div>
+  )
+}
+
+// ─── Composant principal ───────────────────────────────────────────────────
+
 export function PivotSection({
   section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
-  onLabelChange, onToggleCollapse,
+  onUpdate, onLabelChange, onToggleCollapse,
   onConfigChange, onCompute, onCancel, onDelete,
   onToggleRowGroup, onToggleColGroup,
   onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
-  const [editingLabel,   setEditingLabel]   = useState(false)
-  const [activeTab,      setActiveTab]      = useState<'config' | 'result'>('config')
-  const [showRowTotals,  setShowRowTotals]  = useState(true)
-  const [showColTotals,  setShowColTotals]  = useState(true)
+  const [editingLabel, setEditingLabel] = useState(false)
+  const [activeTab,    setActiveTab]    = useState<'config' | 'result'>('config')
+  const [showRowTotals, setShowRowTotals] = useState(true)
+  const [showColTotals, setShowColTotals] = useState(true)
 
   useEffect(() => {
     if (section.status === 'done') setActiveTab('result')
   }, [section.status])
 
-  const hasResult = section.result !== null
+  const hasResult   = section.result !== null
+  const isHorizontal = section.chartLayout === 'horizontal'
 
-  return (
-    <div
+  // Bouton de type de graphique
+  const chartTypeBtn = (type: ChartType, Icon: React.ElementType, title: string) => (
+    <button
+      key={type}
+      title={title}
+      onClick={() => onUpdate({ chartType: type })}
       className={[
-        'rounded-[var(--radius-lg)] border border-border bg-surface',
-        'transition-all duration-200',
-        isDragging ? 'shadow-[var(--shadow-elevated)] opacity-80' : 'shadow-[var(--shadow-card)]',
+        'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
+        section.chartType === type
+          ? 'bg-accent/10 border-accent/40 text-accent-hi'
+          : 'bg-elevated border-border text-subtle hover:text-text',
       ].join(' ')}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+      <Icon size={13} />
+    </button>
+  )
 
+  return (
+    <div className={[
+      'rounded-[var(--radius-lg)] border border-border bg-surface',
+      'transition-all duration-200',
+      isDragging ? 'shadow-[var(--shadow-elevated)] opacity-80' : 'shadow-[var(--shadow-card)]',
+    ].join(' ')}>
+
+      {/* ── Header ── */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <button
           {...dragHandleAttrs}
           {...dragHandleListeners}
@@ -81,10 +119,7 @@ export function PivotSection({
             onChange={e => onLabelChange(e.target.value)}
             onBlur={() => setEditingLabel(false)}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') setEditingLabel(false) }}
-            className={[
-              'flex-1 bg-transparent border-b border-accent/50 outline-none',
-              'text-sm font-semibold text-text px-0.5',
-            ].join(' ')}
+            className="flex-1 bg-transparent border-b border-accent/50 outline-none text-sm font-semibold text-text px-0.5"
           />
         ) : (
           <span
@@ -112,7 +147,6 @@ export function PivotSection({
           >
             {section.collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
           </button>
-
           <button
             onClick={onDelete}
             className="p-1 rounded text-subtle hover:text-danger hover:bg-danger/10 transition-all duration-150"
@@ -123,7 +157,7 @@ export function PivotSection({
         </div>
       </div>
 
-      {/* Corps */}
+      {/* ── Corps ── */}
       {!section.collapsed && (
         <div className="flex flex-col">
 
@@ -147,7 +181,7 @@ export function PivotSection({
             ))}
           </div>
 
-          {/* Contenu */}
+          {/* ── Onglet Configuration ── */}
           {activeTab === 'config' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.status === 'error' && section.errorMessage && (
@@ -170,48 +204,131 @@ export function PivotSection({
             </div>
           )}
 
-
+          {/* ── Onglet Résultats ── */}
           {activeTab === 'result' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.result ? (
                 <>
-                  {/* Toggles */}
-                  <div className="flex items-center gap-3">
-                    {([
-                      { label: 'Totaux lignes',    value: showRowTotals, set: setShowRowTotals },
-                      { label: 'Totaux colonnes',  value: showColTotals, set: setShowColTotals },
-                    ] as const).map(({ label, value, set }) => (
-                      <button
-                        key={label}
-                        onClick={() => set(v => !v)}
-                        className={[
-                          'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-                          'text-[11px] font-medium border transition-all duration-150',
-                          value
-                            ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                            : 'bg-elevated border-border text-subtle hover:text-text',
-                        ].join(' ')}
-                      >
-                        <span className={[
-                          'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                          value ? 'bg-accent' : 'bg-border-strong',
-                        ].join(' ')} />
-                        {label}
-                      </button>
-                    ))}
+                  {/* Barre de contrôles */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+
+                    {/* Gauche : toggles totaux */}
+                    <div className="flex items-center gap-2">
+                      {([
+                        { label: 'Totaux lignes',   value: showRowTotals, set: setShowRowTotals },
+                        { label: 'Totaux colonnes', value: showColTotals, set: setShowColTotals },
+                      ] as const).map(({ label, value, set }) => (
+                        <button
+                          key={label}
+                          onClick={() => set(v => !v)}
+                          className={[
+                            'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
+                            'text-[11px] font-medium border transition-all duration-150',
+                            value
+                              ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                              : 'bg-elevated border-border text-subtle hover:text-text',
+                          ].join(' ')}
+                        >
+                          <span className={['w-1.5 h-1.5 rounded-full flex-shrink-0', value ? 'bg-accent' : 'bg-border-strong'].join(' ')} />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Droite : contrôles graphique */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+
+                      {/* Type de graphique */}
+                      <div className="flex items-center gap-1">
+                        {chartTypeBtn('bar',  BarChart2,   'Barres')}
+                        {chartTypeBtn('line', LineChart,   'Lignes')}
+                        {chartTypeBtn('pie',  PieChart,    'Camembert')}
+                      </div>
+
+                      <div className="w-px h-4 bg-border mx-0.5" />
+
+                      {/* Layout */}
+                      <div className="flex items-center gap-1">
+                        {([
+                          { layout: 'horizontal' as const, Icon: Columns2, title: 'Côte à côte' },
+                          { layout: 'vertical'   as const, Icon: Rows2,    title: 'Empilé' },
+                        ]).map(({ layout, Icon, title }) => (
+                          <button
+                            key={layout}
+                            title={title}
+                            onClick={() => onUpdate({ chartLayout: layout })}
+                            className={[
+                              'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
+                              section.chartLayout === layout
+                                ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                                : 'bg-elevated border-border text-subtle hover:text-text',
+                            ].join(' ')}
+                          >
+                            <Icon size={13} />
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Flex (seulement en mode horizontal) */}
+                      {isHorizontal && (
+                        <>
+                          <div className="w-px h-4 bg-border mx-0.5" />
+                          <FlexStepper
+                            label="T"
+                            value={section.tableFlex}
+                            onChange={v => onUpdate({ tableFlex: v })}
+                          />
+                          <FlexStepper
+                            label="G"
+                            value={section.chartFlex}
+                            onChange={v => onUpdate({ chartFlex: v })}
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
 
-                  <PivotTable
-                    data={section.result}
-                    showRowTotals={showRowTotals}
-                    showColTotals={showColTotals}
-                    collapsedRowGroups={section.collapsedRowGroups}
-                    collapsedColGroups={section.collapsedColGroups}
-                    onToggleRowGroup={onToggleRowGroup}
-                    onToggleColGroup={onToggleColGroup}
-                    onSetCollapsedRows={onSetCollapsedRows}
-                    onSetCollapsedCols={onSetCollapsedCols}
-                  />
+                  {/* Tableau + Graphique */}
+                  <div className={[
+                    'flex gap-3',
+                    isHorizontal ? 'flex-row items-start' : 'flex-col',
+                  ].join(' ')}>
+
+                    {/* Tableau */}
+                    <div
+                      className="min-w-0 overflow-x-auto"
+                      style={{ flex: isHorizontal ? section.tableFlex : undefined }}
+                    >
+                      <PivotTable
+                        data={section.result}
+                        showRowTotals={showRowTotals}
+                        showColTotals={showColTotals}
+                        collapsedRowGroups={section.collapsedRowGroups}
+                        collapsedColGroups={section.collapsedColGroups}
+                        onToggleRowGroup={onToggleRowGroup}
+                        onToggleColGroup={onToggleColGroup}
+                        onSetCollapsedRows={onSetCollapsedRows}
+                        onSetCollapsedCols={onSetCollapsedCols}
+                      />
+                    </div>
+
+                    {/* Séparateur */}
+                    <div className={[
+                      'bg-border flex-shrink-0',
+                      isHorizontal ? 'w-px self-stretch' : 'h-px w-full',
+                    ].join(' ')} />
+
+                    {/* Graphique */}
+                    <div
+                      className="min-w-0 min-h-[280px]"
+                      style={{ flex: isHorizontal ? section.chartFlex : undefined }}
+                    >
+                      <PivotChart
+                        data={section.result}
+                        chartType={section.chartType}
+                      />
+                    </div>
+                  </div>
                 </>
               ) : (
                 <p className="text-xs text-subtle italic">Aucun résultat pour le moment.</p>

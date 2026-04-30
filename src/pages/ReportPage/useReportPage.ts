@@ -31,6 +31,10 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
     config:             null,
     collapsedRowGroups: [],
     collapsedColGroups: [],
+    chartType:          'bar',
+    chartLayout:        'horizontal',
+    tableFlex:          5,
+    chartFlex:          5,
   }
 }
 
@@ -57,6 +61,10 @@ export function useReportPage() {
           ...s,
           collapsedRowGroups: s.collapsedRowGroups ?? [],
           collapsedColGroups: s.collapsedColGroups ?? [],
+          chartType:          s.chartType   ?? 'bar',
+          chartLayout:        s.chartLayout ?? 'horizontal',
+          tableFlex:          s.tableFlex   ?? 5,
+          chartFlex:          s.chartFlex   ?? 5,
         })))
         // Rescanner les valeurs distinctes pour les fichiers restaurés (non persistées).
         // Met aussi à jour les FilterField des sections associées.

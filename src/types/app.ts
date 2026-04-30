@@ -1,6 +1,7 @@
 import type { ParseError, RawRow }  from '@/lib/loader'
 import type { PivotConfig, PivotData } from '@/lib/pivot/types'
 import type { ConfiguratorState }   from '@/components/PivotConfigurator/types'
+import type { ChartType }           from '@/components/ui/PivotChart'
 
 export type FileEntry = {
   id:             string
@@ -29,4 +30,8 @@ export type Section = {
   config:             PivotConfig | null
   collapsedRowGroups: string[]
   collapsedColGroups: string[]
+  chartType:          ChartType             // type de graphique actif
+  chartLayout:        'horizontal' | 'vertical'  // tableau et graphique côte-à-côte ou empilés
+  tableFlex:          number                // flex-grow du tableau
+  chartFlex:          number                // flex-grow du graphique
 }
