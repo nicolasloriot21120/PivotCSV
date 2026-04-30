@@ -10,7 +10,7 @@ import { LayoutGrid } from 'lucide-react'
 
 import { AppSidebar }         from '@/components/AppSidebar'
 import { SortablePivotSection } from './components/SortablePivotSection'
-import { useReportPage }      from './ReportPage.functions'
+import { useReportPage }      from './useReportPage'
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
