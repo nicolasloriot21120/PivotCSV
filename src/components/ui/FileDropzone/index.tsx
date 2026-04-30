@@ -55,16 +55,13 @@ export function FileDropzone({
     const valid = validate(files)
     if (!valid) { setState('error'); return }
     setState('idle')
-    setDropped(prev => {
-      const existing = new Set(prev.map(f => f.name))
-      const newFiles = valid.filter(f => !existing.has(f.name))
-      const next     = [...prev, ...newFiles]
-      onFiles(next)
-      return next
-    })
-    // Auto-sélectionne le premier fichier nouvellement ajouté
+    const existing = new Set(dropped.map(f => f.name))
+    const newFiles = valid.filter(f => !existing.has(f.name))
+    const next     = [...dropped, ...newFiles]
+    setDropped(next)
+    onFiles(next)
     onFileSelect?.(valid[0])
-  }, [validate, onFiles, onFileSelect])
+  }, [validate, onFiles, onFileSelect, dropped])
 
   const onDragOver  = (e: DragEvent) => { e.preventDefault(); setState('hover') }
   const onDragLeave = ()             => setState('idle')
@@ -72,13 +69,10 @@ export function FileDropzone({
   const onChange    = (e: ChangeEvent<HTMLInputElement>) => { if (e.target.files) handle(Array.from(e.target.files)) }
 
   const removeFile = (name: string) => {
-    setDropped(prev => {
-      const next = prev.filter(f => f.name !== name)
-      onFiles(next)
-      // Si le fichier supprimé était sélectionné, sélectionne le suivant disponible
-      if (selectedFile?.name === name) onFileSelect?.(next[0])
-      return next
-    })
+    const next = dropped.filter(f => f.name !== name)
+    setDropped(next)
+    onFiles(next)
+    if (selectedFile?.name === name) onFileSelect?.(next[0])
     setError(null)
     setState('idle')
   }
