@@ -4,12 +4,20 @@ import type { LayoutRow, LayoutCell } from '../types'
 import type { Section } from '@/types/app'
 import { PDF_W, PDF_H } from '../types'
 
+const BG = '#0f172a'
+
 const styles = StyleSheet.create({
-  page:    { backgroundColor: 'white' },
+  page:    { backgroundColor: BG },
   row:     { flexDirection: 'row' },
-  cell:    {},
+  cell:    { overflow: 'hidden' },
   image:   { width: '100%', height: '100%' },
-  comment: { padding: 10, fontSize: 10, color: '#1e293b' },
+  comment: {
+    flex:           1,
+    padding:        20,
+    fontSize:       11,
+    color:          '#e2e8f0',
+    lineHeight:     1.6,
+  },
 })
 
 export async function buildAndDownloadPdf(rows: LayoutRow[], _sections: Section[], filename = 'export.pdf') {
@@ -43,11 +51,11 @@ export async function buildAndDownloadPdf(rows: LayoutRow[], _sections: Section[
                 const cellW = (cell.flex / totalCellFlex) * PDF_W
                 const imgKey = `${row.id}-${cell.id}`
                 return (
-                  <View key={cell.id} style={[styles.cell, { width: cellW, height: rowH, overflow: 'hidden' }]}>
+                  <View key={cell.id} style={[styles.cell, { width: cellW, height: rowH }]}>
                     {cell.content.type === 'comment' ? (
                       <Text style={styles.comment}>{cell.content.text}</Text>
                     ) : images[imgKey] ? (
-                      <Image style={styles.image} src={images[imgKey]!} objectFit="contain" />
+                      <Image style={styles.image} src={images[imgKey]!} />
                     ) : null}
                   </View>
                 )
