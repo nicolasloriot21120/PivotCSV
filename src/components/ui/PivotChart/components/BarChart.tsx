@@ -2,7 +2,7 @@ import { ResponsiveBar } from '@nivo/bar'
 
 import type { PivotData } from '@/lib/pivot/types'
 import { toBarData }     from '@/lib/pivot/chart'
-import { theme, COLORS, MARGIN } from './theme'
+import { theme, COLORS, MARGIN } from '../lib/theme'
 
 type Props = {
   data:          PivotData

@@ -2,7 +2,7 @@ import { ResponsivePie } from '@nivo/pie'
 
 import type { PivotData } from '@/lib/pivot/types'
 import { toPieData }     from '@/lib/pivot/chart'
-import { theme, COLORS } from './theme'
+import { theme, COLORS } from '../lib/theme'
 
 type Props = {
   data:          PivotData

@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { PivotData, AggregationType } from '@/lib/pivot/types'
-import { usePivotTable, AGG_SYM, allGroupKeys } from './usePivotTable'
-import type { TreeNode } from './usePivotTable'
+import { usePivotTable, AGG_SYM, allGroupKeys } from './hooks/usePivotTable'
+import type { TreeNode } from './hooks/usePivotTable'
 
 // =============================================================================
 // PROPS DU COMPOSANT

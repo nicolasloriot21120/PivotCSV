@@ -11,8 +11,8 @@ import { collectDistinctStringValues } from '@/lib/utils/records'
 import type {
   ConfiguratorState, DateGrouping, FieldType,
   FilterField, PlacedField, ValueField, ZoneId,
-} from './types'
-import { toPivotFilters } from './types'
+} from '../types'
+import { toPivotFilters } from '../types'
 
 export type UsePivotConfiguratorProps = {
   value:          ConfiguratorState

@@ -18,8 +18,8 @@ import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 import { makeFormatter }        from '@/lib/pivot/format'
 import { getSeriesLabels }      from '@/lib/pivot/chart'
-import { ResultsToolbar }       from './ResultsToolbar'
-import { ColorPickerPanel }     from './ColorPickerPanel'
+import { ResultsToolbar }       from './components/ResultsToolbar'
+import { ColorPickerPanel }     from './components/ColorPickerPanel'
 
 type Props = {
   section:             Section

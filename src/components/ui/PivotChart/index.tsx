@@ -1,11 +1,11 @@
 import type { PivotData }  from '@/lib/pivot/types'
-import { BarChart }  from './BarChart'
-import { LineChart } from './LineChart'
-import { PieChart }  from './PieChart'
+import { BarChart }  from './components/BarChart'
+import { LineChart } from './components/LineChart'
+import { PieChart }  from './components/PieChart'
 
 export type ChartType = 'bar' | 'line' | 'pie'
 
-export { COLORS } from './theme'
+export { COLORS } from './lib/theme'
 
 type Props = {
   data:           PivotData

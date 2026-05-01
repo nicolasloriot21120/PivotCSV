@@ -2,7 +2,7 @@ import { ResponsiveLine } from '@nivo/line'
 
 import type { PivotData } from '@/lib/pivot/types'
 import { toLineData }    from '@/lib/pivot/chart'
-import { theme, COLORS, MARGIN } from './theme'
+import { theme, COLORS, MARGIN } from '../lib/theme'
 
 type Props = {
   data:          PivotData

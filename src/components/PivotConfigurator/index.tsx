@@ -6,13 +6,13 @@ import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
 import type { RawRow }      from '@/lib/loader'
 import type { PivotConfig } from '@/lib/pivot/types'
 
-import { FieldChip }       from './FieldChip'
-import { DropZone }        from './DropZone'
-import { ValueChip }       from './ValueChip'
-import { FilterZone }      from './FilterZone'
-import { DateGroupPicker } from './DateGroupPicker'
+import { FieldChip }       from './components/FieldChip'
+import { DropZone }        from './components/DropZone'
+import { ValueChip }       from './components/ValueChip'
+import { FilterZone }      from './components/FilterZone'
+import { DateGroupPicker } from './components/DateGroupPicker'
 import type { ConfiguratorState, ValueField } from './types'
-import { usePivotConfigurator } from './usePivotConfigurator'
+import { usePivotConfigurator } from './hooks/usePivotConfigurator'
 
 type Props = {
   value:          ConfiguratorState
