@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   DndContext, DragOverlay,
   closestCenter,
@@ -6,11 +7,12 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { LayoutGrid } from 'lucide-react'
+import { LayoutGrid, Download } from 'lucide-react'
 
 import { AppSidebar }         from '@/components/AppSidebar'
 import { SortablePivotSection } from './components/SortablePivotSection'
 import { useReportPage }      from './useReportPage'
+import { PdfExportModal }     from '@/components/PdfExport'
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -24,6 +26,8 @@ export function ReportPage() {
     updateSection, deleteSection, computeSection, cancelSection,
     onDragStart, onDragEnd,
   } = useReportPage()
+
+  const [showPdfExport, setShowPdfExport] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden bg-base">
@@ -53,7 +57,19 @@ export function ReportPage() {
               }
             </span>
           </div>
-          <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
+          <div className="flex items-center gap-3">
+            {sections.length > 0 && (
+              <button
+                onClick={() => setShowPdfExport(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+                title="Exporter en PDF"
+              >
+                <Download size={13} />
+                Export PDF
+              </button>
+            )}
+            <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto px-6 py-6">
@@ -102,5 +118,9 @@ export function ReportPage() {
 
       </div>
     </div>
+
+    {showPdfExport && (
+      <PdfExportModal sections={sections} onClose={() => setShowPdfExport(false)} />
+    )}
   )
 }

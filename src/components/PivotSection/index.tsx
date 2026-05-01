@@ -219,6 +219,7 @@ export function PivotSection({
                     <div
                       className="min-w-0 overflow-x-auto"
                       style={{ flex: isHorizontal ? section.tableFlex : undefined }}
+                      data-export-target={`${section.id}-table`}
                     >
                       <PivotTable
                         data={section.result}
@@ -244,6 +245,7 @@ export function PivotSection({
                     <div
                       className="min-w-0 min-h-[280px]"
                       style={{ flex: isHorizontal ? section.chartFlex : undefined }}
+                      data-export-target={`${section.id}-chart`}
                     >
                       <PivotChart
                         data={section.result}
