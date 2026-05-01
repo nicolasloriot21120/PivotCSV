@@ -1,5 +1,5 @@
 import { pdf, Document, Page, View, Image, Text, StyleSheet } from '@react-pdf/renderer'
-import html2canvas from 'html2canvas-pro'
+import { captureBlock } from './captureBlocks'
 import type { LayoutRow, LayoutCell } from '../types'
 import type { Section } from '@/types/app'
 import { PDF_W, PDF_H } from '../types'
@@ -12,23 +12,21 @@ const styles = StyleSheet.create({
   comment: { padding: 10, fontSize: 10, color: '#1e293b' },
 })
 
-async function captureCell(rowId: string, cellId: string): Promise<string | null> {
-  const el = document.querySelector(`[data-cell-id="${rowId}-${cellId}"]`) as HTMLElement | null
-  if (!el) return null
-  const canvas = await html2canvas(el, { backgroundColor: '#0f172a', scale: 2, useCORS: true, logging: false })
-  return canvas.toDataURL('image/png')
-}
-
 export async function buildAndDownloadPdf(rows: LayoutRow[], _sections: Section[], filename = 'export.pdf') {
-  // Calculer les hauteurs PDF de chaque ligne
   const totalRowFlex = rows.reduce((s, r) => s + r.flex, 0)
 
-  // Capturer toutes les cellules non-vides
+  // Capturer les vrais contenus depuis la page principale (data-export-target)
   const images: Record<string, string | null> = {}
   for (const row of rows) {
     for (const cell of row.cells) {
-      if (cell.content.type !== 'empty' && cell.content.type !== 'comment') {
-        images[`${row.id}-${cell.id}`] = await captureCell(row.id, cell.id)
+      const { content } = cell
+      if (content.type === 'table' || content.type === 'chart') {
+        const key = `${row.id}-${cell.id}`
+        try {
+          images[key] = await captureBlock(content.sectionId, content.type)
+        } catch {
+          images[key] = null
+        }
       }
     }
   }
