@@ -30,6 +30,7 @@ export function ReportPage() {
   const [showPdfExport, setShowPdfExport] = useState(false)
 
   return (
+    <>
     <div className="flex h-screen overflow-hidden bg-base">
 
       <AppSidebar
@@ -122,5 +123,6 @@ export function ReportPage() {
     {showPdfExport && (
       <PdfExportModal sections={sections} onClose={() => setShowPdfExport(false)} />
     )}
+    </>
   )
 }
