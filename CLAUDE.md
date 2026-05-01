@@ -85,6 +85,49 @@ Overlay full-screen sur ReportPage (pas de route séparée — pour conserver la
 
 ---
 
+## Workflow GitHub
+
+### Issues
+Chaque feature commence par une issue GitHub avec une user story et une checklist de critères d'acceptance :
+
+```markdown
+## User story
+En tant que [rôle], je veux [action] afin de [bénéfice].
+
+## Critères d'acceptance
+- [ ] Critère 1
+- [ ] Critère 2
+- [ ] Critère 3
+```
+
+### Branches
+Une branche par feature : `feat/<nom>`, `fix/<nom>`, `refacto/<nom>`.
+
+### Pull Requests
+Format de PR avec cases à cocher dans le plan de test :
+
+```markdown
+## Summary
+- Point clé 1
+- Point clé 2
+- Point clé 3
+
+## Test plan
+- [ ] Cas nominal
+- [ ] Cas limite 1
+- [ ] Cas limite 2
+- [ ] Pas de régression sur [feature liée]
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+**Règles :**
+- Ne pas merger sans validation explicite de Nicolas
+- Ne pas fermer les issues après merge — Nicolas le fait manuellement
+- Pas de `Co-Authored-By` dans les commits
+
+---
+
 ## Branches actives
 
 | Branche | Contenu |
