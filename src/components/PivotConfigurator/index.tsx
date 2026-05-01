@@ -6,12 +6,13 @@ import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
 import type { RawRow }      from '@/lib/loader'
 import type { PivotConfig } from '@/lib/pivot/types'
 
-import { FieldChip }  from './FieldChip'
-import { DropZone }   from './DropZone'
-import { ValueChip }  from './ValueChip'
-import { FilterZone } from './FilterZone'
+import { FieldChip }       from './components/FieldChip'
+import { DropZone }        from './components/DropZone'
+import { ValueChip }       from './components/ValueChip'
+import { FilterZone }      from './components/FilterZone'
+import { DateGroupPicker } from './components/DateGroupPicker'
 import type { ConfiguratorState, ValueField } from './types'
-import { usePivotConfigurator }               from './usePivotConfigurator'
+import { usePivotConfigurator } from './hooks/usePivotConfigurator'
 
 type Props = {
   value:          ConfiguratorState
@@ -29,7 +30,7 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
   const {
     sensors, dragging, available,
     canCompute, computing,
-    removeFromZone, addToZone,
+    removeFromZone, addToZone, updateDateGroup,
     onDragStart, onDragEnd, handleCompute,
   } = usePivotConfigurator({ value, onChange, headers, preview, distinctValues, status, onCompute })
 
@@ -59,25 +60,39 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
         <div className="grid grid-cols-2 gap-4">
           <DropZone id="rows" label="Lignes" icon={<Rows3 size={12} />} placeholder="Glissez un champ ici">
             {value.rows.map(f => (
-              <FieldChip
-                key={f.field}
-                field={f.field}
-                type={f.type}
-                draggableId={`rows::${f.field}`}
-                onRemove={() => removeFromZone('rows', f.field)}
-              />
+              <div key={f.field} className="flex flex-col gap-0.5">
+                <FieldChip
+                  field={f.field}
+                  type={f.type}
+                  draggableId={`rows::${f.field}`}
+                  onRemove={() => removeFromZone('rows', f.field)}
+                />
+                {f.type === 'date' && (
+                  <DateGroupPicker
+                    value={f.dateGroup}
+                    onChange={g => updateDateGroup('rows', f.field, g)}
+                  />
+                )}
+              </div>
             ))}
           </DropZone>
 
           <DropZone id="columns" label="Colonnes" icon={<Columns3 size={12} />} placeholder="Glissez un champ ici">
             {value.columns.map(f => (
-              <FieldChip
-                key={f.field}
-                field={f.field}
-                type={f.type}
-                draggableId={`columns::${f.field}`}
-                onRemove={() => removeFromZone('columns', f.field)}
-              />
+              <div key={f.field} className="flex flex-col gap-0.5">
+                <FieldChip
+                  field={f.field}
+                  type={f.type}
+                  draggableId={`columns::${f.field}`}
+                  onRemove={() => removeFromZone('columns', f.field)}
+                />
+                {f.type === 'date' && (
+                  <DateGroupPicker
+                    value={f.dateGroup}
+                    onChange={g => updateDateGroup('columns', f.field, g)}
+                  />
+                )}
+              </div>
             ))}
           </DropZone>
 

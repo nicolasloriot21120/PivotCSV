@@ -1,18 +1,25 @@
 import { useState, useEffect }  from 'react'
 import { useSortable }           from '@dnd-kit/sortable'
 import type { DraggableAttributes } from '@dnd-kit/core'
-
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
+
 import {
   GripVertical, ChevronDown, ChevronRight,
   X, FileText, AlertCircle,
 } from 'lucide-react'
+
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import { PivotTable }           from '@/components/ui/PivotTable'
+import { PivotChart }           from '@/components/ui/PivotChart'
+import type { ChartType }       from '@/components/ui/PivotChart'
 import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
+import { makeFormatter }        from '@/lib/pivot/format'
+import { getSeriesLabels }      from '@/lib/pivot/chart'
+import { ResultsToolbar }       from './components/ResultsToolbar'
+import { ColorPickerPanel }     from './components/ColorPickerPanel'
 
 type Props = {
   section:             Section
@@ -22,6 +29,7 @@ type Props = {
   dragHandleAttrs:     DraggableAttributes
   dragHandleListeners: SortableListeners
   isDragging:          boolean
+  onUpdate:            (patch: Partial<Section>) => void
   onLabelChange:       (label: string) => void
   onToggleCollapse:    () => void
   onConfigChange:      (state: ConfiguratorState) => void
@@ -34,36 +42,43 @@ type Props = {
   onSetCollapsedCols:  (pks: string[]) => void
 }
 
+// ─── Composant principal ───────────────────────────────────────────────────
+
 export function PivotSection({
   section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
-  onLabelChange, onToggleCollapse,
+  onUpdate, onLabelChange, onToggleCollapse,
   onConfigChange, onCompute, onCancel, onDelete,
   onToggleRowGroup, onToggleColGroup,
   onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
-  const [editingLabel,   setEditingLabel]   = useState(false)
-  const [activeTab,      setActiveTab]      = useState<'config' | 'result'>('config')
-  const [showRowTotals,  setShowRowTotals]  = useState(true)
-  const [showColTotals,  setShowColTotals]  = useState(true)
+  const [editingLabel,     setEditingLabel]     = useState(false)
+  const [activeTab,        setActiveTab]        = useState<'config' | 'result'>('config')
+  const [showRowTotals,    setShowRowTotals]    = useState(true)
+  const [showColTotals,    setShowColTotals]    = useState(true)
+  const [showColorPicker,  setShowColorPicker]  = useState(false)
 
   useEffect(() => {
     if (section.status === 'done') setActiveTab('result')
   }, [section.status])
 
-  const hasResult = section.result !== null
+  const hasResult    = section.result !== null
+  const isHorizontal = section.chartLayout === 'horizontal'
+  const formatValue  = makeFormatter(section.valueScale, section.valueDecimals)
+  const seriesLabels = section.result
+    ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups, section.chartTranspose)
+    : []
+  const canTranspose = section.chartType !== 'pie' && (section.result?.colKeys.length ?? 0) > 0
 
   return (
-    <div
-      className={[
-        'rounded-[var(--radius-lg)] border border-border bg-surface',
-        'transition-all duration-200',
-        isDragging ? 'shadow-[var(--shadow-elevated)] opacity-80' : 'shadow-[var(--shadow-card)]',
-      ].join(' ')}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+    <div className={[
+      'rounded-[var(--radius-lg)] border border-border bg-surface',
+      'transition-all duration-200',
+      isDragging ? 'shadow-[var(--shadow-elevated)] opacity-80' : 'shadow-[var(--shadow-card)]',
+    ].join(' ')}>
 
+      {/* ── Header ── */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <button
           {...dragHandleAttrs}
           {...dragHandleListeners}
@@ -81,10 +96,7 @@ export function PivotSection({
             onChange={e => onLabelChange(e.target.value)}
             onBlur={() => setEditingLabel(false)}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') setEditingLabel(false) }}
-            className={[
-              'flex-1 bg-transparent border-b border-accent/50 outline-none',
-              'text-sm font-semibold text-text px-0.5',
-            ].join(' ')}
+            className="flex-1 bg-transparent border-b border-accent/50 outline-none text-sm font-semibold text-text px-0.5"
           />
         ) : (
           <span
@@ -112,7 +124,6 @@ export function PivotSection({
           >
             {section.collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
           </button>
-
           <button
             onClick={onDelete}
             className="p-1 rounded text-subtle hover:text-danger hover:bg-danger/10 transition-all duration-150"
@@ -123,7 +134,7 @@ export function PivotSection({
         </div>
       </div>
 
-      {/* Corps */}
+      {/* ── Corps ── */}
       {!section.collapsed && (
         <div className="flex flex-col">
 
@@ -147,7 +158,7 @@ export function PivotSection({
             ))}
           </div>
 
-          {/* Contenu */}
+          {/* ── Onglet Configuration ── */}
           {activeTab === 'config' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.status === 'error' && section.errorMessage && (
@@ -170,48 +181,81 @@ export function PivotSection({
             </div>
           )}
 
-
+          {/* ── Onglet Résultats ── */}
           {activeTab === 'result' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.result ? (
                 <>
-                  {/* Toggles */}
-                  <div className="flex items-center gap-3">
-                    {([
-                      { label: 'Totaux lignes',    value: showRowTotals, set: setShowRowTotals },
-                      { label: 'Totaux colonnes',  value: showColTotals, set: setShowColTotals },
-                    ] as const).map(({ label, value, set }) => (
-                      <button
-                        key={label}
-                        onClick={() => set(v => !v)}
-                        className={[
-                          'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-                          'text-[11px] font-medium border transition-all duration-150',
-                          value
-                            ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                            : 'bg-elevated border-border text-subtle hover:text-text',
-                        ].join(' ')}
-                      >
-                        <span className={[
-                          'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                          value ? 'bg-accent' : 'bg-border-strong',
-                        ].join(' ')} />
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <PivotTable
-                    data={section.result}
+                  {/* Barre de contrôles */}
+                  <ResultsToolbar
+                    section={section}
                     showRowTotals={showRowTotals}
                     showColTotals={showColTotals}
-                    collapsedRowGroups={section.collapsedRowGroups}
-                    collapsedColGroups={section.collapsedColGroups}
-                    onToggleRowGroup={onToggleRowGroup}
-                    onToggleColGroup={onToggleColGroup}
-                    onSetCollapsedRows={onSetCollapsedRows}
-                    onSetCollapsedCols={onSetCollapsedCols}
+                    showColorPicker={showColorPicker}
+                    seriesLabels={seriesLabels}
+                    canTranspose={canTranspose}
+                    onUpdate={onUpdate}
+                    onToggleRowTotals={() => setShowRowTotals(v => !v)}
+                    onToggleColTotals={() => setShowColTotals(v => !v)}
+                    onToggleColorPicker={() => setShowColorPicker(v => !v)}
                   />
+
+                  {/* Panneau de couleurs */}
+                  {showColorPicker && seriesLabels.length > 0 && (
+                    <ColorPickerPanel
+                      seriesLabels={seriesLabels}
+                      chartColors={section.chartColors}
+                      onUpdate={onUpdate}
+                    />
+                  )}
+
+                  {/* Tableau + Graphique */}
+                  <div className={[
+                    'flex gap-3',
+                    isHorizontal ? 'flex-row items-stretch' : 'flex-col',
+                  ].join(' ')}>
+
+                    {/* Tableau */}
+                    <div
+                      className="min-w-0 overflow-x-auto"
+                      style={{ flex: isHorizontal ? section.tableFlex : undefined }}
+                    >
+                      <PivotTable
+                        data={section.result}
+                        showRowTotals={showRowTotals}
+                        showColTotals={showColTotals}
+                        collapsedRowGroups={section.collapsedRowGroups}
+                        collapsedColGroups={section.collapsedColGroups}
+                        onToggleRowGroup={onToggleRowGroup}
+                        onToggleColGroup={onToggleColGroup}
+                        onSetCollapsedRows={onSetCollapsedRows}
+                        onSetCollapsedCols={onSetCollapsedCols}
+                        formatValue={formatValue}
+                      />
+                    </div>
+
+                    {/* Séparateur */}
+                    <div className={[
+                      'bg-border flex-shrink-0',
+                      isHorizontal ? 'w-px self-stretch' : 'h-px w-full',
+                    ].join(' ')} />
+
+                    {/* Graphique */}
+                    <div
+                      className="min-w-0 min-h-[280px]"
+                      style={{ flex: isHorizontal ? section.chartFlex : undefined }}
+                    >
+                      <PivotChart
+                        data={section.result}
+                        chartType={section.chartType}
+                        collapsedRows={section.collapsedRowGroups}
+                        collapsedCols={section.collapsedColGroups}
+                        formatValue={formatValue}
+                        chartColors={section.chartColors}
+                        transpose={section.chartTranspose}
+                      />
+                    </div>
+                  </div>
                 </>
               ) : (
                 <p className="text-xs text-subtle italic">Aucun résultat pour le moment.</p>

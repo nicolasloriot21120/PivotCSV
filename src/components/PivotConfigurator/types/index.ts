@@ -1,10 +1,12 @@
 import type { AggregationType, PivotFilter } from '@/lib/pivot/types'
+import type { DateGrouping } from '@/lib/pivot/dateGroup'
 
-export type FieldType = 'string' | 'number'
+export type FieldType = 'string' | 'number' | 'date'
 
 export type PlacedField = {
-  field: string
-  type:  FieldType
+  field:      string
+  type:       FieldType
+  dateGroup?: DateGrouping
 }
 
 export type ValueField = PlacedField & {
@@ -35,7 +37,7 @@ export function emptyConfiguratorState(): ConfiguratorState {
 
 export function toPivotFilters(filters: FilterField[]): PivotFilter[] {
   return filters.flatMap(f => {
-    if (f.type === 'string') {
+    if (f.type === 'string' || f.type === 'date') {
       if (!f.selectedValues?.length) return []
       return [{ field: f.field, type: 'categorical' as const, values: f.selectedValues }]
     } else {

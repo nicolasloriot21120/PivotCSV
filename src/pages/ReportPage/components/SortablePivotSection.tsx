@@ -35,6 +35,7 @@ export function SortablePivotSection({
         dragHandleAttrs={attributes}
         dragHandleListeners={listeners}
         isDragging={isDragging}
+        onUpdate={onUpdate}
         onLabelChange={label => onUpdate({ label })}
         onToggleCollapse={() => onUpdate({ collapsed: !section.collapsed })}
         onConfigChange={(s: ConfiguratorState) => onUpdate({ configuratorState: s })}

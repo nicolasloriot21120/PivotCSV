@@ -21,9 +21,16 @@ export type FilterRange = {
 
 export type PivotFilter = FilterCategorical | FilterRange
 
+export type { DateGrouping } from './dateGroup'
+
+export type DimField = {
+  field:      string
+  dateGroup?: import('./dateGroup').DateGrouping
+}
+
 export type PivotConfig = {
-  rows:    string[]
-  columns: string[]
+  rows:    DimField[]
+  columns: DimField[]
   values:  PivotValueConfig[]
   filters: PivotFilter[]
 }
