@@ -48,6 +48,7 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
     valueScale:         'none',
     valueDecimals:      2,
     chartColors:        {},
+    chartTranspose:     false,
   }
 }
 
@@ -81,7 +82,8 @@ export function useReportPage() {
           chartFlex:          s.chartFlex     ?? 5,
           valueScale:         s.valueScale    ?? 'none',
           valueDecimals:      s.valueDecimals ?? 2,
-          chartColors:        s.chartColors   ?? {},
+          chartColors:        s.chartColors     ?? {},
+          chartTranspose:     s.chartTranspose  ?? false,
         })))
         // Rescanner les valeurs distinctes pour les fichiers restaurés (non persistées).
         // Met aussi à jour les FilterField des sections associées.

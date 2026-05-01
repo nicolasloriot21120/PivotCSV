@@ -38,4 +38,5 @@ export type Section = {
   valueScale:         ValueScale            // échelle d'affichage des valeurs
   valueDecimals:      number                // nombre de décimales affichées
   chartColors:        Record<string, string> // couleurs personnalisées par label de série
+  chartTranspose:     boolean               // intervertir lignes/colonnes dans le graphique
 }

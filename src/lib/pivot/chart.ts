@@ -55,6 +55,7 @@ export function toBarData(
   data: PivotData,
   collapsedRows: string[] = [],
   collapsedCols: string[] = [],
+  transpose = false,
 ): { barData: BarDatum[]; keys: string[] } {
   const { config, rowKeys, colKeys, cells, rowTotals } = data
   if (!rowKeys.length) return { barData: [], keys: [] }
@@ -73,20 +74,32 @@ export function toBarData(
   }
 
   const visCols = getVisible(colKeys, collapsedCols)
-  const keys    = visCols.map(c => c.label)
 
   const sumCell = (rowLeaves: string[], colLeaves: string[]) =>
     rowLeaves.reduce((s, rk) =>
       colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0)
 
-  const barData = visRows.map(({ label, leaves: rowLeaves }) => {
-    const item: BarDatum = { id: label }
-    for (const { label: colLabel, leaves: colLeaves } of visCols) {
-      item[colLabel] = sumCell(rowLeaves, colLeaves)
-    }
-    return item
-  })
-  return { barData, keys }
+  if (!transpose) {
+    const keys    = visCols.map(c => c.label)
+    const barData = visRows.map(({ label, leaves: rowLeaves }) => {
+      const item: BarDatum = { id: label }
+      for (const { label: colLabel, leaves: colLeaves } of visCols) {
+        item[colLabel] = sumCell(rowLeaves, colLeaves)
+      }
+      return item
+    })
+    return { barData, keys }
+  } else {
+    const keys    = visRows.map(r => r.label)
+    const barData = visCols.map(({ label, leaves: colLeaves }) => {
+      const item: BarDatum = { id: label }
+      for (const { label: rowLabel, leaves: rowLeaves } of visRows) {
+        item[rowLabel] = sumCell(rowLeaves, colLeaves)
+      }
+      return item
+    })
+    return { barData, keys }
+  }
 }
 
 // ─── Line chart ──────────────────────────────────────────────────────────────
@@ -97,6 +110,7 @@ export function toLineData(
   data: PivotData,
   collapsedRows: string[] = [],
   collapsedCols: string[] = [],
+  transpose = false,
 ): LineSeries[] {
   const { config, rowKeys, colKeys, cells, rowTotals } = data
   if (!rowKeys.length) return []
@@ -116,14 +130,25 @@ export function toLineData(
 
   const visCols = getVisible(colKeys, collapsedCols)
 
-  return visCols.map(({ label: colLabel, leaves: colLeaves }) => ({
-    id:   colLabel,
-    data: visRows.map(({ label, leaves: rowLeaves }) => ({
-      x: label,
-      y: rowLeaves.reduce((s, rk) =>
-        colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0),
-    })),
-  }))
+  if (!transpose) {
+    return visCols.map(({ label: colLabel, leaves: colLeaves }) => ({
+      id:   colLabel,
+      data: visRows.map(({ label, leaves: rowLeaves }) => ({
+        x: label,
+        y: rowLeaves.reduce((s, rk) =>
+          colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0),
+      })),
+    }))
+  } else {
+    return visRows.map(({ label: rowLabel, leaves: rowLeaves }) => ({
+      id:   rowLabel,
+      data: visCols.map(({ label, leaves: colLeaves }) => ({
+        x: label,
+        y: rowLeaves.reduce((s, rk) =>
+          colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0),
+      })),
+    }))
+  }
 }
 
 // ─── Pie chart ───────────────────────────────────────────────────────────────
@@ -135,13 +160,11 @@ export function getSeriesLabels(
   chartType: 'bar' | 'line' | 'pie',
   collapsedRows: string[],
   collapsedCols: string[],
+  transpose = false,
 ): string[] {
-  if (chartType === 'pie') {
-    return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
-  }
-  if (!data.colKeys.length) {
-    return [data.config.values[0]?.field ?? '']
-  }
+  if (chartType === 'pie') return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
+  if (!data.colKeys.length)  return [data.config.values[0]?.field ?? '']
+  if (transpose) return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
   return getVisible(data.colKeys, collapsedCols).map(v => v.label)
 }
 

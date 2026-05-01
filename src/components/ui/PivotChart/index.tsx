@@ -8,12 +8,13 @@ import { toBarData, toLineData, toPieData } from '@/lib/pivot/chart'
 export type ChartType = 'bar' | 'line' | 'pie'
 
 type Props = {
-  data:          PivotData
-  chartType:     ChartType
-  collapsedRows: string[]
-  collapsedCols: string[]
-  formatValue:   (v: number) => string
-  chartColors:   Record<string, string>
+  data:           PivotData
+  chartType:      ChartType
+  collapsedRows:  string[]
+  collapsedCols:  string[]
+  formatValue:    (v: number) => string
+  chartColors:    Record<string, string>
+  transpose:      boolean
 }
 
 // Thème sombre cohérent avec l'UI de l'app
@@ -61,8 +62,8 @@ const MARGIN = { top: 16, right: 16, bottom: 56, left: 56 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function BarChart({ data, collapsedRows, collapsedCols, formatValue, chartColors }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string> }) {
-  const { barData, keys } = toBarData(data, collapsedRows, collapsedCols)
+function BarChart({ data, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string>; transpose: boolean }) {
+  const { barData, keys } = toBarData(data, collapsedRows, collapsedCols, transpose)
   if (!barData.length) return <Empty />
   const colorMap = Object.fromEntries(keys.map((k, i) => [k, chartColors[k] ?? COLORS[i % COLORS.length]]))
   return (
@@ -98,8 +99,8 @@ function BarChart({ data, collapsedRows, collapsedCols, formatValue, chartColors
   )
 }
 
-function LineChart({ data, collapsedRows, collapsedCols, formatValue, chartColors }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string> }) {
-  const series = toLineData(data, collapsedRows, collapsedCols)
+function LineChart({ data, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string>; transpose: boolean }) {
+  const series = toLineData(data, collapsedRows, collapsedCols, transpose)
   if (!series.length) return <Empty />
   const colorMap = Object.fromEntries(series.map((s, i) => [String(s.id), chartColors[String(s.id)] ?? COLORS[i % COLORS.length]]))
   return (
@@ -172,11 +173,11 @@ function Empty() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function PivotChart({ data, chartType, collapsedRows, collapsedCols, formatValue, chartColors }: Props) {
+export function PivotChart({ data, chartType, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: Props) {
   return (
     <div className="w-full h-full min-h-[280px]">
-      {chartType === 'bar'  && <BarChart  data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} />}
-      {chartType === 'line' && <LineChart data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} />}
+      {chartType === 'bar'  && <BarChart  data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} transpose={transpose} />}
+      {chartType === 'line' && <LineChart data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} transpose={transpose} />}
       {chartType === 'pie'  && <PieChart  data={data} collapsedRows={collapsedRows} formatValue={formatValue} chartColors={chartColors} />}
     </div>
   )

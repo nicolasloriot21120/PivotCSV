@@ -7,7 +7,7 @@ import {
   GripVertical, ChevronDown, ChevronRight,
   X, FileText, AlertCircle,
   BarChart2, LineChart, PieChart,
-  Columns2, Rows2, Palette,
+  Columns2, Rows2, Palette, ArrowLeftRight,
 } from 'lucide-react'
 
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
@@ -82,8 +82,9 @@ export function PivotSection({
   const isHorizontal = section.chartLayout === 'horizontal'
   const formatValue  = makeFormatter(section.valueScale, section.valueDecimals)
   const seriesLabels = section.result
-    ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups)
+    ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups, section.chartTranspose)
     : []
+  const canTranspose = section.chartType !== 'pie' && (section.result?.colKeys.length ?? 0) > 0
 
   // Bouton de type de graphique
   const chartTypeBtn = (type: ChartType, Icon: React.ElementType, title: string) => (
@@ -283,6 +284,22 @@ export function PivotSection({
                         {chartTypeBtn('pie',  PieChart,    'Camembert')}
                       </div>
 
+                      {/* Transposer lignes ↔ colonnes dans le graphique */}
+                      {canTranspose && (
+                        <button
+                          title="Intervertir lignes/colonnes dans le graphique"
+                          onClick={() => onUpdate({ chartTranspose: !section.chartTranspose })}
+                          className={[
+                            'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
+                            section.chartTranspose
+                              ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                              : 'bg-elevated border-border text-subtle hover:text-text',
+                          ].join(' ')}
+                        >
+                          <ArrowLeftRight size={13} />
+                        </button>
+                      )}
+
                       <div className="w-px h-4 bg-border mx-0.5" />
 
                       {/* Layout */}
@@ -416,6 +433,7 @@ export function PivotSection({
                         collapsedCols={section.collapsedColGroups}
                         formatValue={formatValue}
                         chartColors={section.chartColors}
+                        transpose={section.chartTranspose}
                       />
                     </div>
                   </div>
