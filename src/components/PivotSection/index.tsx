@@ -6,8 +6,6 @@ type SortableListeners = ReturnType<typeof useSortable>['listeners']
 import {
   GripVertical, ChevronDown, ChevronRight,
   X, FileText, AlertCircle,
-  BarChart2, LineChart, PieChart,
-  Columns2, Rows2, Palette, ArrowLeftRight,
 } from 'lucide-react'
 
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
@@ -19,9 +17,9 @@ import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 import { makeFormatter }        from '@/lib/pivot/format'
-import type { ValueScale }      from '@/lib/pivot/format'
 import { getSeriesLabels }      from '@/lib/pivot/chart'
-import { COLORS }               from '@/components/ui/PivotChart'
+import { ResultsToolbar }       from './ResultsToolbar'
+import { ColorPickerPanel }     from './ColorPickerPanel'
 
 type Props = {
   section:             Section
@@ -42,20 +40,6 @@ type Props = {
   onToggleColGroup:    (pk: string) => void
   onSetCollapsedRows:  (pks: string[]) => void
   onSetCollapsedCols:  (pks: string[]) => void
-}
-
-// ─── Stepper flex ──────────────────────────────────────────────────────────
-
-function FlexStepper({ label, value, onChange, min = 1, max = 20 }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number }) {
-  const btnCls = 'w-4 h-4 flex items-center justify-center rounded text-subtle hover:text-text hover:bg-elevated transition-colors text-[11px]'
-  return (
-    <div className="flex items-center gap-0.5">
-      <span className="text-[10px] text-subtle mr-0.5">{label}</span>
-      <button className={btnCls} onClick={() => onChange(Math.max(min, value - 1))}>−</button>
-      <span className="w-4 text-center tabular-nums text-[11px] text-muted">{value}</span>
-      <button className={btnCls} onClick={() => onChange(Math.min(max, value + 1))}>+</button>
-    </div>
-  )
 }
 
 // ─── Composant principal ───────────────────────────────────────────────────
@@ -85,23 +69,6 @@ export function PivotSection({
     ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups, section.chartTranspose)
     : []
   const canTranspose = section.chartType !== 'pie' && (section.result?.colKeys.length ?? 0) > 0
-
-  // Bouton de type de graphique
-  const chartTypeBtn = (type: ChartType, Icon: React.ElementType, title: string) => (
-    <button
-      key={type}
-      title={title}
-      onClick={() => onUpdate({ chartType: type })}
-      className={[
-        'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-        section.chartType === type
-          ? 'bg-accent/10 border-accent/40 text-accent-hi'
-          : 'bg-elevated border-border text-subtle hover:text-text',
-      ].join(' ')}
-    >
-      <Icon size={13} />
-    </button>
-  )
 
   return (
     <div className={[
@@ -220,174 +187,26 @@ export function PivotSection({
               {section.result ? (
                 <>
                   {/* Barre de contrôles */}
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-
-                    {/* Gauche : toggles totaux + format valeurs */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {([
-                        { label: 'Totaux lignes',   value: showRowTotals, set: setShowRowTotals },
-                        { label: 'Totaux colonnes', value: showColTotals, set: setShowColTotals },
-                      ] as const).map(({ label, value, set }) => (
-                        <button
-                          key={label}
-                          onClick={() => set(v => !v)}
-                          className={[
-                            'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-                            'text-[11px] font-medium border transition-all duration-150',
-                            value
-                              ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                              : 'bg-elevated border-border text-subtle hover:text-text',
-                          ].join(' ')}
-                        >
-                          <span className={['w-1.5 h-1.5 rounded-full flex-shrink-0', value ? 'bg-accent' : 'bg-border-strong'].join(' ')} />
-                          {label}
-                        </button>
-                      ))}
-
-                      <div className="w-px h-4 bg-border mx-0.5" />
-
-                      {/* Échelle */}
-                      <div className="flex items-center gap-1">
-                        {(['none', 'K', 'M', 'G'] as const).map(s => (
-                          <button
-                            key={s}
-                            title={s === 'none' ? 'Valeur brute' : s === 'K' ? 'Milliers' : s === 'M' ? 'Millions' : 'Milliards'}
-                            onClick={() => onUpdate({ valueScale: s })}
-                            className={[
-                              'px-1.5 py-1 rounded-[var(--radius-sm)] border text-[11px] font-medium transition-all duration-150',
-                              section.valueScale === s
-                                ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                                : 'bg-elevated border-border text-subtle hover:text-text',
-                            ].join(' ')}
-                          >
-                            {s === 'none' ? '—' : s}
-                          </button>
-                        ))}
-                      </div>
-
-                      <FlexStepper
-                        label="déc."
-                        value={section.valueDecimals}
-                        onChange={v => onUpdate({ valueDecimals: v })}
-                        min={0}
-                        max={4}
-                      />
-                    </div>
-
-                    {/* Droite : contrôles graphique */}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-
-                      {/* Type de graphique */}
-                      <div className="flex items-center gap-1">
-                        {chartTypeBtn('bar',  BarChart2,   'Barres')}
-                        {chartTypeBtn('line', LineChart,   'Lignes')}
-                        {chartTypeBtn('pie',  PieChart,    'Camembert')}
-                      </div>
-
-                      {/* Transposer lignes ↔ colonnes dans le graphique */}
-                      {canTranspose && (
-                        <button
-                          title="Intervertir lignes/colonnes dans le graphique"
-                          onClick={() => onUpdate({ chartTranspose: !section.chartTranspose })}
-                          className={[
-                            'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-                            section.chartTranspose
-                              ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                              : 'bg-elevated border-border text-subtle hover:text-text',
-                          ].join(' ')}
-                        >
-                          <ArrowLeftRight size={13} />
-                        </button>
-                      )}
-
-                      <div className="w-px h-4 bg-border mx-0.5" />
-
-                      {/* Layout */}
-                      <div className="flex items-center gap-1">
-                        {([
-                          { layout: 'horizontal' as const, Icon: Columns2, title: 'Côte à côte' },
-                          { layout: 'vertical'   as const, Icon: Rows2,    title: 'Empilé' },
-                        ]).map(({ layout, Icon, title }) => (
-                          <button
-                            key={layout}
-                            title={title}
-                            onClick={() => onUpdate({ chartLayout: layout })}
-                            className={[
-                              'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-                              section.chartLayout === layout
-                                ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                                : 'bg-elevated border-border text-subtle hover:text-text',
-                            ].join(' ')}
-                          >
-                            <Icon size={13} />
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Flex (seulement en mode horizontal) */}
-                      {isHorizontal && (
-                        <>
-                          <div className="w-px h-4 bg-border mx-0.5" />
-                          <FlexStepper
-                            label="T"
-                            value={section.tableFlex}
-                            onChange={v => onUpdate({ tableFlex: v })}
-                          />
-                          <FlexStepper
-                            label="G"
-                            value={section.chartFlex}
-                            onChange={v => onUpdate({ chartFlex: v })}
-                          />
-                        </>
-                      )}
-
-                      <div className="w-px h-4 bg-border mx-0.5" />
-
-                      {/* Color picker toggle */}
-                      <button
-                        title="Couleurs des séries"
-                        onClick={() => setShowColorPicker(v => !v)}
-                        className={[
-                          'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-                          showColorPicker
-                            ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                            : 'bg-elevated border-border text-subtle hover:text-text',
-                        ].join(' ')}
-                      >
-                        <Palette size={13} />
-                      </button>
-                    </div>
-                  </div>
+                  <ResultsToolbar
+                    section={section}
+                    showRowTotals={showRowTotals}
+                    showColTotals={showColTotals}
+                    showColorPicker={showColorPicker}
+                    seriesLabels={seriesLabels}
+                    canTranspose={canTranspose}
+                    onUpdate={onUpdate}
+                    onToggleRowTotals={() => setShowRowTotals(v => !v)}
+                    onToggleColTotals={() => setShowColTotals(v => !v)}
+                    onToggleColorPicker={() => setShowColorPicker(v => !v)}
+                  />
 
                   {/* Panneau de couleurs */}
                   {showColorPicker && seriesLabels.length > 0 && (
-                    <div className="flex flex-wrap gap-3 px-3 py-2.5 rounded-[var(--radius-md)] border border-border bg-elevated/50">
-                      {seriesLabels.map((label, i) => {
-                        const current = section.chartColors[label] ?? COLORS[i % COLORS.length]
-                        return (
-                          <label key={label} className="flex items-center gap-1.5 cursor-pointer group">
-                            <div
-                              className="w-5 h-5 rounded-sm border border-white/20 flex-shrink-0 ring-offset-1 group-hover:ring-2 group-hover:ring-accent/50 transition-all"
-                              style={{ backgroundColor: current }}
-                            />
-                            <input
-                              type="color"
-                              value={current}
-                              onChange={e => onUpdate({ chartColors: { ...section.chartColors, [label]: e.target.value } })}
-                              className="sr-only"
-                            />
-                            <span className="text-[11px] text-muted max-w-[100px] truncate">{label}</span>
-                          </label>
-                        )
-                      })}
-                      <button
-                        onClick={() => onUpdate({ chartColors: {} })}
-                        className="text-[10px] text-subtle hover:text-danger transition-colors ml-auto"
-                        title="Remettre les couleurs par défaut"
-                      >
-                        Réinitialiser
-                      </button>
-                    </div>
+                    <ColorPickerPanel
+                      seriesLabels={seriesLabels}
+                      chartColors={section.chartColors}
+                      onUpdate={onUpdate}
+                    />
                   )}
 
                   {/* Tableau + Graphique */}

@@ -6,20 +6,13 @@ import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
 import type { RawRow }      from '@/lib/loader'
 import type { PivotConfig } from '@/lib/pivot/types'
 
-import { FieldChip }  from './FieldChip'
-import { DropZone }   from './DropZone'
-import { ValueChip }  from './ValueChip'
-import { FilterZone } from './FilterZone'
-import type { ConfiguratorState, DateGrouping, ValueField } from './types'
+import { FieldChip }       from './FieldChip'
+import { DropZone }        from './DropZone'
+import { ValueChip }       from './ValueChip'
+import { FilterZone }      from './FilterZone'
+import { DateGroupPicker } from './DateGroupPicker'
+import type { ConfiguratorState, ValueField } from './types'
 import { usePivotConfigurator } from './usePivotConfigurator'
-
-const DATE_GROUPS: { key: DateGrouping; label: string; title: string }[] = [
-  { key: 'week',     label: 'S',  title: 'Par semaine'   },
-  { key: 'month',    label: 'M',  title: 'Par mois'      },
-  { key: 'quarter',  label: 'T',  title: 'Par trimestre' },
-  { key: 'semester', label: 'Sm', title: 'Par semestre'  },
-  { key: 'year',     label: 'A',  title: 'Par année'     },
-]
 
 type Props = {
   value:          ConfiguratorState
@@ -31,30 +24,6 @@ type Props = {
   progress:       number
   onCompute:      (config: PivotConfig) => void
   onCancel:       () => void
-}
-
-function DateGroupPicker({
-  value, onChange,
-}: { value: DateGrouping | undefined; onChange: (g: DateGrouping | undefined) => void }) {
-  return (
-    <div className="flex items-center gap-0.5 ml-1">
-      {DATE_GROUPS.map(({ key, label, title }) => (
-        <button
-          key={key}
-          title={title}
-          onClick={() => onChange(value === key ? undefined : key)}
-          className={[
-            'text-[9px] font-semibold px-1 py-0.5 rounded border transition-all duration-100',
-            value === key
-              ? 'bg-accent/20 border-accent/50 text-accent-hi'
-              : 'bg-surface border-border text-subtle hover:text-text hover:border-border-strong',
-          ].join(' ')}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  )
 }
 
 export function PivotConfigurator({ value, onChange, headers, preview, distinctValues, status, progress, onCompute, onCancel }: Props) {

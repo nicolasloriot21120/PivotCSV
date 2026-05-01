@@ -1,8 +1,6 @@
 import type { AggregationType, PivotFilter } from '@/lib/pivot/types'
 import type { DateGrouping } from '@/lib/pivot/dateGroup'
 
-export type { DateGrouping }
-
 export type FieldType = 'string' | 'number' | 'date'
 
 export type PlacedField = {
