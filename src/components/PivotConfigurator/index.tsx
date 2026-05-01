@@ -10,8 +10,16 @@ import { FieldChip }  from './FieldChip'
 import { DropZone }   from './DropZone'
 import { ValueChip }  from './ValueChip'
 import { FilterZone } from './FilterZone'
-import type { ConfiguratorState, ValueField } from './types'
-import { usePivotConfigurator }               from './usePivotConfigurator'
+import type { ConfiguratorState, DateGrouping, ValueField } from './types'
+import { usePivotConfigurator } from './usePivotConfigurator'
+
+const DATE_GROUPS: { key: DateGrouping; label: string; title: string }[] = [
+  { key: 'week',     label: 'S',  title: 'Par semaine'   },
+  { key: 'month',    label: 'M',  title: 'Par mois'      },
+  { key: 'quarter',  label: 'T',  title: 'Par trimestre' },
+  { key: 'semester', label: 'Sm', title: 'Par semestre'  },
+  { key: 'year',     label: 'A',  title: 'Par année'     },
+]
 
 type Props = {
   value:          ConfiguratorState
@@ -25,11 +33,35 @@ type Props = {
   onCancel:       () => void
 }
 
+function DateGroupPicker({
+  value, onChange,
+}: { value: DateGrouping | undefined; onChange: (g: DateGrouping | undefined) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 ml-1">
+      {DATE_GROUPS.map(({ key, label, title }) => (
+        <button
+          key={key}
+          title={title}
+          onClick={() => onChange(value === key ? undefined : key)}
+          className={[
+            'text-[9px] font-semibold px-1 py-0.5 rounded border transition-all duration-100',
+            value === key
+              ? 'bg-accent/20 border-accent/50 text-accent-hi'
+              : 'bg-surface border-border text-subtle hover:text-text hover:border-border-strong',
+          ].join(' ')}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function PivotConfigurator({ value, onChange, headers, preview, distinctValues, status, progress, onCompute, onCancel }: Props) {
   const {
     sensors, dragging, available,
     canCompute, computing,
-    removeFromZone, addToZone,
+    removeFromZone, addToZone, updateDateGroup,
     onDragStart, onDragEnd, handleCompute,
   } = usePivotConfigurator({ value, onChange, headers, preview, distinctValues, status, onCompute })
 
@@ -59,25 +91,39 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
         <div className="grid grid-cols-2 gap-4">
           <DropZone id="rows" label="Lignes" icon={<Rows3 size={12} />} placeholder="Glissez un champ ici">
             {value.rows.map(f => (
-              <FieldChip
-                key={f.field}
-                field={f.field}
-                type={f.type}
-                draggableId={`rows::${f.field}`}
-                onRemove={() => removeFromZone('rows', f.field)}
-              />
+              <div key={f.field} className="flex flex-col gap-0.5">
+                <FieldChip
+                  field={f.field}
+                  type={f.type}
+                  draggableId={`rows::${f.field}`}
+                  onRemove={() => removeFromZone('rows', f.field)}
+                />
+                {f.type === 'date' && (
+                  <DateGroupPicker
+                    value={f.dateGroup}
+                    onChange={g => updateDateGroup('rows', f.field, g)}
+                  />
+                )}
+              </div>
             ))}
           </DropZone>
 
           <DropZone id="columns" label="Colonnes" icon={<Columns3 size={12} />} placeholder="Glissez un champ ici">
             {value.columns.map(f => (
-              <FieldChip
-                key={f.field}
-                field={f.field}
-                type={f.type}
-                draggableId={`columns::${f.field}`}
-                onRemove={() => removeFromZone('columns', f.field)}
-              />
+              <div key={f.field} className="flex flex-col gap-0.5">
+                <FieldChip
+                  field={f.field}
+                  type={f.type}
+                  draggableId={`columns::${f.field}`}
+                  onRemove={() => removeFromZone('columns', f.field)}
+                />
+                {f.type === 'date' && (
+                  <DateGroupPicker
+                    value={f.dateGroup}
+                    onChange={g => updateDateGroup('columns', f.field, g)}
+                  />
+                )}
+              </div>
             ))}
           </DropZone>
 

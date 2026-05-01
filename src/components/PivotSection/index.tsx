@@ -7,7 +7,7 @@ import {
   GripVertical, ChevronDown, ChevronRight,
   X, FileText, AlertCircle,
   BarChart2, LineChart, PieChart,
-  Columns2, Rows2,
+  Columns2, Rows2, Palette,
 } from 'lucide-react'
 
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
@@ -18,6 +18,10 @@ import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
+import { makeFormatter }        from '@/lib/pivot/format'
+import type { ValueScale }      from '@/lib/pivot/format'
+import { getSeriesLabels }      from '@/lib/pivot/chart'
+import { COLORS }               from '@/components/ui/PivotChart'
 
 type Props = {
   section:             Section
@@ -42,14 +46,14 @@ type Props = {
 
 // ─── Stepper flex ──────────────────────────────────────────────────────────
 
-function FlexStepper({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+function FlexStepper({ label, value, onChange, min = 1, max = 20 }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number }) {
   const btnCls = 'w-4 h-4 flex items-center justify-center rounded text-subtle hover:text-text hover:bg-elevated transition-colors text-[11px]'
   return (
     <div className="flex items-center gap-0.5">
       <span className="text-[10px] text-subtle mr-0.5">{label}</span>
-      <button className={btnCls} onClick={() => onChange(Math.max(1, value - 1))}>−</button>
+      <button className={btnCls} onClick={() => onChange(Math.max(min, value - 1))}>−</button>
       <span className="w-4 text-center tabular-nums text-[11px] text-muted">{value}</span>
-      <button className={btnCls} onClick={() => onChange(Math.min(20, value + 1))}>+</button>
+      <button className={btnCls} onClick={() => onChange(Math.min(max, value + 1))}>+</button>
     </div>
   )
 }
@@ -64,17 +68,22 @@ export function PivotSection({
   onToggleRowGroup, onToggleColGroup,
   onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
-  const [editingLabel, setEditingLabel] = useState(false)
-  const [activeTab,    setActiveTab]    = useState<'config' | 'result'>('config')
-  const [showRowTotals, setShowRowTotals] = useState(true)
-  const [showColTotals, setShowColTotals] = useState(true)
+  const [editingLabel,     setEditingLabel]     = useState(false)
+  const [activeTab,        setActiveTab]        = useState<'config' | 'result'>('config')
+  const [showRowTotals,    setShowRowTotals]    = useState(true)
+  const [showColTotals,    setShowColTotals]    = useState(true)
+  const [showColorPicker,  setShowColorPicker]  = useState(false)
 
   useEffect(() => {
     if (section.status === 'done') setActiveTab('result')
   }, [section.status])
 
-  const hasResult   = section.result !== null
+  const hasResult    = section.result !== null
   const isHorizontal = section.chartLayout === 'horizontal'
+  const formatValue  = makeFormatter(section.valueScale, section.valueDecimals)
+  const seriesLabels = section.result
+    ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups)
+    : []
 
   // Bouton de type de graphique
   const chartTypeBtn = (type: ChartType, Icon: React.ElementType, title: string) => (
@@ -212,8 +221,8 @@ export function PivotSection({
                   {/* Barre de contrôles */}
                   <div className="flex items-center justify-between gap-2 flex-wrap">
 
-                    {/* Gauche : toggles totaux */}
-                    <div className="flex items-center gap-2">
+                    {/* Gauche : toggles totaux + format valeurs */}
+                    <div className="flex items-center gap-2 flex-wrap">
                       {([
                         { label: 'Totaux lignes',   value: showRowTotals, set: setShowRowTotals },
                         { label: 'Totaux colonnes', value: showColTotals, set: setShowColTotals },
@@ -233,6 +242,35 @@ export function PivotSection({
                           {label}
                         </button>
                       ))}
+
+                      <div className="w-px h-4 bg-border mx-0.5" />
+
+                      {/* Échelle */}
+                      <div className="flex items-center gap-1">
+                        {(['none', 'K', 'M', 'G'] as const).map(s => (
+                          <button
+                            key={s}
+                            title={s === 'none' ? 'Valeur brute' : s === 'K' ? 'Milliers' : s === 'M' ? 'Millions' : 'Milliards'}
+                            onClick={() => onUpdate({ valueScale: s })}
+                            className={[
+                              'px-1.5 py-1 rounded-[var(--radius-sm)] border text-[11px] font-medium transition-all duration-150',
+                              section.valueScale === s
+                                ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                                : 'bg-elevated border-border text-subtle hover:text-text',
+                            ].join(' ')}
+                          >
+                            {s === 'none' ? '—' : s}
+                          </button>
+                        ))}
+                      </div>
+
+                      <FlexStepper
+                        label="déc."
+                        value={section.valueDecimals}
+                        onChange={v => onUpdate({ valueDecimals: v })}
+                        min={0}
+                        max={4}
+                      />
                     </div>
 
                     {/* Droite : contrôles graphique */}
@@ -285,13 +323,60 @@ export function PivotSection({
                           />
                         </>
                       )}
+
+                      <div className="w-px h-4 bg-border mx-0.5" />
+
+                      {/* Color picker toggle */}
+                      <button
+                        title="Couleurs des séries"
+                        onClick={() => setShowColorPicker(v => !v)}
+                        className={[
+                          'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
+                          showColorPicker
+                            ? 'bg-accent/10 border-accent/40 text-accent-hi'
+                            : 'bg-elevated border-border text-subtle hover:text-text',
+                        ].join(' ')}
+                      >
+                        <Palette size={13} />
+                      </button>
                     </div>
                   </div>
+
+                  {/* Panneau de couleurs */}
+                  {showColorPicker && seriesLabels.length > 0 && (
+                    <div className="flex flex-wrap gap-3 px-3 py-2.5 rounded-[var(--radius-md)] border border-border bg-elevated/50">
+                      {seriesLabels.map((label, i) => {
+                        const current = section.chartColors[label] ?? COLORS[i % COLORS.length]
+                        return (
+                          <label key={label} className="flex items-center gap-1.5 cursor-pointer group">
+                            <div
+                              className="w-5 h-5 rounded-sm border border-white/20 flex-shrink-0 ring-offset-1 group-hover:ring-2 group-hover:ring-accent/50 transition-all"
+                              style={{ backgroundColor: current }}
+                            />
+                            <input
+                              type="color"
+                              value={current}
+                              onChange={e => onUpdate({ chartColors: { ...section.chartColors, [label]: e.target.value } })}
+                              className="sr-only"
+                            />
+                            <span className="text-[11px] text-muted max-w-[100px] truncate">{label}</span>
+                          </label>
+                        )
+                      })}
+                      <button
+                        onClick={() => onUpdate({ chartColors: {} })}
+                        className="text-[10px] text-subtle hover:text-danger transition-colors ml-auto"
+                        title="Remettre les couleurs par défaut"
+                      >
+                        Réinitialiser
+                      </button>
+                    </div>
+                  )}
 
                   {/* Tableau + Graphique */}
                   <div className={[
                     'flex gap-3',
-                    isHorizontal ? 'flex-row items-start' : 'flex-col',
+                    isHorizontal ? 'flex-row items-stretch' : 'flex-col',
                   ].join(' ')}>
 
                     {/* Tableau */}
@@ -309,6 +394,7 @@ export function PivotSection({
                         onToggleColGroup={onToggleColGroup}
                         onSetCollapsedRows={onSetCollapsedRows}
                         onSetCollapsedCols={onSetCollapsedCols}
+                        formatValue={formatValue}
                       />
                     </div>
 
@@ -326,6 +412,10 @@ export function PivotSection({
                       <PivotChart
                         data={section.result}
                         chartType={section.chartType}
+                        collapsedRows={section.collapsedRowGroups}
+                        collapsedCols={section.collapsedColGroups}
+                        formatValue={formatValue}
+                        chartColors={section.chartColors}
                       />
                     </div>
                   </div>

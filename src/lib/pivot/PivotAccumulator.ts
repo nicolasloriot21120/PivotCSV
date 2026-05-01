@@ -1,5 +1,6 @@
 import type { RawRow } from '../loader/csv/types'
 import type { AggregationType, PivotConfig, PivotData } from './types'
+import { groupDate } from './dateGroup'
 
 type Accum = { sum: number; count: number; min: number; max: number }
 
@@ -54,8 +55,14 @@ export class PivotAccumulator {
   }
 
   add(row: RawRow): void {
-    const rowParts = this.config.rows.map(f    => String(row[f] ?? ''))
-    const colParts = this.config.columns.map(f => String(row[f] ?? ''))
+    const rowParts = this.config.rows.map(f => {
+      const raw = String(row[f.field] ?? '')
+      return f.dateGroup ? groupDate(raw, f.dateGroup) : raw
+    })
+    const colParts = this.config.columns.map(f => {
+      const raw = String(row[f.field] ?? '')
+      return f.dateGroup ? groupDate(raw, f.dateGroup) : raw
+    })
     const rk = keyStr(rowParts)
     const ck = keyStr(colParts)
 

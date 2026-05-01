@@ -1,43 +1,88 @@
 import type { PivotData } from './types'
 
-// Helpers identiques à PivotTable pour la cohérence des clés
 const keyStr  = (parts: string[]) => parts.join('\x00')
 const cellKey = (rk: string, ck: string) => JSON.stringify([rk, ck])
+const dispKey = (parts: string[]) => parts.join(' › ')
 
-// Le graphique utilise toujours le premier champ valeur configuré.
-// Avec plusieurs valeurs, l'utilisateur peut choisir lequel afficher
-// (fonctionnalité future — pour l'instant on prend values[0]).
+// ─── Visibilité selon l'état replié ──────────────────────────────────────────
+// Un item visible est soit :
+//   - une feuille dont aucun ancêtre n'est replié
+//   - un groupe replié (remplace ses enfants, agrégeant leurs valeurs)
+
+type VisItem = {
+  label:    string    // label d'axe/légende
+  leaves:   string[]  // keyStr des feuilles qui contribuent à la valeur
+}
+
+function getVisible(allKeys: string[][], collapsed: string[]): VisItem[] {
+  const cSet  = new Set(collapsed)
+  const result: VisItem[]  = []
+  const seenGroups = new Set<string>()
+
+  for (const key of allKeys) {
+    let groupPath: string[] | null = null
+    for (let i = 1; i < key.length; i++) {
+      if (cSet.has(keyStr(key.slice(0, i)))) { groupPath = key.slice(0, i); break }
+    }
+
+    if (!groupPath) {
+      result.push({ label: dispKey(key), leaves: [keyStr(key)] })
+    } else {
+      const gk = keyStr(groupPath)
+      if (!seenGroups.has(gk)) {
+        seenGroups.add(gk)
+        result.push({
+          label:  dispKey(groupPath),
+          leaves: allKeys.filter(k => keyStr(k).startsWith(gk + '\x00')).map(keyStr),
+        })
+      }
+    }
+  }
+  return result
+}
+
+// Somme une valeur (index 0) sur une liste de clés feuilles
+const sumLeaves = (
+  leaves: string[],
+  lookup: Record<string, (number | null)[]>,
+) => leaves.reduce((s, k) => s + (lookup[k]?.[0] ?? 0), 0)
 
 // ─── Bar chart ───────────────────────────────────────────────────────────────
-// Format Nivo ResponsiveBar :
-//   [{ id: 'Nord', 'Cat A': 150, 'Cat B': 200 }, ...]
-//   keys = ['Cat A', 'Cat B']  (colonnes → groupes de barres)
 
 export type BarDatum = Record<string, string | number>
 
-export function toBarData(data: PivotData): { barData: BarDatum[]; keys: string[] } {
+export function toBarData(
+  data: PivotData,
+  collapsedRows: string[] = [],
+  collapsedCols: string[] = [],
+): { barData: BarDatum[]; keys: string[] } {
   const { config, rowKeys, colKeys, cells, rowTotals } = data
   if (!rowKeys.length) return { barData: [], keys: [] }
 
   const valueField = config.values[0]
+  const visRows = getVisible(rowKeys, collapsedRows)
 
   if (!colKeys.length) {
-    // Pas de colonnes : une barre par ligne, hauteur = total ligne
     return {
       keys:    [valueField.field],
-      barData: rowKeys.map(rk => ({
-        id:               rk[rk.length - 1],
-        [valueField.field]: rowTotals[keyStr(rk)]?.[0] ?? 0,
+      barData: visRows.map(({ label, leaves }) => ({
+        id:                 label,
+        [valueField.field]: sumLeaves(leaves, rowTotals),
       })),
     }
   }
 
-  // Colonnes présentes : barres groupées, une couleur par colonne
-  const keys = colKeys.map(ck => ck[ck.length - 1])
-  const barData = rowKeys.map(rk => {
-    const item: BarDatum = { id: rk[rk.length - 1] }
-    for (const ck of colKeys) {
-      item[ck[ck.length - 1]] = cells[cellKey(keyStr(rk), keyStr(ck))]?.[0] ?? 0
+  const visCols = getVisible(colKeys, collapsedCols)
+  const keys    = visCols.map(c => c.label)
+
+  const sumCell = (rowLeaves: string[], colLeaves: string[]) =>
+    rowLeaves.reduce((s, rk) =>
+      colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0)
+
+  const barData = visRows.map(({ label, leaves: rowLeaves }) => {
+    const item: BarDatum = { id: label }
+    for (const { label: colLabel, leaves: colLeaves } of visCols) {
+      item[colLabel] = sumCell(rowLeaves, colLeaves)
     }
     return item
   })
@@ -45,50 +90,73 @@ export function toBarData(data: PivotData): { barData: BarDatum[]; keys: string[
 }
 
 // ─── Line chart ──────────────────────────────────────────────────────────────
-// Format Nivo ResponsiveLine :
-//   [{ id: 'Cat A', data: [{ x: 'Nord', y: 150 }, ...] }, ...]
-//   Une série par colonne (ou une seule série = valeur totale si pas de colonnes)
 
 export type LineSeries = { id: string; data: { x: string; y: number }[] }
 
-export function toLineData(data: PivotData): LineSeries[] {
+export function toLineData(
+  data: PivotData,
+  collapsedRows: string[] = [],
+  collapsedCols: string[] = [],
+): LineSeries[] {
   const { config, rowKeys, colKeys, cells, rowTotals } = data
   if (!rowKeys.length) return []
 
   const valueField = config.values[0]
+  const visRows    = getVisible(rowKeys, collapsedRows)
 
   if (!colKeys.length) {
     return [{
       id:   valueField.field,
-      data: rowKeys.map(rk => ({
-        x: rk[rk.length - 1],
-        y: rowTotals[keyStr(rk)]?.[0] ?? 0,
+      data: visRows.map(({ label, leaves }) => ({
+        x: label,
+        y: sumLeaves(leaves, rowTotals),
       })),
     }]
   }
 
-  return colKeys.map(ck => ({
-    id:   ck[ck.length - 1],
-    data: rowKeys.map(rk => ({
-      x: rk[rk.length - 1],
-      y: cells[cellKey(keyStr(rk), keyStr(ck))]?.[0] ?? 0,
+  const visCols = getVisible(colKeys, collapsedCols)
+
+  return visCols.map(({ label: colLabel, leaves: colLeaves }) => ({
+    id:   colLabel,
+    data: visRows.map(({ label, leaves: rowLeaves }) => ({
+      x: label,
+      y: rowLeaves.reduce((s, rk) =>
+        colLeaves.reduce((s2, ck) => s2 + (cells[cellKey(rk, ck)]?.[0] ?? 0), s), 0),
     })),
   }))
 }
 
 // ─── Pie chart ───────────────────────────────────────────────────────────────
-// Format Nivo ResponsivePie :
-//   [{ id: 'Nord', label: 'Nord', value: 350 }, ...]
-//   Utilise les totaux ligne (ignore les colonnes — agrège tout).
-//   Les valeurs négatives sont mises à 0 (Nivo ne supporte pas les arcs négatifs).
+
+// ─── Labels des séries visibles (pour le color picker) ───────────────────────
+
+export function getSeriesLabels(
+  data: PivotData,
+  chartType: 'bar' | 'line' | 'pie',
+  collapsedRows: string[],
+  collapsedCols: string[],
+): string[] {
+  if (chartType === 'pie') {
+    return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
+  }
+  if (!data.colKeys.length) {
+    return [data.config.values[0]?.field ?? '']
+  }
+  return getVisible(data.colKeys, collapsedCols).map(v => v.label)
+}
+
+// ─── Pie chart ───────────────────────────────────────────────────────────────
 
 export type PieDatum = { id: string; label: string; value: number }
 
-export function toPieData(data: PivotData): PieDatum[] {
+export function toPieData(
+  data: PivotData,
+  collapsedRows: string[] = [],
+): PieDatum[] {
   const { rowKeys, rowTotals } = data
-  return rowKeys.map(rk => ({
-    id:    keyStr(rk),
-    label: rk[rk.length - 1],
-    value: Math.max(0, rowTotals[keyStr(rk)]?.[0] ?? 0),
+  return getVisible(rowKeys, collapsedRows).map(({ label, leaves }) => ({
+    id:    label,
+    label,
+    value: Math.max(0, sumLeaves(leaves, rowTotals)),
   }))
 }

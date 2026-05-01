@@ -8,8 +8,12 @@ import { toBarData, toLineData, toPieData } from '@/lib/pivot/chart'
 export type ChartType = 'bar' | 'line' | 'pie'
 
 type Props = {
-  data:      PivotData
-  chartType: ChartType
+  data:          PivotData
+  chartType:     ChartType
+  collapsedRows: string[]
+  collapsedCols: string[]
+  formatValue:   (v: number) => string
+  chartColors:   Record<string, string>
 }
 
 // Thème sombre cohérent avec l'UI de l'app
@@ -39,19 +43,28 @@ const theme = {
   },
 }
 
-// Palette de couleurs qui ressort sur fond sombre
-const COLORS = [
-  '#60a5fa', '#34d399', '#fbbf24', '#f87171',
-  '#a78bfa', '#38bdf8', '#fb923c', '#e879f9',
+// Palette Tableau-10 adaptée fond sombre — teintes désaturées, lisiblité éprouvée
+export const COLORS = [
+  '#5b9cf6',  // blue
+  '#f5a623',  // amber
+  '#3ecf8e',  // emerald
+  '#f26868',  // coral
+  '#a78bfa',  // violet
+  '#22d3ee',  // cyan
+  '#fb923c',  // orange
+  '#c084fc',  // purple
+  '#34d399',  // mint
+  '#f472b6',  // rose
 ]
 
 const MARGIN = { top: 16, right: 16, bottom: 56, left: 56 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function BarChart({ data }: { data: PivotData }) {
-  const { barData, keys } = toBarData(data)
+function BarChart({ data, collapsedRows, collapsedCols, formatValue, chartColors }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string> }) {
+  const { barData, keys } = toBarData(data, collapsedRows, collapsedCols)
   if (!barData.length) return <Empty />
+  const colorMap = Object.fromEntries(keys.map((k, i) => [k, chartColors[k] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsiveBar
       data={barData}
@@ -59,16 +72,17 @@ function BarChart({ data }: { data: PivotData }) {
       indexBy="id"
       groupMode="grouped"
       theme={theme}
-      colors={COLORS}
+      colors={(d: any) => colorMap[String(d.id)] ?? COLORS[0]}
       margin={MARGIN}
       padding={0.25}
       innerPadding={2}
       enableLabel={false}
+      valueFormat={v => formatValue(v)}
       axisBottom={{
         tickRotation: barData.length > 6 ? -35 : 0,
         tickSize: 4,
       }}
-      axisLeft={{ tickSize: 4 }}
+      axisLeft={{ tickSize: 4, format: v => formatValue(Number(v)) }}
       legends={keys.length > 1 ? [{
         dataFrom:      'keys',
         anchor:        'bottom',
@@ -84,17 +98,19 @@ function BarChart({ data }: { data: PivotData }) {
   )
 }
 
-function LineChart({ data }: { data: PivotData }) {
-  const series = toLineData(data)
+function LineChart({ data, collapsedRows, collapsedCols, formatValue, chartColors }: { data: PivotData; collapsedRows: string[]; collapsedCols: string[]; formatValue: (v: number) => string; chartColors: Record<string, string> }) {
+  const series = toLineData(data, collapsedRows, collapsedCols)
   if (!series.length) return <Empty />
+  const colorMap = Object.fromEntries(series.map((s, i) => [String(s.id), chartColors[String(s.id)] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsiveLine
       data={series}
       theme={theme}
-      colors={COLORS}
+      colors={(s: any) => colorMap[String(s.id)] ?? COLORS[0]}
       margin={MARGIN}
       xScale={{ type: 'point' }}
-      yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+      yScale={{ type: 'linear', min: 0, max: 'auto', nice: true }}
+      curve="monotoneX"
       pointSize={6}
       pointColor={{ theme: 'background' }}
       pointBorderWidth={2}
@@ -102,11 +118,12 @@ function LineChart({ data }: { data: PivotData }) {
       enableArea={series.length === 1}
       areaOpacity={0.1}
       useMesh
+      yFormat={v => formatValue(Number(v))}
       axisBottom={{
         tickRotation: series[0]?.data.length > 6 ? -35 : 0,
         tickSize: 4,
       }}
-      axisLeft={{ tickSize: 4 }}
+      axisLeft={{ tickSize: 4, format: v => formatValue(Number(v)) }}
       legends={series.length > 1 ? [{
         anchor:        'bottom',
         direction:     'row',
@@ -121,24 +138,26 @@ function LineChart({ data }: { data: PivotData }) {
   )
 }
 
-function PieChart({ data }: { data: PivotData }) {
-  const pieData = toPieData(data)
+function PieChart({ data, collapsedRows, formatValue, chartColors }: { data: PivotData; collapsedRows: string[]; formatValue: (v: number) => string; chartColors: Record<string, string> }) {
+  const pieData = toPieData(data, collapsedRows)
   if (!pieData.length) return <Empty />
+  const colorMap = Object.fromEntries(pieData.map((d, i) => [d.id, chartColors[d.id] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsivePie
       data={pieData}
       theme={theme}
-      colors={COLORS}
+      colors={(d: any) => colorMap[d.id] ?? COLORS[0]}
       margin={{ top: 24, right: 80, bottom: 40, left: 80 }}
       innerRadius={0.5}
       padAngle={1.5}
       cornerRadius={3}
       activeOuterRadiusOffset={6}
+      valueFormat={v => formatValue(v)}
       arcLinkLabelsSkipAngle={10}
       arcLinkLabelsTextColor="#94a3b8"
       arcLinkLabelsColor={{ from: 'color' }}
       arcLabelsSkipAngle={18}
-      arcLabelsTextColor="#0f172a"
+      arcLabelsTextColor="#e2e8f0"
     />
   )
 }
@@ -153,12 +172,12 @@ function Empty() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function PivotChart({ data, chartType }: Props) {
+export function PivotChart({ data, chartType, collapsedRows, collapsedCols, formatValue, chartColors }: Props) {
   return (
-    <div className="w-full h-full">
-      {chartType === 'bar'  && <BarChart  data={data} />}
-      {chartType === 'line' && <LineChart data={data} />}
-      {chartType === 'pie'  && <PieChart  data={data} />}
+    <div className="w-full h-full min-h-[280px]">
+      {chartType === 'bar'  && <BarChart  data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} />}
+      {chartType === 'line' && <LineChart data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} />}
+      {chartType === 'pie'  && <PieChart  data={data} collapsedRows={collapsedRows} formatValue={formatValue} chartColors={chartColors} />}
     </div>
   )
 }

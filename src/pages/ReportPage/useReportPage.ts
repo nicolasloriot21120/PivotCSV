@@ -14,6 +14,16 @@ import type { FileEntry, Section } from '@/types/app'
 
 const loader = new CSVLoader()
 
+// Migration : anciens configs persistés avaient rows/columns: string[]
+function normalizeConfig(config: PivotConfig | null): PivotConfig | null {
+  if (!config) return null
+  return {
+    ...config,
+    rows:    config.rows.map((f: any) => typeof f === 'string' ? { field: f } : f),
+    columns: config.columns.map((f: any) => typeof f === 'string' ? { field: f } : f),
+  }
+}
+
 export function makeSection(fileId: string, fileName: string, index: number): Section {
   return {
     id:                crypto.randomUUID(),
@@ -35,6 +45,9 @@ export function makeSection(fileId: string, fileName: string, index: number): Se
     chartLayout:        'horizontal',
     tableFlex:          5,
     chartFlex:          5,
+    valueScale:         'none',
+    valueDecimals:      2,
+    chartColors:        {},
   }
 }
 
@@ -59,12 +72,16 @@ export function useReportPage() {
         setFileEntries(state.fileEntries)
         setSections(state.sections.map(s => ({
           ...s,
+          config:             normalizeConfig(s.config),
           collapsedRowGroups: s.collapsedRowGroups ?? [],
           collapsedColGroups: s.collapsedColGroups ?? [],
-          chartType:          s.chartType   ?? 'bar',
-          chartLayout:        s.chartLayout ?? 'horizontal',
-          tableFlex:          s.tableFlex   ?? 5,
-          chartFlex:          s.chartFlex   ?? 5,
+          chartType:          s.chartType     ?? 'bar',
+          chartLayout:        s.chartLayout   ?? 'horizontal',
+          tableFlex:          s.tableFlex     ?? 5,
+          chartFlex:          s.chartFlex     ?? 5,
+          valueScale:         s.valueScale    ?? 'none',
+          valueDecimals:      s.valueDecimals ?? 2,
+          chartColors:        s.chartColors   ?? {},
         })))
         // Rescanner les valeurs distinctes pour les fichiers restaurés (non persistées).
         // Met aussi à jour les FilterField des sections associées.

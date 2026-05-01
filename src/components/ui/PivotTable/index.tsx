@@ -278,18 +278,16 @@ function buildColHeader(colTree: TreeNode[], nCF: number, nVal: number): HCell[]
 // =============================================================================
 
 export type PivotTableProps = {
-  data:               PivotData   // résultat du calcul pivot (depuis le worker)
-  showRowTotals:      boolean     // afficher la colonne "Total" à droite
-  showColTotals:      boolean     // afficher la ligne "Total" en bas
-  // État des groupes repliés — tableaux de prefixKey (ex: ['Nord', 'Nord\x00Lille'])
-  // Persistés dans Section.collapsedRowGroups / collapsedColGroups (IndexedDB)
-  // → les graphiques futurs seront bindés sur ces mêmes états
+  data:               PivotData
+  showRowTotals:      boolean
+  showColTotals:      boolean
   collapsedRowGroups: string[]
   collapsedColGroups: string[]
-  onToggleRowGroup:   (pk: string) => void    // basculer un groupe ligne
-  onToggleColGroup:   (pk: string) => void    // basculer un groupe colonne
-  onSetCollapsedRows: (pks: string[]) => void // remplacer toute la liste (tout replier/déplier)
-  onSetCollapsedCols: (pks: string[]) => void // idem pour colonnes
+  onToggleRowGroup:   (pk: string) => void
+  onToggleColGroup:   (pk: string) => void
+  onSetCollapsedRows: (pks: string[]) => void
+  onSetCollapsedCols: (pks: string[]) => void
+  formatValue?:       (v: number) => string   // formateur personnalisé (échelle + décimales)
 }
 
 // =============================================================================
@@ -301,9 +299,16 @@ export function PivotTable({
   collapsedRowGroups, collapsedColGroups,
   onToggleRowGroup, onToggleColGroup,
   onSetCollapsedRows, onSetCollapsedCols,
+  formatValue,
 }: PivotTableProps) {
   const { config, rowKeys, colKeys, cells, rowTotals, colTotals, grandTotal } = data
   const { values } = config
+
+  const fmtCell = (v: number | null, agg: AggregationType) => {
+    if (v === null) return '—'
+    if (formatValue && agg !== 'count') return formatValue(v)
+    return fmt(v, agg)
+  }
 
   const nVal     = values.length           // nombre de champs valeur (ex: 2 si Σ Qté + Σ CA)
   const nRF      = config.rows.length      // nombre de champs ligne
@@ -465,7 +470,7 @@ export function PivotTable({
                   rowSpan={nHeaderRows}
                   className={`${thBase} text-left text-subtle`}
                 >
-                  {config.rows.join(' › ')}
+                  {config.rows.map(f => f.field).join(' › ')}
                 </th>
               )}
 
@@ -515,7 +520,7 @@ export function PivotTable({
           {!hasCols && (
             <tr>
               <th rowSpan={nHeaderRows} className={`${thBase} text-left text-subtle`}>
-                {config.rows.join(' › ')}
+                {config.rows.map(f => f.field).join(' › ')}
               </th>
               {showRowTotals && (
                 <th
@@ -631,7 +636,7 @@ export function PivotTable({
                       // Groupes : text-text (sous-total visible), feuilles : text-muted
                       className={`${tdBase} text-right tabular-nums ${isGroup ? 'text-text font-medium' : 'text-muted'}`}
                     >
-                      {fmt(vals[vi], vc.aggregation)}
+                      {fmtCell(vals[vi], vc.aggregation)}
                     </td>
                   ))
                 })}
@@ -643,7 +648,7 @@ export function PivotTable({
                     key={`rt-${vi}`}
                     className={`${tdBase} text-right tabular-nums bg-elevated/30 ${isGroup ? 'font-bold text-text' : 'font-semibold text-text'}`}
                   >
-                    {fmt(v, values[vi].aggregation)}
+                    {fmtCell(v, values[vi].aggregation)}
                   </td>
                 ))}
 
@@ -673,7 +678,7 @@ export function PivotTable({
                     key={`ct-${ci}-${vi}`}
                     className={`${tdBase} text-right tabular-nums font-semibold text-text bg-elevated/30`}
                   >
-                    {fmt(vals[vi], vc.aggregation)}
+                    {fmtCell(vals[vi], vc.aggregation)}
                   </td>
                 ))
               })}
@@ -684,7 +689,7 @@ export function PivotTable({
                   key={`gt-${vi}`}
                   className={`${tdBase} text-right tabular-nums font-bold text-accent-hi bg-accent/10`}
                 >
-                  {fmt(grandTotal[vi] ?? null, vc.aggregation)}
+                  {fmtCell(grandTotal[vi] ?? null, vc.aggregation)}
                 </td>
               ))}
             </tr>
