@@ -4,8 +4,8 @@ import type { ExportBlock } from '../types'
 const styles = StyleSheet.create({
   page:    { backgroundColor: 'white', position: 'relative' },
   block:   { position: 'absolute' },
-  image:   { width: '100%', height: '100%', objectFit: 'contain' },
-  comment: { fontSize: 10, color: '#334155', padding: 8, border: '1pt solid #e2e8f0', borderRadius: 4 },
+  image:   { width: '100%', height: '100%' },
+  comment: { fontSize: 10, color: '#334155', padding: 8, borderWidth: 1, borderColor: '#e2e8f0', borderStyle: 'solid', borderRadius: 4 },
   title:   { fontSize: 8, color: '#64748b', marginBottom: 4, fontWeight: 'bold' },
 })
 
@@ -21,7 +21,7 @@ function PdfDocument({ blocks, images }: { blocks: ExportBlock[]; images: Record
                 <Text style={{ fontSize: 10, color: '#1e293b' }}>{block.comment ?? ''}</Text>
               </View>
             ) : (
-              images[block.id] ? <Image style={styles.image} src={images[block.id]} /> : null
+              images[block.id] ? <Image style={styles.image} src={images[block.id]} objectFit="contain" /> : null
             )}
           </View>
         ))}
