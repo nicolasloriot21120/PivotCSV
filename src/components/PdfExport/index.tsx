@@ -1,7 +1,7 @@
 import { Download } from 'lucide-react'
 import type { Section } from '@/types/app'
-import { usePdfExport } from './hooks/usePdfExport'
-import { LayoutEditor } from './components/LayoutEditor'
+import { usePdfExport }   from './hooks/usePdfExport'
+import { LayoutEditor }   from './components/LayoutEditor'
 
 type Props = {
   sections: Section[]
@@ -13,6 +13,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
     rows, generating, hasContent,
     addRow, removeRow, updateRowFlex,
     splitCell, removeCell, setCellContent, updateCellFlex,
+    generate,
   } = usePdfExport(sections)
 
   return (
@@ -98,10 +99,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
           }}
         >
           <button
-            onClick={generating ? undefined : async () => {
-              const { buildAndDownloadPdf } = await import('./lib/buildPdf')
-              await buildAndDownloadPdf(rows, sections)
-            }}
+            onClick={generating ? undefined : generate}
             disabled={!hasContent || generating}
             style={{
               display:      'flex',
