@@ -1,0 +1,220 @@
+import { useState, useEffect, useCallback } from 'react'
+import { ChevronLeft, ChevronRight, X }     from 'lucide-react'
+import { PivotTable }  from '@/components/ui/PivotTable'
+import { PivotChart }  from '@/components/ui/PivotChart'
+import { makeFormatter } from '@/lib/pivot/format'
+import type { Section } from '@/types/app'
+
+type Props = {
+  sections: Section[]  // uniquement les sections avec result !== null
+  onClose:  () => void
+}
+
+export function PresentationMode({ sections, onClose }: Props) {
+  const [index,   setIndex]   = useState(0)
+  const [notes,   setNotes]   = useState<Record<string, string>>({})
+  const [cRows,   setCRows]   = useState<Record<string, string[]>>({})
+  const [cCols,   setCCols]   = useState<Record<string, string[]>>({})
+
+  // Initialise les états collapsed depuis les sections
+  useEffect(() => {
+    setCRows(Object.fromEntries(sections.map(s => [s.id, s.collapsedRowGroups])))
+    setCCols(Object.fromEntries(sections.map(s => [s.id, s.collapsedColGroups])))
+  }, [sections])
+
+  const prev = useCallback(() => setIndex(i => Math.max(0, i - 1)), [])
+  const next = useCallback(() => setIndex(i => Math.min(sections.length - 1, i + 1)), [sections.length])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  prev()
+      else if (e.key === 'ArrowRight') next()
+      else if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [prev, next, onClose])
+
+  const section = sections[index]
+  if (!section?.result) return null
+
+  const formatValue        = makeFormatter(section.valueScale, section.valueDecimals)
+  const collapsedRowGroups = cRows[section.id] ?? section.collapsedRowGroups
+  const collapsedColGroups = cCols[section.id] ?? section.collapsedColGroups
+
+  const isFirst = index === 0
+  const isLast  = index === sections.length - 1
+
+  const chevronStyle = (disabled: boolean) => ({
+    position:        'absolute' as const,
+    top:             '50%',
+    transform:       'translateY(-50%)',
+    zIndex:          10,
+    width:           40,
+    height:          40,
+    borderRadius:    8,
+    display:         'flex',
+    alignItems:      'center',
+    justifyContent:  'center',
+    cursor:          disabled ? 'default' : 'pointer',
+    background:      disabled ? 'transparent' : 'rgba(30,41,59,0.9)',
+    border:          `1px solid ${disabled ? 'transparent' : '#334155'}`,
+    color:           disabled ? '#1e293b' : '#94a3b8',
+    transition:      'background 0.15s, color 0.15s',
+  })
+
+  return (
+    <div style={{
+      position:       'fixed',
+      inset:          0,
+      background:     '#0f172a',
+      zIndex:         100,
+      display:        'flex',
+      flexDirection:  'column',
+      overflow:       'hidden',
+    }}>
+
+      {/* ── Header ── */}
+      <div style={{
+        display:         'flex',
+        alignItems:      'center',
+        justifyContent:  'space-between',
+        padding:         '0 24px',
+        height:          52,
+        flexShrink:      0,
+        borderBottom:    '1px solid #1e293b',
+      }}>
+        <span style={{ fontSize: 12, color: '#475569', minWidth: 60 }}>
+          {index + 1} / {sections.length}
+        </span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
+          {section.label}
+        </span>
+        <button
+          onClick={onClose}
+          title="Fermer (Esc)"
+          style={{
+            background:  'transparent',
+            border:      'none',
+            color:       '#475569',
+            cursor:      'pointer',
+            padding:     4,
+            display:     'flex',
+            alignItems:  'center',
+            minWidth:    60,
+            justifyContent: 'flex-end',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#475569' }}
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      {/* ── Tableau + Graphique ── */}
+      <div style={{ flex: 3, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
+
+        <button
+          onClick={isFirst ? undefined : prev}
+          disabled={isFirst}
+          style={{ ...chevronStyle(isFirst), left: 10 }}
+          onMouseEnter={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
+          onMouseLeave={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        <div style={{ flex: 1, display: 'flex', padding: '16px 60px', gap: 12, overflow: 'hidden' }}>
+
+          {/* Tableau */}
+          <div style={{ flex: section.tableFlex, overflow: 'auto', minWidth: 0 }}>
+            <PivotTable
+              data={section.result}
+              showRowTotals={true}
+              showColTotals={true}
+              collapsedRowGroups={collapsedRowGroups}
+              collapsedColGroups={collapsedColGroups}
+              onToggleRowGroup={pk => setCRows(r => ({
+                ...r,
+                [section.id]: collapsedRowGroups.includes(pk)
+                  ? collapsedRowGroups.filter(x => x !== pk)
+                  : [...collapsedRowGroups, pk],
+              }))}
+              onToggleColGroup={pk => setCCols(r => ({
+                ...r,
+                [section.id]: collapsedColGroups.includes(pk)
+                  ? collapsedColGroups.filter(x => x !== pk)
+                  : [...collapsedColGroups, pk],
+              }))}
+              onSetCollapsedRows={pks => setCRows(r => ({ ...r, [section.id]: pks }))}
+              onSetCollapsedCols={pks => setCCols(r => ({ ...r, [section.id]: pks }))}
+              formatValue={formatValue}
+            />
+          </div>
+
+          <div style={{ width: 1, background: '#1e293b', flexShrink: 0 }} />
+
+          {/* Graphique */}
+          <div style={{ flex: section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
+            <PivotChart
+              data={section.result}
+              chartType={section.chartType}
+              collapsedRows={collapsedRowGroups}
+              collapsedCols={collapsedColGroups}
+              formatValue={formatValue}
+              chartColors={section.chartColors}
+              transpose={section.chartTranspose}
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={isLast ? undefined : next}
+          disabled={isLast}
+          style={{ ...chevronStyle(isLast), right: 10 }}
+          onMouseEnter={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
+          onMouseLeave={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+      <div style={{ height: 1, background: '#1e293b', flexShrink: 0 }} />
+
+      {/* ── Notes ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 24px 16px' }}>
+        <label style={{
+          fontSize:        11,
+          color:           '#475569',
+          fontWeight:      600,
+          marginBottom:    6,
+          textTransform:   'uppercase',
+          letterSpacing:   '0.05em',
+          flexShrink:      0,
+        }}>
+          Notes
+        </label>
+        <textarea
+          value={notes[section.id] ?? ''}
+          onChange={e => setNotes(n => ({ ...n, [section.id]: e.target.value }))}
+          placeholder="Observations, commentaires…"
+          style={{
+            flex:        1,
+            background:  '#1e293b',
+            border:      '1px solid #334155',
+            borderRadius: 6,
+            color:       '#e2e8f0',
+            fontSize:    13,
+            padding:     '10px 12px',
+            resize:      'none',
+            outline:     'none',
+            fontFamily:  'inherit',
+            lineHeight:  1.6,
+          }}
+          onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = '#6366f1' }}
+          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = '#334155' }}
+        />
+      </div>
+    </div>
+  )
+}

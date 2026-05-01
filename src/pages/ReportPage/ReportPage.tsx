@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   DndContext, DragOverlay,
   closestCenter,
@@ -7,12 +6,13 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { LayoutGrid, Download } from 'lucide-react'
+import { LayoutGrid, Download, Presentation } from 'lucide-react'
 
-import { AppSidebar }         from '@/components/AppSidebar'
+import { AppSidebar }           from '@/components/AppSidebar'
 import { SortablePivotSection } from './components/SortablePivotSection'
-import { useReportPage }      from './useReportPage'
-import { PdfExportModal }     from '@/components/PdfExport'
+import { useReportPage }        from './useReportPage'
+import { PdfExportModal }       from '@/components/PdfExport'
+import { PresentationMode }     from './components/PresentationMode'
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -24,10 +24,14 @@ export function ReportPage() {
     sensors,
     handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     updateSection, deleteSection, computeSection, cancelSection,
+    presentationLoading, presentationOpen, openPresentation, closePresentation,
     onDragStart, onDragEnd,
   } = useReportPage()
 
   const [showPdfExport, setShowPdfExport] = useState(false)
+
+  const canPresent          = sections.some(s => s.config !== null)
+  const presentableSections = sections.filter(s => s.result !== null)
 
   return (
     <>
@@ -59,6 +63,16 @@ export function ReportPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            {canPresent && (
+              <button
+                onClick={openPresentation}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+                title="Mode présentation"
+              >
+                <Presentation size={13} />
+                Présentation
+              </button>
+            )}
             {sections.length > 0 && (
               <button
                 onClick={() => setShowPdfExport(true)}
@@ -122,6 +136,39 @@ export function ReportPage() {
 
     {showPdfExport && (
       <PdfExportModal sections={sections} onClose={() => setShowPdfExport(false)} />
+    )}
+
+    {presentationLoading && (
+      <div style={{
+        position:        'fixed',
+        inset:           0,
+        background:      'rgba(15,23,42,0.93)',
+        zIndex:          100,
+        display:         'flex',
+        flexDirection:   'column',
+        alignItems:      'center',
+        justifyContent:  'center',
+        gap:             16,
+      }}>
+        <div style={{
+          width:           32,
+          height:          32,
+          borderRadius:    '50%',
+          border:          '3px solid #334155',
+          borderTopColor:  '#6366f1',
+          animation:       'spin 0.7s linear infinite',
+        }} />
+        <span style={{ color: '#94a3b8', fontSize: 14 }}>
+          Génération de la présentation en cours…
+        </span>
+      </div>
+    )}
+
+    {presentationOpen && (
+      <PresentationMode
+        sections={presentableSections}
+        onClose={closePresentation}
+      />
     )}
     </>
   )

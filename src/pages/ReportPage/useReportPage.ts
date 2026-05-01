@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import {
   PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -11,6 +11,8 @@ import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
 import type { WorkerResponse } from '@/lib/pivot/worker'
 import type { FileEntry, Section } from '@/types/app'
+
+type QueueItem = { sectionId: string; file: File; config: PivotConfig }
 
 const loader = new CSVLoader()
 
@@ -64,6 +66,10 @@ export function useReportPage() {
   const computingRef = useRef<{ sectionId: string } | null>(null)
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const restoredRef  = useRef(false)
+
+  const [presentationLoading, setPresentationLoading] = useState(false)
+  const [presentationOpen,    setPresentationOpen]    = useState(false)
+  const presentationQueueRef = useRef<QueueItem[]>([])
 
   // Restauration initiale (async — IndexedDB)
   useEffect(() => {
@@ -252,6 +258,78 @@ export function useReportPage() {
     updateSection(sectionId, { status: 'idle', progress: 0 })
   }
 
+  // ── Mode présentation ─────────────────────────────────────────────────────
+
+  const computeNextInQueue = useCallback(() => {
+    const queue = presentationQueueRef.current
+    if (queue.length === 0) {
+      setPresentationLoading(false)
+      setPresentationOpen(true)
+      return
+    }
+
+    const { sectionId, file, config } = queue[0]
+
+    workerRef.current?.terminate()
+    computingRef.current = { sectionId }
+    updateSection(sectionId, { status: 'computing', progress: 0, result: null, config })
+
+    const worker = new Worker(
+      new URL('../../lib/pivot/worker.ts', import.meta.url),
+      { type: 'module' },
+    )
+    workerRef.current = worker
+
+    const advance = () => {
+      presentationQueueRef.current = presentationQueueRef.current.slice(1)
+      computeNextInQueue()
+    }
+
+    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
+      const msg = e.data
+      if (msg.type === 'progress') {
+        updateSection(sectionId, { progress: msg.percent })
+      } else if (msg.type === 'result') {
+        updateSection(sectionId, { status: 'done', result: msg.data, errors: msg.errors, progress: 100 })
+        computingRef.current = null
+        worker.terminate()
+        advance()
+      } else if (msg.type === 'error') {
+        updateSection(sectionId, { status: 'error', errorMessage: msg.message })
+        computingRef.current = null
+        worker.terminate()
+        advance()
+      }
+    }
+    worker.onerror = () => {
+      if (computingRef.current) updateSection(sectionId, { status: 'error' })
+      computingRef.current = null
+      worker.terminate()
+      advance()
+    }
+
+    worker.postMessage({ file, config })
+  }, [updateSection]) // workerRef, computingRef, presentationQueueRef sont des refs stables
+
+  const openPresentation = useCallback(() => {
+    const toCompute: QueueItem[] = []
+    for (const s of sections) {
+      if (s.config && !s.result) {
+        const entry = fileEntries.find(f => f.id === s.fileId)
+        if (entry) toCompute.push({ sectionId: s.id, file: entry.file, config: s.config })
+      }
+    }
+    if (toCompute.length === 0) {
+      setPresentationOpen(true)
+      return
+    }
+    presentationQueueRef.current = toCompute
+    setPresentationLoading(true)
+    computeNextInQueue()
+  }, [sections, fileEntries, computeNextInQueue])
+
+  const closePresentation = useCallback(() => setPresentationOpen(false), [])
+
   // ── DnD ───────────────────────────────────────────────────────────────────
 
   const onDragStart = (e: DragStartEvent) => setDraggingId(String(e.active.id))
@@ -280,6 +358,8 @@ export function useReportPage() {
     handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     // handlers — sections
     updateSection, deleteSection, computeSection, cancelSection,
+    // présentation
+    presentationLoading, presentationOpen, openPresentation, closePresentation,
     // handlers — dnd
     onDragStart, onDragEnd,
   }

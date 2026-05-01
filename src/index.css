@@ -154,3 +154,5 @@ body {
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-subtle); border-radius: 99px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
