@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { Section } from '@/types/app'
 import type { ExportBlock } from '../types'
 import { captureBlock } from '../lib/captureBlocks'
-import { buildAndDownloadPdf } from '../lib/buildPdf'
 
 export function usePdfExport(sections: Section[]) {
   const [blocks, setBlocks] = useState<ExportBlock[]>([])
@@ -52,6 +51,7 @@ export function usePdfExport(sections: Section[]) {
           images[block.id] = await captureBlock(block.sectionId, block.type as 'table' | 'chart')
         }
       }
+      const { buildAndDownloadPdf } = await import('../lib/buildPdf')
       await buildAndDownloadPdf(blocks, images)
     } finally {
       setGenerating(false)
