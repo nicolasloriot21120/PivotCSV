@@ -1,8 +1,7 @@
 import { Download } from 'lucide-react'
 import type { Section } from '@/types/app'
 import { usePdfExport } from './hooks/usePdfExport'
-import { BlockSelector } from './components/BlockSelector'
-import { PdfCanvas } from './components/PdfCanvas'
+import { LayoutEditor } from './components/LayoutEditor'
 
 type Props = {
   sections: Section[]
@@ -11,13 +10,23 @@ type Props = {
 
 export function PdfExportModal({ sections, onClose }: Props) {
   const {
-    blocks, generating,
-    toggleBlock, addComment, updateBlock, removeBlock, isSelected, generate,
+    rows, generating, hasContent,
+    addRow, removeRow, updateRowFlex,
+    splitCell, removeCell, setCellContent, updateCellFlex,
   } = usePdfExport(sections)
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.70)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{
+        position:        'fixed',
+        inset:           0,
+        background:      'rgba(0,0,0,0.70)',
+        zIndex:          50,
+        display:         'flex',
+        alignItems:      'center',
+        justifyContent:  'center',
+        padding:         16,
+      }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
@@ -26,67 +35,100 @@ export function PdfExportModal({ sections, onClose }: Props) {
           borderRadius:  12,
           display:       'flex',
           flexDirection: 'column',
-          width:         'min(95vw, 1100px)',
-          height:        'min(90vh, 900px)',
+          width:         'min(95vw, 760px)',
+          height:        'min(90vh, 960px)',
         }}
         onClick={e => e.stopPropagation()}
       >
         {/* En-tête */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-700 flex-shrink-0">
-          <span className="text-white font-semibold text-sm">Export PDF</span>
+        <div
+          style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'space-between',
+            padding:        '10px 20px',
+            borderBottom:   '1px solid #1e293b',
+            flexShrink:     0,
+          }}
+        >
+          <span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Export PDF</span>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors text-lg leading-none"
+            style={{
+              background: 'transparent',
+              border:     'none',
+              color:      '#64748b',
+              fontSize:   18,
+              cursor:     'pointer',
+              lineHeight: 1,
+              padding:    0,
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748b' }}
             title="Fermer"
           >
             ✕
           </button>
         </div>
 
-        {/* Corps */}
-        <div className="flex flex-row flex-1 overflow-hidden">
-          {/* Panneau gauche — sélection des blocs */}
-          <div
-            className="border-r border-slate-700 overflow-y-auto p-4 flex-shrink-0"
-            style={{ width: 256 }}
-          >
-            <BlockSelector
-              sections={sections}
-              isSelected={isSelected}
-              onToggle={toggleBlock}
-              onAddComment={addComment}
-            />
-          </div>
-
-          {/* Zone centrale — canvas A4 */}
-          <div className="flex-1 overflow-auto">
-            <PdfCanvas
-              blocks={blocks}
-              onUpdateBlock={updateBlock}
-              onRemoveBlock={removeBlock}
-            />
-          </div>
+        {/* Corps — LayoutEditor scrollable */}
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+          <LayoutEditor
+            rows={rows}
+            sections={sections}
+            onAddRow={addRow}
+            onRemoveRow={removeRow}
+            onUpdateRowFlex={updateRowFlex}
+            onSplitCell={splitCell}
+            onRemoveCell={removeCell}
+            onSetContent={setCellContent}
+            onUpdateCellFlex={updateCellFlex}
+          />
         </div>
 
         {/* Pied de page */}
-        <div className="px-4 py-3 border-t border-slate-700 flex items-center justify-between flex-shrink-0">
-          <span className="text-xs text-slate-400">
-            {blocks.length} bloc{blocks.length > 1 ? 's' : ''} sélectionné{blocks.length > 1 ? 's' : ''}
-          </span>
+        <div
+          style={{
+            display:        'flex',
+            alignItems:     'center',
+            justifyContent: 'flex-end',
+            padding:        '10px 16px',
+            borderTop:      '1px solid #1e293b',
+            flexShrink:     0,
+          }}
+        >
           <button
-            onClick={generate}
-            disabled={blocks.length === 0 || generating}
-            className={[
-              'flex items-center gap-2 px-4 py-2 rounded text-sm font-medium transition-all',
-              blocks.length === 0 || generating
-                ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                : 'bg-blue-600 text-white hover:bg-blue-500',
-            ].join(' ')}
+            onClick={generating ? undefined : async () => {
+              const { buildAndDownloadPdf } = await import('./lib/buildPdf')
+              await buildAndDownloadPdf(rows, sections)
+            }}
+            disabled={!hasContent || generating}
+            style={{
+              display:      'flex',
+              alignItems:   'center',
+              gap:          6,
+              padding:      '7px 16px',
+              borderRadius: 6,
+              border:       'none',
+              fontSize:     13,
+              fontWeight:   500,
+              cursor:       !hasContent || generating ? 'not-allowed' : 'pointer',
+              background:   !hasContent || generating ? '#1e293b' : '#2563eb',
+              color:        !hasContent || generating ? '#475569' : 'white',
+              transition:   'background 0.15s',
+            }}
           >
             {generating ? (
               <span
-                className="animate-spin"
-                style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%' }}
+                style={{
+                  display:         'inline-block',
+                  width:           14,
+                  height:          14,
+                  border:          '2px solid currentColor',
+                  borderTopColor:  'transparent',
+                  borderRadius:    '50%',
+                  animation:       'spin 0.7s linear infinite',
+                }}
               />
             ) : (
               <Download size={14} />
