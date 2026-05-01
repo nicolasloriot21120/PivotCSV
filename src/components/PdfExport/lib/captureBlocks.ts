@@ -1,4 +1,4 @@
-import html2canvas from 'html2canvas'
+import html2canvas from 'html2canvas-pro'
 
 export async function captureBlock(sectionId: string, type: 'table' | 'chart'): Promise<string> {
   const el = document.querySelector(`[data-export-target="${sectionId}-${type}"]`) as HTMLElement | null
