@@ -65,13 +65,15 @@ export function usePdfExport(sections: Section[]) {
     try {
       const { buildAndDownloadPdf } = await import('../lib/buildPdf')
       await buildAndDownloadPdf(rows, sections)
+    } catch (err) {
+      console.error('[PdfExport] génération échouée :', err)
     } finally {
       setGenerating(false)
     }
   }
 
   return {
-    rows, generating, hasContent,
+    rows, generating, hasContent, generate,
     addRow, removeRow, updateRowFlex,
     splitCell, removeCell, setCellContent, updateCellFlex,
     sections,
