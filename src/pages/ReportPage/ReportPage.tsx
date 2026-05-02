@@ -10,6 +10,7 @@ import {
 import { LayoutGrid, Download, Presentation } from 'lucide-react'
 
 import { AppSidebar }           from '@/components/AppSidebar'
+import { LoadingOverlay }       from '@/components/ui/LoadingSpinner'
 import { SortablePivotSection } from './components/SortablePivotSection'
 import { useReportPage }        from './useReportPage'
 import { PdfExportModal }       from '@/components/PdfExport'
@@ -140,29 +141,7 @@ export function ReportPage() {
     )}
 
     {presentationLoading && (
-      <div style={{
-        position:        'fixed',
-        inset:           0,
-        background:      'rgba(15,23,42,0.93)',
-        zIndex:          100,
-        display:         'flex',
-        flexDirection:   'column',
-        alignItems:      'center',
-        justifyContent:  'center',
-        gap:             16,
-      }}>
-        <div style={{
-          width:           32,
-          height:          32,
-          borderRadius:    '50%',
-          border:          '3px solid #334155',
-          borderTopColor:  '#6366f1',
-          animation:       'spin 0.7s linear infinite',
-        }} />
-        <span style={{ color: '#94a3b8', fontSize: 14 }}>
-          Génération de la présentation en cours…
-        </span>
-      </div>
+      <LoadingOverlay label="Génération de la présentation en cours…" />
     )}
 
     {presentationOpen && (

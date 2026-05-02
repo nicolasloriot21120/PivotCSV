@@ -1,7 +1,8 @@
 import { Download } from 'lucide-react'
 import type { Section } from '@/types/app'
-import { CloseButton }   from '@/components/ui/CloseButton'
-import { ModalHeader }   from '@/components/ui/ModalHeader'
+import { CloseButton }    from '@/components/ui/CloseButton'
+import { ModalHeader }    from '@/components/ui/ModalHeader'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { usePdfExport }   from './hooks/usePdfExport'
 import { LayoutEditor }   from './components/LayoutEditor'
 
@@ -94,21 +95,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
               transition:   'background 0.15s',
             }}
           >
-            {generating ? (
-              <span
-                style={{
-                  display:         'inline-block',
-                  width:           14,
-                  height:          14,
-                  border:          '2px solid currentColor',
-                  borderTopColor:  'transparent',
-                  borderRadius:    '50%',
-                  animation:       'spin 0.7s linear infinite',
-                }}
-              />
-            ) : (
-              <Download size={14} />
-            )}
+            {generating ? <LoadingSpinner size={14} /> : <Download size={14} />}
             Générer PDF
           </button>
         </div>
