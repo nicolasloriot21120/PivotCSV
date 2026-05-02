@@ -155,3 +155,9 @@
 .dragOverlayChip {
   @apply shadow-[var(--shadow-elevated)] opacity-90 rotate-1 scale-105;
 }
+
+/* ── Icône Loader2 en rotation ── */
+
+.iconSpin {
+  @apply animate-spin;
+}

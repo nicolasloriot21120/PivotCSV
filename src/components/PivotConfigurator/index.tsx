@@ -138,7 +138,7 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
             className={computeButtonClass}
           >
             {computing
-              ? <><Loader2 size={14} className="animate-spin" /> Annuler</>
+              ? <><Loader2 size={14} className={styles.iconSpin} /> Annuler</>
               : <><Play size={14} /> Calculer</>
             }
           </button>
