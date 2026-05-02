@@ -1,0 +1,83 @@
+@reference "../../index.css";
+
+/* ── Header ── */
+
+.header {
+  @apply flex items-center justify-between w-full;
+}
+
+.titleGroup {
+  @apply flex items-baseline gap-2;
+}
+
+.title {
+  @apply text-base font-bold text-text;
+}
+
+.subtitle {
+  @apply text-[11px] text-subtle;
+}
+
+/* ── Footer ── */
+
+.footer {
+  @apply px-3 py-3;
+}
+
+/* ── Liste de fichiers ── */
+
+.list {
+  @apply px-3 py-3 flex flex-col gap-1;
+}
+
+.empty {
+  @apply text-subtle text-xs text-center py-4;
+}
+
+/* Ligne fichier */
+
+.row {
+  @apply flex items-center gap-2 px-2.5 py-2 rounded-[var(--radius-md)];
+  @apply cursor-pointer transition-all duration-150 hover:bg-elevated;
+}
+
+.fileIcon {
+  @apply text-accent flex-shrink-0;
+}
+
+.rowText {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+.fileName {
+  @apply text-xs font-medium text-text truncate;
+}
+
+.meta {
+  @apply text-[10px] text-subtle;
+}
+
+/* Actions visibles au hover de la ligne (remplace group-hover Tailwind) */
+
+.actions {
+  @apply flex items-center gap-0.5 opacity-0 transition-opacity duration-150;
+}
+
+.row:hover .actions {
+  @apply opacity-100;
+}
+
+.actionButton {
+  @apply w-5 h-5 rounded flex items-center justify-center;
+  @apply text-subtle transition-all duration-150;
+}
+
+.actionButtonAdd {
+  composes: actionButton;
+  @apply hover:text-accent hover:bg-accent/10;
+}
+
+.actionButtonRemove {
+  composes: actionButton;
+  @apply hover:text-danger hover:bg-danger/10;
+}
