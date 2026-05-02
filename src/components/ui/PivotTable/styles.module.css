@@ -1,0 +1,185 @@
+@reference "../../../index.css";
+
+/* ============================================================
+   Layout & toolbar
+   ============================================================ */
+
+.empty {
+  @apply text-xs text-subtle italic;
+}
+
+.root {
+  @apply flex flex-col gap-2;
+}
+
+.toolbar {
+  @apply flex items-center gap-2 flex-wrap;
+}
+
+.toggleButton {
+  @apply flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)];
+  @apply text-[11px] font-medium border transition-all duration-150;
+}
+
+.toggleButtonActive {
+  composes: toggleButton;
+  composes: toggleActive from '../../../styles/shared.module.css';
+}
+
+.toggleButtonIdle {
+  composes: toggleButton;
+  composes: toggleIdle from '../../../styles/shared.module.css';
+}
+
+.toggleDot {
+  @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+}
+
+.toggleDotActive {
+  composes: toggleDot;
+  @apply bg-accent;
+}
+
+.toggleDotIdle {
+  composes: toggleDot;
+  @apply bg-border-strong;
+}
+
+/* ============================================================
+   Table
+   ============================================================ */
+
+.tableContainer {
+  @apply overflow-auto rounded-[var(--radius-md)] border border-border;
+}
+
+.table {
+  @apply border-collapse text-xs w-full;
+}
+
+/* ── Cellules d'en-tête (<th>) ── */
+
+.th {
+  @apply border border-border bg-elevated px-3 py-2 font-medium whitespace-nowrap;
+}
+
+.thRowsLabel {
+  composes: th;
+  @apply text-left text-subtle;
+}
+
+.thColCell {
+  composes: th;
+  @apply text-center text-text font-semibold;
+}
+
+.thColCellClickable {
+  composes: th;
+  @apply text-center cursor-pointer select-none hover:bg-elevated/80 text-text;
+}
+
+.thTotalRoot {
+  composes: th;
+  @apply text-center text-accent-hi font-semibold;
+}
+
+.thValueLabel {
+  composes: th;
+  @apply text-center text-subtle font-medium text-[10px];
+}
+
+.thInner {
+  @apply flex items-center justify-center gap-1;
+}
+
+.thChevron {
+  @apply text-accent flex-shrink-0;
+}
+
+/* ── Cellules de données (<td>) ── */
+
+.td {
+  @apply border border-border px-3 py-1.5 whitespace-nowrap;
+}
+
+/* Première colonne (libellé de ligne) */
+
+.tdRowLabel {
+  composes: td;
+  @apply text-text;
+}
+
+.tdRowLabelGroup {
+  composes: tdRowLabel;
+  @apply font-semibold !border-l-2 !border-l-accent/50;
+}
+
+.tdRowLabelLeaf {
+  composes: tdRowLabel;
+  @apply font-medium text-muted/90;
+}
+
+.tdRowLabelButton {
+  @apply flex items-center gap-1 w-full text-left;
+}
+
+/* Cellules de valeur (numériques) */
+
+.tdValue {
+  composes: td;
+  @apply text-right tabular-nums;
+}
+
+.tdValueGroup {
+  composes: tdValue;
+  @apply text-text font-medium;
+}
+
+.tdValueLeaf {
+  composes: tdValue;
+  @apply text-muted;
+}
+
+/* Totaux par ligne (colonne "Total" à droite) */
+
+.tdRowTotal {
+  composes: tdValue;
+  @apply bg-elevated/30 text-text;
+}
+
+.tdRowTotalGroup {
+  composes: tdRowTotal;
+  @apply font-bold;
+}
+
+.tdRowTotalLeaf {
+  composes: tdRowTotal;
+  @apply font-semibold;
+}
+
+/* Footer : totaux par colonne + grand total */
+
+.tdFooterLabel {
+  composes: td;
+  @apply font-semibold text-accent-hi bg-elevated/30;
+}
+
+.tdColTotal {
+  composes: tdValue;
+  @apply font-semibold text-text bg-elevated/30;
+}
+
+.tdGrandTotal {
+  composes: tdValue;
+  @apply font-bold text-accent-hi bg-accent/10;
+}
+
+/* ── Lignes ── */
+
+.rowGroup {
+  @apply bg-elevated/60;
+}
+
+.rowLeafOdd {
+  @apply bg-elevated/20;
+}
