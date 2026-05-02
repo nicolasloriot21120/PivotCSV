@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, X }     from 'lucide-react'
+import { ChevronLeft, ChevronRight }         from 'lucide-react'
 import { PivotTable }  from '@/components/ui/PivotTable'
 import { PivotChart }  from '@/components/ui/PivotChart'
+import { CloseButton } from '@/components/ui/CloseButton'
 import { makeFormatter } from '@/lib/pivot/format'
 import type { Section } from '@/types/app'
 
@@ -90,25 +91,9 @@ export function PresentationMode({ sections, onClose }: Props) {
         <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
           {section.label}
         </span>
-        <button
-          onClick={onClose}
-          title="Fermer (Esc)"
-          style={{
-            background:  'transparent',
-            border:      'none',
-            color:       '#475569',
-            cursor:      'pointer',
-            padding:     4,
-            display:     'flex',
-            alignItems:  'center',
-            minWidth:    60,
-            justifyContent: 'flex-end',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#475569' }}
-        >
-          <X size={18} />
-        </button>
+        <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
+          <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="#475569" />
+        </div>
       </div>
 
       {/* ── Tableau + Graphique ── */}

@@ -1,6 +1,7 @@
 export * from './Button'
 export * from './Card'
 export * from './Badge'
+export * from './CloseButton'
 export * from './FileDropzone'
 export * from './Sidebar'
 export * from './ThemePicker'

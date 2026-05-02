@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react'
 import type { Section } from '@/types/app'
+import { CloseButton }   from '@/components/ui/CloseButton'
 import { usePdfExport }   from './hooks/usePdfExport'
 import { LayoutEditor }   from './components/LayoutEditor'
 
@@ -53,23 +54,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
           }}
         >
           <span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Export PDF</span>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border:     'none',
-              color:      '#64748b',
-              fontSize:   18,
-              cursor:     'pointer',
-              lineHeight: 1,
-              padding:    0,
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748b' }}
-            title="Fermer"
-          >
-            ✕
-          </button>
+          <CloseButton onClick={onClose} />
         </div>
 
         {/* Corps — LayoutEditor scrollable */}
