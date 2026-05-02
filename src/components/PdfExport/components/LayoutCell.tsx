@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Section } from '@/types/app'
+import { SmallIconButton } from '@/components/ui/SmallIconButton'
 import type { LayoutCell as LayoutCellType, CellContent } from '../types'
 import { CellPicker } from './CellPicker'
 
@@ -161,73 +162,33 @@ export function LayoutCell({
           }}
         >
           {/* Bouton split — toujours disponible */}
-          <button
+          <SmallIconButton
             onClick={e => { e.stopPropagation(); onSplit() }}
             title="Diviser la cellule"
-            style={{
-              width:        20,
-              height:       20,
-              borderRadius: 3,
-              background:   'rgba(15,23,42,0.8)',
-              border:       '1px solid #334155',
-              color:        '#94a3b8',
-              fontSize:     10,
-              cursor:       'pointer',
-              display:      'flex',
-              alignItems:   'center',
-              justifyContent: 'center',
-              lineHeight:   1,
-            }}
           >
             ÷
-          </button>
+          </SmallIconButton>
 
           {/* Bouton supprimer cellule — si pas seule + contenu vide */}
           {canRemove && content.type === 'empty' && (
-            <button
+            <SmallIconButton
               onClick={e => { e.stopPropagation(); onRemove() }}
               title="Supprimer la cellule"
-              style={{
-                width:        20,
-                height:       20,
-                borderRadius: 3,
-                background:   'rgba(15,23,42,0.8)',
-                border:       '1px solid #334155',
-                color:        '#ef4444',
-                fontSize:     10,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                lineHeight:   1,
-              }}
+              color="#ef4444"
             >
               ✕
-            </button>
+            </SmallIconButton>
           )}
 
           {/* Bouton vider — si contenu non vide */}
           {content.type !== 'empty' && (
-            <button
+            <SmallIconButton
               onClick={e => { e.stopPropagation(); handleClear() }}
               title="Vider la cellule"
-              style={{
-                width:        20,
-                height:       20,
-                borderRadius: 3,
-                background:   'rgba(15,23,42,0.8)',
-                border:       '1px solid #334155',
-                color:        '#ef4444',
-                fontSize:     10,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                lineHeight:   1,
-              }}
+              color="#ef4444"
             >
               ✕
-            </button>
+            </SmallIconButton>
           )}
         </div>
       )}
