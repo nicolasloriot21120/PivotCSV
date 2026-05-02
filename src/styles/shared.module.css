@@ -27,3 +27,15 @@
 .toolbarDivider {
   @apply w-px h-4 bg-border mx-0.5 flex-shrink-0;
 }
+
+/* ── Poignée de drag (GripVertical) ──
+   Utilisé partout où un élément est draggable via @dnd-kit.
+   Composer avec une classe locale si besoin de tailles/marges
+   spécifiques :
+     composes: dragHandle from '../../styles/shared.module.css';
+*/
+
+.dragHandle {
+  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing;
+  @apply touch-none flex-shrink-0;
+}

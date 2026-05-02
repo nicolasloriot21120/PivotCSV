@@ -18,7 +18,7 @@
 }
 
 .dragHandle {
-  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing touch-none flex-shrink-0;
+  composes: dragHandle from '../../styles/shared.module.css';
 }
 
 .fileIcon {
