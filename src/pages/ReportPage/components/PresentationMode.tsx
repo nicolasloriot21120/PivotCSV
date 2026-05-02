@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from 'react'
-import { PivotTable }  from '@/components/ui/PivotTable'
-import { PivotChart }  from '@/components/ui/PivotChart'
-import { CloseButton } from '@/components/ui/CloseButton'
-import { ModalHeader } from '@/components/ui/ModalHeader'
+import { PivotTable }       from '@/components/ui/PivotTable'
+import { PivotChart }       from '@/components/ui/PivotChart'
+import { CloseButton }      from '@/components/ui/CloseButton'
+import { ModalHeader }      from '@/components/ui/ModalHeader'
 import { NavigationButton } from './NavigationButton'
-import { makeFormatter } from '@/lib/pivot/format'
-import type { Section } from '@/types/app'
+import { usePresentationMode } from './usePresentationMode'
+import type { Section }     from '@/types/app'
 
 type Props = {
   sections: Section[]  // uniquement les sections avec result !== null
@@ -13,39 +12,8 @@ type Props = {
 }
 
 export function PresentationMode({ sections, onClose }: Props) {
-  const [index,   setIndex]   = useState(0)
-  const [notes,   setNotes]   = useState<Record<string, string>>({})
-  const [cRows,   setCRows]   = useState<Record<string, string[]>>({})
-  const [cCols,   setCCols]   = useState<Record<string, string[]>>({})
-
-  // Initialise les états collapsed depuis les sections
-  useEffect(() => {
-    setCRows(Object.fromEntries(sections.map(s => [s.id, s.collapsedRowGroups])))
-    setCCols(Object.fromEntries(sections.map(s => [s.id, s.collapsedColGroups])))
-  }, [sections])
-
-  const prev = useCallback(() => setIndex(i => Math.max(0, i - 1)), [])
-  const next = useCallback(() => setIndex(i => Math.min(sections.length - 1, i + 1)), [sections.length])
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft')  prev()
-      else if (e.key === 'ArrowRight') next()
-      else if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [prev, next, onClose])
-
-  const section = sections[index]
-  if (!section?.result) return null
-
-  const formatValue        = makeFormatter(section.valueScale, section.valueDecimals)
-  const collapsedRowGroups = cRows[section.id] ?? section.collapsedRowGroups
-  const collapsedColGroups = cCols[section.id] ?? section.collapsedColGroups
-
-  const isFirst = index === 0
-  const isLast  = index === sections.length - 1
+  const ui = usePresentationMode(sections, onClose)
+  if (!ui.section?.result || !ui.formatValue) return null
 
   return (
     <div style={{
@@ -63,12 +31,12 @@ export function PresentationMode({ sections, onClose }: Props) {
         height={52}
         left={
           <span style={{ fontSize: 12, color: 'var(--color-modal-text-faint)', minWidth: 60 }}>
-            {index + 1} / {sections.length}
+            {ui.sectionIndex + 1} / {ui.sectionsCount}
           </span>
         }
         center={
           <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-modal-text)' }}>
-            {section.label}
+            {ui.section.label}
           </span>
         }
         right={
@@ -81,53 +49,43 @@ export function PresentationMode({ sections, onClose }: Props) {
       {/* ── Tableau + Graphique ── */}
       <div style={{ flex: 3, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
 
-        <NavigationButton direction="prev" disabled={isFirst} onClick={prev} />
+        <NavigationButton direction="prev" disabled={ui.isFirst} onClick={ui.prev} />
 
         <div style={{ flex: 1, display: 'flex', padding: '16px 60px', gap: 12, overflow: 'hidden' }}>
 
           {/* Tableau */}
-          <div style={{ flex: section.tableFlex, overflow: 'auto', minWidth: 0 }}>
+          <div style={{ flex: ui.section.tableFlex, overflow: 'auto', minWidth: 0 }}>
             <PivotTable
-              data={section.result}
+              data={ui.section.result}
               showRowTotals={true}
               showColTotals={true}
-              collapsedRowGroups={collapsedRowGroups}
-              collapsedColGroups={collapsedColGroups}
-              onToggleRowGroup={pk => setCRows(r => ({
-                ...r,
-                [section.id]: collapsedRowGroups.includes(pk)
-                  ? collapsedRowGroups.filter(x => x !== pk)
-                  : [...collapsedRowGroups, pk],
-              }))}
-              onToggleColGroup={pk => setCCols(r => ({
-                ...r,
-                [section.id]: collapsedColGroups.includes(pk)
-                  ? collapsedColGroups.filter(x => x !== pk)
-                  : [...collapsedColGroups, pk],
-              }))}
-              onSetCollapsedRows={pks => setCRows(r => ({ ...r, [section.id]: pks }))}
-              onSetCollapsedCols={pks => setCCols(r => ({ ...r, [section.id]: pks }))}
-              formatValue={formatValue}
+              collapsedRowGroups={ui.collapsedRowGroups}
+              collapsedColGroups={ui.collapsedColGroups}
+              onToggleRowGroup={ui.toggleRowGroup}
+              onToggleColGroup={ui.toggleColGroup}
+              onSetCollapsedRows={ui.setCollapsedRows}
+              onSetCollapsedCols={ui.setCollapsedCols}
+              formatValue={ui.formatValue}
             />
           </div>
 
           <div style={{ width: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
 
           {/* Graphique */}
-          <div style={{ flex: section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ flex: ui.section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
             <PivotChart
-              data={section.result}
-              chartType={section.chartType}
-              collapsedRows={collapsedRowGroups}
-              collapsedCols={collapsedColGroups}
-              formatValue={formatValue}
-              chartColors={section.chartColors}
-              transpose={section.chartTranspose}
+              data={ui.section.result}
+              chartType={ui.section.chartType}
+              collapsedRows={ui.collapsedRowGroups}
+              collapsedCols={ui.collapsedColGroups}
+              formatValue={ui.formatValue}
+              chartColors={ui.section.chartColors}
+              transpose={ui.section.chartTranspose}
             />
           </div>
         </div>
 
-        <NavigationButton direction="next" disabled={isLast} onClick={next} />
+        <NavigationButton direction="next" disabled={ui.isLast} onClick={ui.next} />
       </div>
 
       <div style={{ height: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
@@ -135,35 +93,35 @@ export function PresentationMode({ sections, onClose }: Props) {
       {/* ── Notes ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 24px 16px' }}>
         <label style={{
-          fontSize:        11,
-          color:           'var(--color-modal-text-faint)',
-          fontWeight:      600,
-          marginBottom:    6,
-          textTransform:   'uppercase',
-          letterSpacing:   '0.05em',
-          flexShrink:      0,
+          fontSize:      11,
+          color:         'var(--color-modal-text-faint)',
+          fontWeight:    600,
+          marginBottom:  6,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          flexShrink:    0,
         }}>
           Notes
         </label>
         <textarea
-          value={notes[section.id] ?? ''}
-          onChange={e => setNotes(n => ({ ...n, [section.id]: e.target.value }))}
+          value={ui.notes}
+          onChange={e => ui.setNotes(e.target.value)}
           placeholder="Observations, commentaires…"
           style={{
-            flex:        1,
-            background:  'var(--color-modal-elevated)',
-            border:      '1px solid var(--color-modal-border-strong)',
+            flex:         1,
+            background:   'var(--color-modal-elevated)',
+            border:       '1px solid var(--color-modal-border-strong)',
             borderRadius: 6,
-            color:       'var(--color-modal-text)',
-            fontSize:    13,
-            padding:     '10px 12px',
-            resize:      'none',
-            outline:     'none',
-            fontFamily:  'inherit',
-            lineHeight:  1.6,
+            color:        'var(--color-modal-text)',
+            fontSize:     13,
+            padding:      '10px 12px',
+            resize:       'none',
+            outline:      'none',
+            fontFamily:   'inherit',
+            lineHeight:   1.6,
           }}
           onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)' }}
-          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-modal-border-strong)' }}
+          onBlur={e =>  { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-modal-border-strong)' }}
         />
       </div>
     </div>
