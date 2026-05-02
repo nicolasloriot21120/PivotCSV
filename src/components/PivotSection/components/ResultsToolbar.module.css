@@ -1,0 +1,85 @@
+@reference "../../../index.css";
+
+/* ── Layout général ── */
+
+.toolbar {
+  @apply flex items-center justify-between gap-2 flex-wrap;
+}
+
+.toolbarGroup {
+  @apply flex items-center gap-2 flex-wrap;
+}
+
+.toolbarGroupTight {
+  @apply flex items-center gap-1.5 flex-wrap;
+}
+
+.buttonRow {
+  @apply flex items-center gap-1;
+}
+
+/* ── Toggles avec icône + texte (px-2.5 py-1) ── */
+
+.labelToggle {
+  @apply flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)];
+  @apply text-[11px] font-medium border transition-all duration-150;
+}
+
+.labelToggleActive {
+  composes: labelToggle;
+  composes: toggleActive from '../../../styles/shared.module.css';
+}
+
+.labelToggleIdle {
+  composes: labelToggle;
+  composes: toggleIdle from '../../../styles/shared.module.css';
+}
+
+/* Pastille à l'intérieur des toggles label */
+
+.labelToggleDot {
+  @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+}
+
+.labelToggleDotActive {
+  composes: labelToggleDot;
+  @apply bg-accent;
+}
+
+.labelToggleDotIdle {
+  composes: labelToggleDot;
+  @apply bg-border-strong;
+}
+
+/* ── Toggles icône seule (p-1.5) ── */
+
+.iconToggle {
+  @apply p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150;
+}
+
+.iconToggleActive {
+  composes: iconToggle;
+  composes: toggleActive from '../../../styles/shared.module.css';
+}
+
+.iconToggleIdle {
+  composes: iconToggle;
+  composes: toggleIdle from '../../../styles/shared.module.css';
+}
+
+/* ── Toggles texte court (échelles K/M/G — px-1.5 py-1) ── */
+
+.scaleToggle {
+  @apply px-1.5 py-1 rounded-[var(--radius-sm)] border;
+  @apply text-[11px] font-medium transition-all duration-150;
+}
+
+.scaleToggleActive {
+  composes: scaleToggle;
+  composes: toggleActive from '../../../styles/shared.module.css';
+}
+
+.scaleToggleIdle {
+  composes: scaleToggle;
+  composes: toggleIdle from '../../../styles/shared.module.css';
+}

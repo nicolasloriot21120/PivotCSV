@@ -5,7 +5,9 @@ import {
 
 import type { ChartType } from '@/components/ui/PivotChart'
 import type { Section }   from '@/types/app'
-import { FlexStepper }   from './FlexStepper'
+import { FlexStepper }    from './FlexStepper'
+import shared             from '@/styles/shared.module.css'
+import styles             from './ResultsToolbar.module.css'
 
 type Props = {
   section:            Section
@@ -18,6 +20,13 @@ type Props = {
   onToggleRowTotals:  () => void
   onToggleColTotals:  () => void
   onToggleColorPicker: () => void
+}
+
+const SCALE_TITLES: Record<'none' | 'K' | 'M' | 'G', string> = {
+  none: 'Valeur brute',
+  K:    'Milliers',
+  M:    'Millions',
+  G:    'Milliards',
 }
 
 export function ResultsToolbar({
@@ -33,22 +42,17 @@ export function ResultsToolbar({
       key={type}
       title={title}
       onClick={() => onUpdate({ chartType: type })}
-      className={[
-        'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-        section.chartType === type
-          ? 'bg-accent/10 border-accent/40 text-accent-hi'
-          : 'bg-elevated border-border text-subtle hover:text-text',
-      ].join(' ')}
+      className={section.chartType === type ? styles.iconToggleActive : styles.iconToggleIdle}
     >
       <Icon size={13} />
     </button>
   )
 
   return (
-    <div className="flex items-center justify-between gap-2 flex-wrap">
+    <div className={styles.toolbar}>
 
       {/* Gauche : toggles totaux + format valeurs */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className={styles.toolbarGroup}>
         {([
           { label: 'Totaux lignes',   value: showRowTotals, toggle: onToggleRowTotals },
           { label: 'Totaux colonnes', value: showColTotals, toggle: onToggleColTotals },
@@ -56,34 +60,23 @@ export function ResultsToolbar({
           <button
             key={label}
             onClick={toggle}
-            className={[
-              'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-              'text-[11px] font-medium border transition-all duration-150',
-              value
-                ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                : 'bg-elevated border-border text-subtle hover:text-text',
-            ].join(' ')}
+            className={value ? styles.labelToggleActive : styles.labelToggleIdle}
           >
-            <span className={['w-1.5 h-1.5 rounded-full flex-shrink-0', value ? 'bg-accent' : 'bg-border-strong'].join(' ')} />
+            <span className={value ? styles.labelToggleDotActive : styles.labelToggleDotIdle} />
             {label}
           </button>
         ))}
 
-        <div className="w-px h-4 bg-border mx-0.5" />
+        <div className={shared.toolbarDivider} />
 
         {/* Échelle */}
-        <div className="flex items-center gap-1">
+        <div className={styles.buttonRow}>
           {(['none', 'K', 'M', 'G'] as const).map(s => (
             <button
               key={s}
-              title={s === 'none' ? 'Valeur brute' : s === 'K' ? 'Milliers' : s === 'M' ? 'Millions' : 'Milliards'}
+              title={SCALE_TITLES[s]}
               onClick={() => onUpdate({ valueScale: s })}
-              className={[
-                'px-1.5 py-1 rounded-[var(--radius-sm)] border text-[11px] font-medium transition-all duration-150',
-                section.valueScale === s
-                  ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                  : 'bg-elevated border-border text-subtle hover:text-text',
-              ].join(' ')}
+              className={section.valueScale === s ? styles.scaleToggleActive : styles.scaleToggleIdle}
             >
               {s === 'none' ? '—' : s}
             </button>
@@ -100,10 +93,10 @@ export function ResultsToolbar({
       </div>
 
       {/* Droite : contrôles graphique */}
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className={styles.toolbarGroupTight}>
 
         {/* Type de graphique */}
-        <div className="flex items-center gap-1">
+        <div className={styles.buttonRow}>
           {chartTypeBtn('bar',  BarChart2, 'Barres')}
           {chartTypeBtn('line', LineChart, 'Lignes')}
           {chartTypeBtn('pie',  PieChart,  'Camembert')}
@@ -114,21 +107,16 @@ export function ResultsToolbar({
           <button
             title="Intervertir lignes/colonnes dans le graphique"
             onClick={() => onUpdate({ chartTranspose: !section.chartTranspose })}
-            className={[
-              'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-              section.chartTranspose
-                ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                : 'bg-elevated border-border text-subtle hover:text-text',
-            ].join(' ')}
+            className={section.chartTranspose ? styles.iconToggleActive : styles.iconToggleIdle}
           >
             <ArrowLeftRight size={13} />
           </button>
         )}
 
-        <div className="w-px h-4 bg-border mx-0.5" />
+        <div className={shared.toolbarDivider} />
 
         {/* Layout */}
-        <div className="flex items-center gap-1">
+        <div className={styles.buttonRow}>
           {([
             { layout: 'horizontal' as const, Icon: Columns2, title: 'Côte à côte' },
             { layout: 'vertical'   as const, Icon: Rows2,    title: 'Empilé' },
@@ -137,12 +125,7 @@ export function ResultsToolbar({
               key={layout}
               title={title}
               onClick={() => onUpdate({ chartLayout: layout })}
-              className={[
-                'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-                section.chartLayout === layout
-                  ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                  : 'bg-elevated border-border text-subtle hover:text-text',
-              ].join(' ')}
+              className={section.chartLayout === layout ? styles.iconToggleActive : styles.iconToggleIdle}
             >
               <Icon size={13} />
             </button>
@@ -152,7 +135,7 @@ export function ResultsToolbar({
         {/* Flex (seulement en mode horizontal) */}
         {isHorizontal && (
           <>
-            <div className="w-px h-4 bg-border mx-0.5" />
+            <div className={shared.toolbarDivider} />
             <FlexStepper
               label="T"
               value={section.tableFlex}
@@ -166,18 +149,13 @@ export function ResultsToolbar({
           </>
         )}
 
-        <div className="w-px h-4 bg-border mx-0.5" />
+        <div className={shared.toolbarDivider} />
 
         {/* Color picker toggle */}
         <button
           title="Couleurs des séries"
           onClick={onToggleColorPicker}
-          className={[
-            'p-1.5 rounded-[var(--radius-sm)] border transition-all duration-150',
-            showColorPicker
-              ? 'bg-accent/10 border-accent/40 text-accent-hi'
-              : 'bg-elevated border-border text-subtle hover:text-text',
-          ].join(' ')}
+          className={showColorPicker ? styles.iconToggleActive : styles.iconToggleIdle}
         >
           <Palette size={13} />
         </button>
