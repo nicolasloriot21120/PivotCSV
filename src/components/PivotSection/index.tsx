@@ -1,4 +1,3 @@
-import { useState, useEffect }  from 'react'
 import { useSortable }           from '@dnd-kit/sortable'
 import type { DraggableAttributes } from '@dnd-kit/core'
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
@@ -11,15 +10,13 @@ import {
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import { PivotTable }           from '@/components/ui/PivotTable'
 import { PivotChart }           from '@/components/ui/PivotChart'
-import type { ChartType }       from '@/components/ui/PivotChart'
 import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
-import { makeFormatter }        from '@/lib/pivot/format'
-import { getSeriesLabels }      from '@/lib/pivot/chart'
 import { ResultsToolbar }       from './components/ResultsToolbar'
 import { ColorPickerPanel }     from './components/ColorPickerPanel'
+import { usePivotSectionUI }    from './hooks/usePivotSectionUI'
 
 type Props = {
   section:             Section
@@ -42,8 +39,6 @@ type Props = {
   onSetCollapsedCols:  (pks: string[]) => void
 }
 
-// ─── Composant principal ───────────────────────────────────────────────────
-
 export function PivotSection({
   section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
@@ -52,23 +47,7 @@ export function PivotSection({
   onToggleRowGroup, onToggleColGroup,
   onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
-  const [editingLabel,     setEditingLabel]     = useState(false)
-  const [activeTab,        setActiveTab]        = useState<'config' | 'result'>('config')
-  const [showRowTotals,    setShowRowTotals]    = useState(true)
-  const [showColTotals,    setShowColTotals]    = useState(true)
-  const [showColorPicker,  setShowColorPicker]  = useState(false)
-
-  useEffect(() => {
-    if (section.status === 'done') setActiveTab('result')
-  }, [section.status])
-
-  const hasResult    = section.result !== null
-  const isHorizontal = section.chartLayout === 'horizontal'
-  const formatValue  = makeFormatter(section.valueScale, section.valueDecimals)
-  const seriesLabels = section.result
-    ? getSeriesLabels(section.result, section.chartType, section.collapsedRowGroups, section.collapsedColGroups, section.chartTranspose)
-    : []
-  const canTranspose = section.chartType !== 'pie' && (section.result?.colKeys.length ?? 0) > 0
+  const ui = usePivotSectionUI(section)
 
   return (
     <div className={[
@@ -89,19 +68,19 @@ export function PivotSection({
 
         <FileText size={13} className="text-accent/60 flex-shrink-0" />
 
-        {editingLabel ? (
+        {ui.editingLabel ? (
           <input
             autoFocus
             value={section.label}
             onChange={e => onLabelChange(e.target.value)}
-            onBlur={() => setEditingLabel(false)}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') setEditingLabel(false) }}
+            onBlur={() => ui.setEditingLabel(false)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') ui.setEditingLabel(false) }}
             className="flex-1 bg-transparent border-b border-accent/50 outline-none text-sm font-semibold text-text px-0.5"
           />
         ) : (
           <span
             className="flex-1 text-sm font-semibold text-text cursor-text truncate"
-            onDoubleClick={() => setEditingLabel(true)}
+            onDoubleClick={() => ui.setEditingLabel(true)}
             title="Double-cliquer pour renommer"
           >
             {section.label}
@@ -143,12 +122,12 @@ export function PivotSection({
             {(['config', 'result'] as const).map(tab => (
               <button
                 key={tab}
-                onClick={() => { if (tab === 'config' || hasResult) setActiveTab(tab) }}
+                onClick={() => { if (tab === 'config' || ui.hasResult) ui.setActiveTab(tab) }}
                 className={[
                   'px-3 py-2 text-[11px] font-medium border-b-2 -mb-px transition-all duration-150',
-                  activeTab === tab
+                  ui.activeTab === tab
                     ? 'border-accent text-accent-hi'
-                    : tab === 'result' && !hasResult
+                    : tab === 'result' && !ui.hasResult
                       ? 'border-transparent text-subtle cursor-default'
                       : 'border-transparent text-muted hover:text-text',
                 ].join(' ')}
@@ -159,7 +138,7 @@ export function PivotSection({
           </div>
 
           {/* ── Onglet Configuration ── */}
-          {activeTab === 'config' && (
+          {ui.activeTab === 'config' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.status === 'error' && section.errorMessage && (
                 <div className="flex items-start gap-2 px-3 py-2.5 rounded-[var(--radius-md)] bg-danger/10 border border-danger/30">
@@ -182,28 +161,26 @@ export function PivotSection({
           )}
 
           {/* ── Onglet Résultats ── */}
-          {activeTab === 'result' && (
+          {ui.activeTab === 'result' && (
             <div className="px-5 py-4 flex flex-col gap-3">
               {section.result ? (
                 <>
-                  {/* Barre de contrôles */}
                   <ResultsToolbar
                     section={section}
-                    showRowTotals={showRowTotals}
-                    showColTotals={showColTotals}
-                    showColorPicker={showColorPicker}
-                    seriesLabels={seriesLabels}
-                    canTranspose={canTranspose}
+                    showRowTotals={ui.showRowTotals}
+                    showColTotals={ui.showColTotals}
+                    showColorPicker={ui.showColorPicker}
+                    seriesLabels={ui.seriesLabels}
+                    canTranspose={ui.canTranspose}
                     onUpdate={onUpdate}
-                    onToggleRowTotals={() => setShowRowTotals(v => !v)}
-                    onToggleColTotals={() => setShowColTotals(v => !v)}
-                    onToggleColorPicker={() => setShowColorPicker(v => !v)}
+                    onToggleRowTotals={() => ui.setShowRowTotals(v => !v)}
+                    onToggleColTotals={() => ui.setShowColTotals(v => !v)}
+                    onToggleColorPicker={() => ui.setShowColorPicker(v => !v)}
                   />
 
-                  {/* Panneau de couleurs */}
-                  {showColorPicker && seriesLabels.length > 0 && (
+                  {ui.showColorPicker && ui.seriesLabels.length > 0 && (
                     <ColorPickerPanel
-                      seriesLabels={seriesLabels}
+                      seriesLabels={ui.seriesLabels}
                       chartColors={section.chartColors}
                       onUpdate={onUpdate}
                     />
@@ -212,39 +189,36 @@ export function PivotSection({
                   {/* Tableau + Graphique */}
                   <div className={[
                     'flex gap-3',
-                    isHorizontal ? 'flex-row items-stretch' : 'flex-col',
+                    ui.isHorizontal ? 'flex-row items-stretch' : 'flex-col',
                   ].join(' ')}>
 
-                    {/* Tableau */}
                     <div
                       className="min-w-0 overflow-x-auto"
-                      style={{ flex: isHorizontal ? section.tableFlex : undefined }}
+                      style={{ flex: ui.isHorizontal ? section.tableFlex : undefined }}
                       data-export-target={`${section.id}-table`}
                     >
                       <PivotTable
                         data={section.result}
-                        showRowTotals={showRowTotals}
-                        showColTotals={showColTotals}
+                        showRowTotals={ui.showRowTotals}
+                        showColTotals={ui.showColTotals}
                         collapsedRowGroups={section.collapsedRowGroups}
                         collapsedColGroups={section.collapsedColGroups}
                         onToggleRowGroup={onToggleRowGroup}
                         onToggleColGroup={onToggleColGroup}
                         onSetCollapsedRows={onSetCollapsedRows}
                         onSetCollapsedCols={onSetCollapsedCols}
-                        formatValue={formatValue}
+                        formatValue={ui.formatValue}
                       />
                     </div>
 
-                    {/* Séparateur */}
                     <div className={[
                       'bg-border flex-shrink-0',
-                      isHorizontal ? 'w-px self-stretch' : 'h-px w-full',
+                      ui.isHorizontal ? 'w-px self-stretch' : 'h-px w-full',
                     ].join(' ')} />
 
-                    {/* Graphique */}
                     <div
                       className="min-w-0 min-h-[280px]"
-                      style={{ flex: isHorizontal ? section.chartFlex : undefined }}
+                      style={{ flex: ui.isHorizontal ? section.chartFlex : undefined }}
                       data-export-target={`${section.id}-chart`}
                     >
                       <PivotChart
@@ -252,7 +226,7 @@ export function PivotSection({
                         chartType={section.chartType}
                         collapsedRows={section.collapsedRowGroups}
                         collapsedCols={section.collapsedColGroups}
-                        formatValue={formatValue}
+                        formatValue={ui.formatValue}
                         chartColors={section.chartColors}
                         transpose={section.chartTranspose}
                       />

@@ -19,7 +19,6 @@ type Props = {
 export function LayoutCell({
   rowId,
   cell,
-  rowFlex,
   sections,
   canRemove,
   onSplit,
