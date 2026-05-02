@@ -13,8 +13,7 @@ import { LoadingOverlay }       from '@/components/ui/LoadingSpinner'
 import { SortablePivotSection } from './components/SortablePivotSection'
 import { useReportPage }        from './useReportPage'
 import { PresentationMode }     from './components/PresentationMode'
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+import styles                   from './styles.module.css'
 
 export function ReportPage() {
   const {
@@ -33,7 +32,7 @@ export function ReportPage() {
 
   return (
     <>
-    <div className="flex h-screen overflow-hidden bg-base">
+    <div className={styles.page}>
 
       <AppSidebar
         open={sidebarOpen}
@@ -48,47 +47,47 @@ export function ReportPage() {
         onThemeChange={setTheme}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className={styles.mainArea}>
 
-        <header className="flex items-center justify-between px-6 h-12 border-b border-border bg-surface flex-shrink-0">
-          <div className="flex items-center gap-2 text-muted">
+        <header className={styles.header}>
+          <div className={styles.headerLeft}>
             <LayoutGrid size={14} />
-            <span className="text-xs font-medium">
+            <span className={styles.sectionsCount}>
               {sections.length === 0
                 ? 'Aucune section — ajoutez un pivot depuis la sidebar'
                 : `${sections.length} section${sections.length > 1 ? 's' : ''}`
               }
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className={styles.headerActions}>
             {canPresent && (
               <button
                 onClick={openPresentation}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
+                className={styles.actionButton}
                 title="Mode présentation"
               >
                 <Presentation size={13} />
                 Présentation
               </button>
             )}
-            <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
+            <img src="/finex-wordmark-dark.svg" alt="Finex" className={styles.logo} />
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-6 py-6">
+        <main className={styles.mainScroll}>
           {sections.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-              <LayoutGrid size={32} className="text-subtle" />
-              <p className="text-muted text-sm font-medium">Aucune section</p>
-              <p className="text-subtle text-xs max-w-xs">
+            <div className={styles.emptyState}>
+              <LayoutGrid size={32} className={styles.emptyStateIcon} />
+              <p className={styles.emptyStateTitle}>Aucune section</p>
+              <p className={styles.emptyStateDescription}>
                 Importez un fichier CSV dans la sidebar puis cliquez sur&nbsp;
-                <span className="text-accent">+</span> pour créer votre premier pivot.
+                <span className={styles.emptyStateHighlight}>+</span> pour créer votre premier pivot.
               </p>
             </div>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragEnd={onDragEnd}>
               <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                <div className="flex flex-col gap-4">
+                <div className={styles.sectionsList}>
                   {sections.map(section => {
                     const entry = fileEntries.find(f => f.id === section.fileId)
                     return (
@@ -110,8 +109,8 @@ export function ReportPage() {
 
               <DragOverlay>
                 {draggingSection && (
-                  <div className="rounded-[var(--radius-lg)] border border-accent/40 bg-surface shadow-[var(--shadow-elevated)] px-4 py-3 opacity-90">
-                    <span className="text-sm font-semibold text-text">{draggingSection.label}</span>
+                  <div className={styles.dragOverlayCard}>
+                    <span className={styles.dragOverlayLabel}>{draggingSection.label}</span>
                   </div>
                 )}
               </DragOverlay>
