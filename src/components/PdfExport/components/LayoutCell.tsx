@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Section } from '@/types/app'
+import { SmallIconButton } from '@/components/ui/SmallIconButton'
 import type { LayoutCell as LayoutCellType, CellContent } from '../types'
 import { CellPicker } from './CellPicker'
 
@@ -37,23 +38,23 @@ export function LayoutCell({
     switch (content.type) {
       case 'empty':
         return {
-          background:  'rgba(99,102,241,0.08)',
-          border:      '1px dashed rgba(99,102,241,0.3)',
+          background:  'var(--color-accent-bg-faint)',
+          border:      '1px dashed var(--color-accent-border-soft)',
         }
       case 'table':
         return {
-          background:  'rgba(59,130,246,0.06)',
-          border:      '1px solid rgba(59,130,246,0.15)',
+          background:  'var(--color-cell-table-bg)',
+          border:      '1px solid var(--color-cell-table-border)',
         }
       case 'chart':
         return {
-          background:  'rgba(16,185,129,0.06)',
-          border:      '1px solid rgba(16,185,129,0.15)',
+          background:  'var(--color-cell-chart-bg)',
+          border:      '1px solid var(--color-cell-chart-border)',
         }
       case 'comment':
         return {
-          background:  'rgba(245,158,11,0.06)',
-          border:      '1px solid rgba(245,158,11,0.15)',
+          background:  'var(--color-cell-comment-bg)',
+          border:      '1px solid var(--color-cell-comment-border)',
         }
     }
   })()
@@ -83,9 +84,9 @@ export function LayoutCell({
               width:        40,
               height:       40,
               borderRadius: '50%',
-              background:   'rgba(99,102,241,0.2)',
-              border:       '1px solid rgba(99,102,241,0.4)',
-              color:        '#818cf8',
+              background:   'var(--color-accent-bg)',
+              border:       '1px solid var(--color-accent-border)',
+              color:        'var(--color-accent-hi)',
               fontSize:     22,
               cursor:       'pointer',
               display:      'flex',
@@ -94,8 +95,8 @@ export function LayoutCell({
               lineHeight:   1,
               transition:   'background 0.15s',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.35)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.2)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-bg-strong)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-bg)' }}
           >
             +
           </button>
@@ -116,7 +117,7 @@ export function LayoutCell({
             <span style={{ fontSize: 11 }}>{content.type === 'table' ? '📋' : '📊'}</span>
             <span style={{
               fontSize:    10,
-              color:       '#64748b',
+              color:       'var(--color-modal-text-secondary)',
               overflow:    'hidden',
               textOverflow: 'ellipsis',
               whiteSpace:  'nowrap',
@@ -139,7 +140,7 @@ export function LayoutCell({
               background: 'transparent',
               border:     'none',
               outline:    'none',
-              color:      '#cbd5e1',
+              color:      'var(--color-modal-text-strong)',
               fontSize:   11,
               fontFamily: 'inherit',
               padding:    4,
@@ -161,73 +162,33 @@ export function LayoutCell({
           }}
         >
           {/* Bouton split — toujours disponible */}
-          <button
+          <SmallIconButton
             onClick={e => { e.stopPropagation(); onSplit() }}
             title="Diviser la cellule"
-            style={{
-              width:        20,
-              height:       20,
-              borderRadius: 3,
-              background:   'rgba(15,23,42,0.8)',
-              border:       '1px solid #334155',
-              color:        '#94a3b8',
-              fontSize:     10,
-              cursor:       'pointer',
-              display:      'flex',
-              alignItems:   'center',
-              justifyContent: 'center',
-              lineHeight:   1,
-            }}
           >
             ÷
-          </button>
+          </SmallIconButton>
 
           {/* Bouton supprimer cellule — si pas seule + contenu vide */}
           {canRemove && content.type === 'empty' && (
-            <button
+            <SmallIconButton
               onClick={e => { e.stopPropagation(); onRemove() }}
               title="Supprimer la cellule"
-              style={{
-                width:        20,
-                height:       20,
-                borderRadius: 3,
-                background:   'rgba(15,23,42,0.8)',
-                border:       '1px solid #334155',
-                color:        '#ef4444',
-                fontSize:     10,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                lineHeight:   1,
-              }}
+              color="var(--color-danger)"
             >
               ✕
-            </button>
+            </SmallIconButton>
           )}
 
           {/* Bouton vider — si contenu non vide */}
           {content.type !== 'empty' && (
-            <button
+            <SmallIconButton
               onClick={e => { e.stopPropagation(); handleClear() }}
               title="Vider la cellule"
-              style={{
-                width:        20,
-                height:       20,
-                borderRadius: 3,
-                background:   'rgba(15,23,42,0.8)',
-                border:       '1px solid #334155',
-                color:        '#ef4444',
-                fontSize:     10,
-                cursor:       'pointer',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                lineHeight:   1,
-              }}
+              color="var(--color-danger)"
             >
               ✕
-            </button>
+            </SmallIconButton>
           )}
         </div>
       )}

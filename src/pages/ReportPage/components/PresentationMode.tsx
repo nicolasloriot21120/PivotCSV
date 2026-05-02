@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, X }     from 'lucide-react'
 import { PivotTable }  from '@/components/ui/PivotTable'
 import { PivotChart }  from '@/components/ui/PivotChart'
+import { CloseButton } from '@/components/ui/CloseButton'
+import { ModalHeader } from '@/components/ui/ModalHeader'
+import { NavigationButton } from './NavigationButton'
 import { makeFormatter } from '@/lib/pivot/format'
 import type { Section } from '@/types/app'
 
@@ -45,29 +47,11 @@ export function PresentationMode({ sections, onClose }: Props) {
   const isFirst = index === 0
   const isLast  = index === sections.length - 1
 
-  const chevronStyle = (disabled: boolean) => ({
-    position:        'absolute' as const,
-    top:             '50%',
-    transform:       'translateY(-50%)',
-    zIndex:          10,
-    width:           40,
-    height:          40,
-    borderRadius:    8,
-    display:         'flex',
-    alignItems:      'center',
-    justifyContent:  'center',
-    cursor:          disabled ? 'default' : 'pointer',
-    background:      disabled ? 'transparent' : 'rgba(30,41,59,0.9)',
-    border:          `1px solid ${disabled ? 'transparent' : '#334155'}`,
-    color:           disabled ? '#1e293b' : '#94a3b8',
-    transition:      'background 0.15s, color 0.15s',
-  })
-
   return (
     <div style={{
       position:       'fixed',
       inset:          0,
-      background:     '#0f172a',
+      background:     'var(--color-modal-bg)',
       zIndex:         100,
       display:        'flex',
       flexDirection:  'column',
@@ -75,54 +59,29 @@ export function PresentationMode({ sections, onClose }: Props) {
     }}>
 
       {/* ── Header ── */}
-      <div style={{
-        display:         'flex',
-        alignItems:      'center',
-        justifyContent:  'space-between',
-        padding:         '0 24px',
-        height:          52,
-        flexShrink:      0,
-        borderBottom:    '1px solid #1e293b',
-      }}>
-        <span style={{ fontSize: 12, color: '#475569', minWidth: 60 }}>
-          {index + 1} / {sections.length}
-        </span>
-        <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
-          {section.label}
-        </span>
-        <button
-          onClick={onClose}
-          title="Fermer (Esc)"
-          style={{
-            background:  'transparent',
-            border:      'none',
-            color:       '#475569',
-            cursor:      'pointer',
-            padding:     4,
-            display:     'flex',
-            alignItems:  'center',
-            minWidth:    60,
-            justifyContent: 'flex-end',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#475569' }}
-        >
-          <X size={18} />
-        </button>
-      </div>
+      <ModalHeader
+        height={52}
+        left={
+          <span style={{ fontSize: 12, color: 'var(--color-modal-text-faint)', minWidth: 60 }}>
+            {index + 1} / {sections.length}
+          </span>
+        }
+        center={
+          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-modal-text)' }}>
+            {section.label}
+          </span>
+        }
+        right={
+          <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
+            <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="var(--color-modal-text-faint)" />
+          </div>
+        }
+      />
 
       {/* ── Tableau + Graphique ── */}
       <div style={{ flex: 3, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
 
-        <button
-          onClick={isFirst ? undefined : prev}
-          disabled={isFirst}
-          style={{ ...chevronStyle(isFirst), left: 10 }}
-          onMouseEnter={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
-          onMouseLeave={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
-        >
-          <ChevronLeft size={20} />
-        </button>
+        <NavigationButton direction="prev" disabled={isFirst} onClick={prev} />
 
         <div style={{ flex: 1, display: 'flex', padding: '16px 60px', gap: 12, overflow: 'hidden' }}>
 
@@ -152,7 +111,7 @@ export function PresentationMode({ sections, onClose }: Props) {
             />
           </div>
 
-          <div style={{ width: 1, background: '#1e293b', flexShrink: 0 }} />
+          <div style={{ width: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
 
           {/* Graphique */}
           <div style={{ flex: section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
@@ -168,24 +127,16 @@ export function PresentationMode({ sections, onClose }: Props) {
           </div>
         </div>
 
-        <button
-          onClick={isLast ? undefined : next}
-          disabled={isLast}
-          style={{ ...chevronStyle(isLast), right: 10 }}
-          onMouseEnter={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
-          onMouseLeave={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
-        >
-          <ChevronRight size={20} />
-        </button>
+        <NavigationButton direction="next" disabled={isLast} onClick={next} />
       </div>
 
-      <div style={{ height: 1, background: '#1e293b', flexShrink: 0 }} />
+      <div style={{ height: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
 
       {/* ── Notes ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 24px 16px' }}>
         <label style={{
           fontSize:        11,
-          color:           '#475569',
+          color:           'var(--color-modal-text-faint)',
           fontWeight:      600,
           marginBottom:    6,
           textTransform:   'uppercase',
@@ -200,10 +151,10 @@ export function PresentationMode({ sections, onClose }: Props) {
           placeholder="Observations, commentaires…"
           style={{
             flex:        1,
-            background:  '#1e293b',
-            border:      '1px solid #334155',
+            background:  'var(--color-modal-elevated)',
+            border:      '1px solid var(--color-modal-border-strong)',
             borderRadius: 6,
-            color:       '#e2e8f0',
+            color:       'var(--color-modal-text)',
             fontSize:    13,
             padding:     '10px 12px',
             resize:      'none',
@@ -211,8 +162,8 @@ export function PresentationMode({ sections, onClose }: Props) {
             fontFamily:  'inherit',
             lineHeight:  1.6,
           }}
-          onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = '#6366f1' }}
-          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = '#334155' }}
+          onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)' }}
+          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-modal-border-strong)' }}
         />
       </div>
     </div>

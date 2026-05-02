@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Section } from '@/types/app'
+import { SmallIconButton } from '@/components/ui/SmallIconButton'
 import type { LayoutRow as LayoutRowType, CellContent } from '../types'
 import { LayoutCell } from './LayoutCell'
 import { ResizeDivider } from './ResizeDivider'
@@ -61,30 +62,17 @@ export function LayoutRow({
       >
         {/* Bouton supprimer la ligne (hover) */}
         {hovered && canRemove && (
-          <button
-            onClick={e => { e.stopPropagation(); onRemove() }}
-            title="Supprimer la ligne"
-            style={{
-              position:     'absolute',
-              top:          4,
-              left:         4,
-              zIndex:       30,
-              width:        18,
-              height:       18,
-              borderRadius: 3,
-              background:   'rgba(15,23,42,0.85)',
-              border:       '1px solid #334155',
-              color:        '#ef4444',
-              fontSize:     9,
-              cursor:       'pointer',
-              display:      'flex',
-              alignItems:   'center',
-              justifyContent: 'center',
-              lineHeight:   1,
-            }}
-          >
-            ✕
-          </button>
+          <div style={{ position: 'absolute', top: 4, left: 4, zIndex: 30 }}>
+            <SmallIconButton
+              onClick={e => { e.stopPropagation(); onRemove() }}
+              title="Supprimer la ligne"
+              size={18}
+              fontSize={9}
+              color="var(--color-danger)"
+            >
+              ✕
+            </SmallIconButton>
+          </div>
         )}
 
         {row.cells.map((cell, idx) => (

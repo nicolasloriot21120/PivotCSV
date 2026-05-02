@@ -1,5 +1,8 @@
 import { Download } from 'lucide-react'
 import type { Section } from '@/types/app'
+import { CloseButton }    from '@/components/ui/CloseButton'
+import { ModalHeader }    from '@/components/ui/ModalHeader'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { usePdfExport }   from './hooks/usePdfExport'
 import { LayoutEditor }   from './components/LayoutEditor'
 
@@ -21,7 +24,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
       style={{
         position:        'fixed',
         inset:           0,
-        background:      'rgba(0,0,0,0.70)',
+        background:      'var(--color-modal-backdrop)',
         zIndex:          50,
         display:         'flex',
         alignItems:      'center',
@@ -32,7 +35,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
     >
       <div
         style={{
-          background:    '#0f172a',
+          background:    'var(--color-modal-bg)',
           borderRadius:  12,
           display:       'flex',
           flexDirection: 'column',
@@ -42,35 +45,11 @@ export function PdfExportModal({ sections, onClose }: Props) {
         onClick={e => e.stopPropagation()}
       >
         {/* En-tête */}
-        <div
-          style={{
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'space-between',
-            padding:        '10px 20px',
-            borderBottom:   '1px solid #1e293b',
-            flexShrink:     0,
-          }}
-        >
-          <span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Export PDF</span>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border:     'none',
-              color:      '#64748b',
-              fontSize:   18,
-              cursor:     'pointer',
-              lineHeight: 1,
-              padding:    0,
-            }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748b' }}
-            title="Fermer"
-          >
-            ✕
-          </button>
-        </div>
+        <ModalHeader
+          height={40}
+          left={<span style={{ color: 'var(--color-modal-text)', fontWeight: 600, fontSize: 14 }}>Export PDF</span>}
+          right={<CloseButton onClick={onClose} />}
+        />
 
         {/* Corps — LayoutEditor scrollable */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
@@ -94,7 +73,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
             alignItems:     'center',
             justifyContent: 'flex-end',
             padding:        '10px 16px',
-            borderTop:      '1px solid #1e293b',
+            borderTop:      '1px solid var(--color-modal-border)',
             flexShrink:     0,
           }}
         >
@@ -111,26 +90,12 @@ export function PdfExportModal({ sections, onClose }: Props) {
               fontSize:     13,
               fontWeight:   500,
               cursor:       !hasContent || generating ? 'not-allowed' : 'pointer',
-              background:   !hasContent || generating ? '#1e293b' : '#2563eb',
-              color:        !hasContent || generating ? '#475569' : 'white',
+              background:   !hasContent || generating ? 'var(--color-modal-elevated)' : 'var(--color-accent)',
+              color:        !hasContent || generating ? 'var(--color-modal-text-faint)' : 'var(--color-text)',
               transition:   'background 0.15s',
             }}
           >
-            {generating ? (
-              <span
-                style={{
-                  display:         'inline-block',
-                  width:           14,
-                  height:          14,
-                  border:          '2px solid currentColor',
-                  borderTopColor:  'transparent',
-                  borderRadius:    '50%',
-                  animation:       'spin 0.7s linear infinite',
-                }}
-              />
-            ) : (
-              <Download size={14} />
-            )}
+            {generating ? <LoadingSpinner size={14} /> : <Download size={14} />}
             Générer PDF
           </button>
         </div>
