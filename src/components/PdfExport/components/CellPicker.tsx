@@ -31,32 +31,32 @@ export function CellPicker({ sections, onSelect, onClose }: Props) {
         top:          '50%',
         left:         '50%',
         transform:    'translate(-50%, -50%)',
-        background:   '#0f172a',
-        border:       '1px solid #334155',
+        background:   'var(--color-modal-bg)',
+        border:       '1px solid var(--color-modal-border-strong)',
         borderRadius: 8,
-        boxShadow:    '0 8px 32px rgba(0,0,0,0.6)',
+        boxShadow:    'var(--shadow-elevated)',
         zIndex:       100,
         minWidth:     240,
         maxWidth:     300,
         overflow:     'hidden',
       }}
     >
-      <div style={{ padding: '8px 12px', borderBottom: '1px solid #1e293b' }}>
-        <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--color-modal-border)' }}>
+        <span style={{ fontSize: 11, color: 'var(--color-modal-text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Ajouter du contenu
         </span>
       </div>
 
       <div style={{ padding: '6px 0', maxHeight: 320, overflowY: 'auto' }}>
         {availableSections.length === 0 && (
-          <p style={{ fontSize: 11, color: '#475569', padding: '8px 12px' }}>
+          <p style={{ fontSize: 11, color: 'var(--color-modal-text-faint)', padding: '8px 12px' }}>
             Aucune section avec des données disponibles.
           </p>
         )}
 
         {availableSections.map(section => (
           <div key={section.id}>
-            <div style={{ padding: '4px 12px', fontSize: 10, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ padding: '4px 12px', fontSize: 10, color: 'var(--color-modal-text-faint)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {section.label}
             </div>
             <button
@@ -69,12 +69,12 @@ export function CellPicker({ sections, onSelect, onClose }: Props) {
                 padding:    '6px 16px',
                 background: 'transparent',
                 border:     'none',
-                color:      '#cbd5e1',
+                color:      'var(--color-modal-text-strong)',
                 fontSize:   12,
                 cursor:     'pointer',
                 textAlign:  'left',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e293b' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-modal-elevated)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
               <span>📋</span>
@@ -90,12 +90,12 @@ export function CellPicker({ sections, onSelect, onClose }: Props) {
                 padding:    '6px 16px',
                 background: 'transparent',
                 border:     'none',
-                color:      '#cbd5e1',
+                color:      'var(--color-modal-text-strong)',
                 fontSize:   12,
                 cursor:     'pointer',
                 textAlign:  'left',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e293b' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-modal-elevated)' }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
             >
               <span>📊</span>
@@ -105,7 +105,7 @@ export function CellPicker({ sections, onSelect, onClose }: Props) {
         ))}
 
         {availableSections.length > 0 && (
-          <div style={{ borderTop: '1px solid #1e293b', margin: '4px 0' }} />
+          <div style={{ borderTop: '1px solid var(--color-modal-border)', margin: '4px 0' }} />
         )}
 
         <button
@@ -118,12 +118,12 @@ export function CellPicker({ sections, onSelect, onClose }: Props) {
             padding:    '6px 16px',
             background: 'transparent',
             border:     'none',
-            color:      '#cbd5e1',
+            color:      'var(--color-modal-text-strong)',
             fontSize:   12,
             cursor:     'pointer',
             textAlign:  'left',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1e293b' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-modal-elevated)' }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
         >
           <span>✏️</span>

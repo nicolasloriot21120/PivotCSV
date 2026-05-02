@@ -51,7 +51,7 @@ export function PresentationMode({ sections, onClose }: Props) {
     <div style={{
       position:       'fixed',
       inset:          0,
-      background:     '#0f172a',
+      background:     'var(--color-modal-bg)',
       zIndex:         100,
       display:        'flex',
       flexDirection:  'column',
@@ -62,12 +62,12 @@ export function PresentationMode({ sections, onClose }: Props) {
       <ModalHeader
         height={52}
         left={
-          <span style={{ fontSize: 12, color: '#475569', minWidth: 60 }}>
+          <span style={{ fontSize: 12, color: 'var(--color-modal-text-faint)', minWidth: 60 }}>
             {index + 1} / {sections.length}
           </span>
         }
         center={
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
+          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-modal-text)' }}>
             {section.label}
           </span>
         }
@@ -111,7 +111,7 @@ export function PresentationMode({ sections, onClose }: Props) {
             />
           </div>
 
-          <div style={{ width: 1, background: '#1e293b', flexShrink: 0 }} />
+          <div style={{ width: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
 
           {/* Graphique */}
           <div style={{ flex: section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
@@ -130,13 +130,13 @@ export function PresentationMode({ sections, onClose }: Props) {
         <NavigationButton direction="next" disabled={isLast} onClick={next} />
       </div>
 
-      <div style={{ height: 1, background: '#1e293b', flexShrink: 0 }} />
+      <div style={{ height: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
 
       {/* ── Notes ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 24px 16px' }}>
         <label style={{
           fontSize:        11,
-          color:           '#475569',
+          color:           'var(--color-modal-text-faint)',
           fontWeight:      600,
           marginBottom:    6,
           textTransform:   'uppercase',
@@ -151,10 +151,10 @@ export function PresentationMode({ sections, onClose }: Props) {
           placeholder="Observations, commentaires…"
           style={{
             flex:        1,
-            background:  '#1e293b',
-            border:      '1px solid #334155',
+            background:  'var(--color-modal-elevated)',
+            border:      '1px solid var(--color-modal-border-strong)',
             borderRadius: 6,
-            color:       '#e2e8f0',
+            color:       'var(--color-modal-text)',
             fontSize:    13,
             padding:     '10px 12px',
             resize:      'none',
@@ -162,8 +162,8 @@ export function PresentationMode({ sections, onClose }: Props) {
             fontFamily:  'inherit',
             lineHeight:  1.6,
           }}
-          onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = '#6366f1' }}
-          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = '#334155' }}
+          onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)' }}
+          onBlur={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-modal-border-strong)' }}
         />
       </div>
     </div>

@@ -42,7 +42,7 @@ export function ResizeDivider({ direction, onResize }: Props) {
         transition:   'background 0.15s',
         zIndex:       10,
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.4)' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-border)' }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
     />
   )

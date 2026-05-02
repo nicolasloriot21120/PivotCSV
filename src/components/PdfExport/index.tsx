@@ -24,7 +24,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
       style={{
         position:        'fixed',
         inset:           0,
-        background:      'rgba(0,0,0,0.70)',
+        background:      'var(--color-modal-backdrop)',
         zIndex:          50,
         display:         'flex',
         alignItems:      'center',
@@ -35,7 +35,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
     >
       <div
         style={{
-          background:    '#0f172a',
+          background:    'var(--color-modal-bg)',
           borderRadius:  12,
           display:       'flex',
           flexDirection: 'column',
@@ -47,7 +47,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
         {/* En-tête */}
         <ModalHeader
           height={40}
-          left={<span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>Export PDF</span>}
+          left={<span style={{ color: 'var(--color-modal-text)', fontWeight: 600, fontSize: 14 }}>Export PDF</span>}
           right={<CloseButton onClick={onClose} />}
         />
 
@@ -73,7 +73,7 @@ export function PdfExportModal({ sections, onClose }: Props) {
             alignItems:     'center',
             justifyContent: 'flex-end',
             padding:        '10px 16px',
-            borderTop:      '1px solid #1e293b',
+            borderTop:      '1px solid var(--color-modal-border)',
             flexShrink:     0,
           }}
         >
@@ -90,8 +90,8 @@ export function PdfExportModal({ sections, onClose }: Props) {
               fontSize:     13,
               fontWeight:   500,
               cursor:       !hasContent || generating ? 'not-allowed' : 'pointer',
-              background:   !hasContent || generating ? '#1e293b' : '#2563eb',
-              color:        !hasContent || generating ? '#475569' : 'white',
+              background:   !hasContent || generating ? 'var(--color-modal-elevated)' : 'var(--color-accent)',
+              color:        !hasContent || generating ? 'var(--color-modal-text-faint)' : 'var(--color-text)',
               transition:   'background 0.15s',
             }}
           >

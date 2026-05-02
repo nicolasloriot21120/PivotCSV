@@ -22,16 +22,44 @@
   --color-danger:  #EF4444;
 
   /* ── Modaux / overlays sombres (constants, indépendants du thème) ── */
-  --color-modal-border:               #1E293B;
-  --color-modal-border-strong:        #334155;
-  --color-modal-text-muted:           #94A3B8;
-  --color-modal-text-faint:           #475569;
-  --color-modal-text-disabled:        #1E293B;
+  --color-modal-bg:                   #0F172A;     /* slate-900 — fond principal */
+  --color-modal-elevated:             #1E293B;     /* slate-800 — surface interne (input bg, hover bg) */
+  --color-modal-backdrop:             rgba(0, 0, 0, 0.70);
+
+  --color-modal-border:               #1E293B;     /* slate-800 — bordures internes */
+  --color-modal-border-strong:        #334155;     /* slate-700 — bordures plus visibles */
+
+  --color-modal-text:                 #E2E8F0;     /* slate-200 — texte principal (inputs) */
+  --color-modal-text-strong:          #CBD5E1;     /* slate-300 — items de menu */
+  --color-modal-text-muted:           #94A3B8;     /* slate-400 — labels secondaires */
+  --color-modal-text-secondary:       #64748B;     /* slate-500 — labels uppercase */
+  --color-modal-text-faint:           #475569;     /* slate-600 — texte tertiaire */
+  --color-modal-text-disabled:        #1E293B;     /* slate-800 — état disabled */
 
   --color-overlay:                    rgba(15, 23, 42, 0.93);
   --color-overlay-button:             rgba(30, 41, 59, 0.9);
   --color-overlay-button-hover:       rgba(51, 65, 85, 0.9);
   --color-overlay-button-translucent: rgba(15, 23, 42, 0.85);
+
+  /* ── Accents indigo translucides (overlays/boutons sur fonds sombres) ── */
+  --color-accent-bg-faint:            rgba(99, 102, 241, 0.08);
+  --color-accent-bg-soft:             rgba(99, 102, 241, 0.15);
+  --color-accent-bg:                  rgba(99, 102, 241, 0.25);
+  --color-accent-bg-strong:           rgba(99, 102, 241, 0.35);
+  --color-accent-border-soft:         rgba(99, 102, 241, 0.30);
+  --color-accent-border:              rgba(99, 102, 241, 0.40);
+
+  /* ── Cellules layout PDF par type de contenu (sémantiques, indépendants du thème) ── */
+  --color-cell-table-bg:              rgba(59, 130, 246, 0.06);
+  --color-cell-table-border:          rgba(59, 130, 246, 0.15);
+  --color-cell-chart-bg:              rgba(16, 185, 129, 0.06);
+  --color-cell-chart-border:          rgba(16, 185, 129, 0.15);
+  --color-cell-comment-bg:            rgba(245, 158, 11, 0.06);
+  --color-cell-comment-border:        rgba(245, 158, 11, 0.15);
+
+  /* ── Toile A4 (éditeur de layout PDF) ── */
+  --color-canvas-bg:                  #475569;
+  --color-paper:                      #FFFFFF;     /* fond de la page A4 simulée (toujours blanc) */
 
   /* ── Ombres ── */
   --shadow-glow:     0 0 24px #6366F140;

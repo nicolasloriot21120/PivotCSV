@@ -31,7 +31,7 @@ export function LayoutEditor({
   return (
     <div
       style={{
-        background: '#475569',
+        background: 'var(--color-canvas-bg)',
         padding:    24,
         display:    'flex',
         flexDirection: 'column',
@@ -42,10 +42,10 @@ export function LayoutEditor({
       {/* Page A4 simulée */}
       <div
         style={{
-          background:   'white',
+          background:   'var(--color-paper)',
           width:        CANVAS_W,
           minHeight:    CANVAS_H,
-          boxShadow:    '0 4px 32px rgba(0,0,0,0.5)',
+          boxShadow:    'var(--shadow-elevated)',
           overflow:     'hidden',
           flexShrink:   0,
           display:      'flex',
@@ -84,16 +84,16 @@ export function LayoutEditor({
         style={{
           marginTop:    12,
           padding:      '6px 16px',
-          background:   'rgba(99,102,241,0.15)',
-          border:       '1px dashed rgba(99,102,241,0.4)',
+          background:   'var(--color-accent-bg-soft)',
+          border:       '1px dashed var(--color-accent-border)',
           borderRadius: 6,
-          color:        '#818cf8',
+          color:        'var(--color-accent-hi)',
           fontSize:     12,
           cursor:       'pointer',
           transition:   'background 0.15s',
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.25)' }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.15)' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-bg)' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-bg-soft)' }}
       >
         + Ajouter une ligne
       </button>
