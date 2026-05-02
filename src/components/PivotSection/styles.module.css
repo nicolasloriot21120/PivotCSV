@@ -1,0 +1,174 @@
+@reference "../../index.css";
+
+/* ── Carte principale ── */
+
+.card {
+  @apply rounded-[var(--radius-lg)] border border-border bg-surface;
+  @apply transition-all duration-200 shadow-[var(--shadow-card)];
+}
+
+.cardDragging {
+  @apply shadow-[var(--shadow-elevated)] opacity-80;
+}
+
+/* ── Header ── */
+
+.headerBar {
+  @apply flex items-center gap-2 px-4 py-3 border-b border-border;
+}
+
+.dragHandle {
+  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing touch-none flex-shrink-0;
+}
+
+.fileIcon {
+  @apply text-accent/60 flex-shrink-0;
+}
+
+.labelInput {
+  @apply flex-1 bg-transparent border-b border-accent/50 outline-none;
+  @apply text-sm font-semibold text-text px-0.5;
+}
+
+.labelText {
+  @apply flex-1 text-sm font-semibold text-text cursor-text truncate;
+}
+
+.fileName {
+  @apply text-[10px] text-subtle truncate max-w-[120px] flex-shrink-0 hidden sm:block;
+}
+
+/* Pastille de statut */
+
+.statusDot {
+  @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+}
+
+.statusDotDone {
+  composes: statusDot;
+  @apply bg-success;
+}
+
+.statusDotComputing {
+  composes: statusDot;
+  @apply bg-accent animate-pulse;
+}
+
+.statusDotError {
+  composes: statusDot;
+  @apply bg-danger;
+}
+
+/* Boutons d'action du header */
+
+.headerActions {
+  @apply flex items-center gap-1 flex-shrink-0;
+}
+
+.iconButton {
+  @apply p-1 rounded transition-all duration-150;
+}
+
+.iconButtonNeutral {
+  composes: iconButton;
+  @apply text-subtle hover:text-text hover:bg-elevated;
+}
+
+.iconButtonDanger {
+  composes: iconButton;
+  @apply text-subtle hover:text-danger hover:bg-danger/10;
+}
+
+/* ── Corps ── */
+
+.body {
+  @apply flex flex-col;
+}
+
+/* Onglets */
+
+.tabsBar {
+  @apply flex border-b border-border px-4;
+}
+
+.tab {
+  @apply px-3 py-2 text-[11px] font-medium border-b-2 -mb-px transition-all duration-150;
+}
+
+.tabActive {
+  composes: tab;
+  @apply border-accent text-accent-hi;
+}
+
+.tabIdle {
+  composes: tab;
+  @apply border-transparent text-muted hover:text-text;
+}
+
+.tabDisabled {
+  composes: tab;
+  @apply border-transparent text-subtle cursor-default;
+}
+
+/* Contenu d'onglet */
+
+.tabPanel {
+  @apply px-5 py-4 flex flex-col gap-3;
+}
+
+/* Bloc d'erreur */
+
+.errorBox {
+  @apply flex items-start gap-2 px-3 py-2.5;
+  @apply rounded-[var(--radius-md)] bg-danger/10 border border-danger/30;
+}
+
+.errorIcon {
+  @apply text-danger flex-shrink-0 mt-0.5;
+}
+
+.errorText {
+  @apply text-danger text-xs;
+}
+
+/* Layout résultats : tableau + graphique */
+
+.resultsLayout {
+  @apply flex gap-3;
+}
+
+.resultsLayoutHorizontal {
+  composes: resultsLayout;
+  @apply flex-row items-stretch;
+}
+
+.resultsLayoutVertical {
+  composes: resultsLayout;
+  @apply flex-col;
+}
+
+.tableContainer {
+  @apply min-w-0 overflow-x-auto;
+}
+
+.divider {
+  @apply bg-border flex-shrink-0;
+}
+
+.dividerVertical {
+  composes: divider;
+  @apply w-px self-stretch;
+}
+
+.dividerHorizontal {
+  composes: divider;
+  @apply h-px w-full;
+}
+
+.chartContainer {
+  @apply min-w-0 min-h-[280px];
+}
+
+.emptyResult {
+  @apply text-xs text-subtle italic;
+}
