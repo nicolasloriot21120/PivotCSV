@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   DndContext, DragOverlay,
   closestCenter,
@@ -7,13 +6,12 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { LayoutGrid, Download, Presentation } from 'lucide-react'
+import { LayoutGrid, Presentation } from 'lucide-react'
 
 import { AppSidebar }           from '@/components/AppSidebar'
 import { LoadingOverlay }       from '@/components/ui/LoadingSpinner'
 import { SortablePivotSection } from './components/SortablePivotSection'
 import { useReportPage }        from './useReportPage'
-import { PdfExportModal }       from '@/components/PdfExport'
 import { PresentationMode }     from './components/PresentationMode'
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -29,8 +27,6 @@ export function ReportPage() {
     presentationLoading, presentationOpen, openPresentation, closePresentation,
     onDragStart, onDragEnd,
   } = useReportPage()
-
-  const [showPdfExport, setShowPdfExport] = useState(false)
 
   const canPresent          = sections.some(s => s.config !== null)
   const presentableSections = sections.filter(s => s.result !== null)
@@ -73,16 +69,6 @@ export function ReportPage() {
               >
                 <Presentation size={13} />
                 Présentation
-              </button>
-            )}
-            {sections.length > 0 && (
-              <button
-                onClick={() => setShowPdfExport(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
-                title="Exporter en PDF"
-              >
-                <Download size={13} />
-                Export PDF
               </button>
             )}
             <img src="/finex-wordmark-dark.svg" alt="Finex" className="h-9 w-auto opacity-50 hover:opacity-80 transition-opacity" />
@@ -135,10 +121,6 @@ export function ReportPage() {
 
       </div>
     </div>
-
-    {showPdfExport && (
-      <PdfExportModal sections={sections} onClose={() => setShowPdfExport(false)} />
-    )}
 
     {presentationLoading && (
       <LoadingOverlay label="Génération de la présentation en cours…" />
