@@ -174,7 +174,7 @@ export function LayoutCell({
             <SmallIconButton
               onClick={e => { e.stopPropagation(); onRemove() }}
               title="Supprimer la cellule"
-              color="#ef4444"
+              color="var(--color-danger)"
             >
               ✕
             </SmallIconButton>
@@ -185,7 +185,7 @@ export function LayoutCell({
             <SmallIconButton
               onClick={e => { e.stopPropagation(); handleClear() }}
               title="Vider la cellule"
-              color="#ef4444"
+              color="var(--color-danger)"
             >
               ✕
             </SmallIconButton>

@@ -21,6 +21,18 @@
   --color-warning: #F59E0B;
   --color-danger:  #EF4444;
 
+  /* ── Modaux / overlays sombres (constants, indépendants du thème) ── */
+  --color-modal-border:               #1E293B;
+  --color-modal-border-strong:        #334155;
+  --color-modal-text-muted:           #94A3B8;
+  --color-modal-text-faint:           #475569;
+  --color-modal-text-disabled:        #1E293B;
+
+  --color-overlay:                    rgba(15, 23, 42, 0.93);
+  --color-overlay-button:             rgba(30, 41, 59, 0.9);
+  --color-overlay-button-hover:       rgba(51, 65, 85, 0.9);
+  --color-overlay-button-translucent: rgba(15, 23, 42, 0.85);
+
   /* ── Ombres ── */
   --shadow-glow:     0 0 24px #6366F140;
   --shadow-card:     0 4px 24px #00000060, 0 1px 0 #ffffff0a inset;

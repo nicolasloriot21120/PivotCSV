@@ -33,9 +33,17 @@ export function NavigationButton({ direction, disabled, onClick }: Props) {
         alignItems:     'center',
         justifyContent: 'center',
         cursor:         disabled ? 'default' : 'pointer',
-        background:     disabled ? 'transparent' : isHot ? 'rgba(51,65,85,0.9)' : 'rgba(30,41,59,0.9)',
-        border:         `1px solid ${disabled ? 'transparent' : '#334155'}`,
-        color:          disabled ? '#1e293b' : isHot ? 'white' : '#94a3b8',
+        background:     disabled
+          ? 'transparent'
+          : isHot
+            ? 'var(--color-overlay-button-hover)'
+            : 'var(--color-overlay-button)',
+        border:         `1px solid ${disabled ? 'transparent' : 'var(--color-modal-border-strong)'}`,
+        color:          disabled
+          ? 'var(--color-modal-text-disabled)'
+          : isHot
+            ? 'var(--color-text)'
+            : 'var(--color-modal-text-muted)',
         transition:     'background 0.15s, color 0.15s',
       }}
     >

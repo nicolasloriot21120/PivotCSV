@@ -68,7 +68,7 @@ export function LayoutRow({
               title="Supprimer la ligne"
               size={18}
               fontSize={9}
-              color="#ef4444"
+              color="var(--color-danger)"
             >
               ✕
             </SmallIconButton>

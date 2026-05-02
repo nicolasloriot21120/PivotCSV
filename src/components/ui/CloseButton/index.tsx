@@ -12,8 +12,8 @@ export function CloseButton({
   onClick,
   title       = 'Fermer',
   size        = 18,
-  colorIdle   = '#64748b',
-  colorHover  = 'white',
+  colorIdle   = 'var(--color-muted)',
+  colorHover  = 'var(--color-text)',
 }: Props) {
   return (
     <button

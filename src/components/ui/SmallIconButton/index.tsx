@@ -14,7 +14,7 @@ export function SmallIconButton({
   title,
   children,
   size     = 20,
-  color    = '#94a3b8',
+  color    = 'var(--color-modal-text-muted)',
   fontSize = 10,
 }: Props) {
   return (
@@ -26,8 +26,8 @@ export function SmallIconButton({
         width:          size,
         height:         size,
         borderRadius:   3,
-        background:     'rgba(15,23,42,0.85)',
-        border:         '1px solid #334155',
+        background:     'var(--color-overlay-button-translucent)',
+        border:         '1px solid var(--color-modal-border-strong)',
         color,
         fontSize,
         cursor:         'pointer',

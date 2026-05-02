@@ -73,7 +73,7 @@ export function PresentationMode({ sections, onClose }: Props) {
         }
         right={
           <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
-            <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="#475569" />
+            <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="var(--color-modal-text-faint)" />
           </div>
         }
       />

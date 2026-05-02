@@ -38,7 +38,7 @@ type OverlayProps = {
 
 export function LoadingOverlay({
   label,
-  background = 'rgba(15,23,42,0.93)',
+  background = 'var(--color-overlay)',
   zIndex     = 100,
 }: OverlayProps) {
   return (
@@ -55,8 +55,17 @@ export function LoadingOverlay({
         gap:            16,
       }}
     >
-      <LoadingSpinner size={32} thickness={3} color="#334155" accentColor="#6366f1" />
-      {label && <span style={{ color: '#94a3b8', fontSize: 14 }}>{label}</span>}
+      <LoadingSpinner
+        size={32}
+        thickness={3}
+        color="var(--color-modal-border-strong)"
+        accentColor="var(--color-accent)"
+      />
+      {label && (
+        <span style={{ color: 'var(--color-modal-text-muted)', fontSize: 14 }}>
+          {label}
+        </span>
+      )}
     </div>
   )
 }

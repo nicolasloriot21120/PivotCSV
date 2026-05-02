@@ -17,7 +17,7 @@ export function ModalHeader({ left, center, right, height = 48 }: Props) {
         padding:        '0 20px',
         height,
         flexShrink:     0,
-        borderBottom:   '1px solid #1e293b',
+        borderBottom:   '1px solid var(--color-modal-border)',
       }}
     >
       {left}
