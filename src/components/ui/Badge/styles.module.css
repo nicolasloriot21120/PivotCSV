@@ -1,0 +1,26 @@
+@reference "../../../index.css";
+
+.base {
+  @apply inline-flex items-center gap-1.5 px-2 py-0.5;
+  @apply rounded-full border text-xs font-medium;
+}
+
+/* ── Variantes (combinent bg / text / border) ── */
+
+.variantAccent  { @apply bg-accent/15  text-accent-hi border-accent/30; }
+.variantSuccess { @apply bg-success/15 text-success   border-success/30; }
+.variantWarning { @apply bg-warning/15 text-warning   border-warning/30; }
+.variantDanger  { @apply bg-danger/15  text-danger    border-danger/30; }
+.variantNeutral { @apply bg-elevated   text-muted     border-border; }
+
+/* ── Pastille (dot=true) ── */
+
+.dot {
+  @apply w-1.5 h-1.5 rounded-full;
+}
+
+.dotAccent  { composes: dot; @apply bg-accent-hi; }
+.dotSuccess { composes: dot; @apply bg-success; }
+.dotWarning { composes: dot; @apply bg-warning; }
+.dotDanger  { composes: dot; @apply bg-danger; }
+.dotNeutral { composes: dot; @apply bg-muted; }

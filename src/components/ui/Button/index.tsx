@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import styles from './styles.module.css'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 export type ButtonSize    = 'sm' | 'md' | 'lg'
@@ -13,23 +14,16 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const variants: Record<ButtonVariant, string> = {
-  primary:
-    'bg-gradient-to-r from-accent-lo to-accent text-white shadow-[0_0_16px_#6366F130] ' +
-    'hover:shadow-[0_0_24px_#6366F155] hover:brightness-110 active:brightness-95',
-  secondary:
-    'bg-elevated border border-border-strong text-text ' +
-    'hover:border-accent/50 hover:bg-elevated/80 hover:text-accent-hi active:brightness-90',
-  ghost:
-    'text-muted hover:text-text hover:bg-elevated active:bg-surface',
-  danger:
-    'bg-danger/10 border border-danger/30 text-danger ' +
-    'hover:bg-danger/20 hover:border-danger/60 active:brightness-90',
+  primary:   styles.variantPrimary,
+  secondary: styles.variantSecondary,
+  ghost:     styles.variantGhost,
+  danger:    styles.variantDanger,
 }
 
 const sizes: Record<ButtonSize, string> = {
-  sm: 'h-7  px-3   text-xs  gap-1.5 rounded-[var(--radius-sm)]',
-  md: 'h-9  px-4   text-sm  gap-2   rounded-[var(--radius-md)]',
-  lg: 'h-11 px-5   text-base gap-2.5 rounded-[var(--radius-md)]',
+  sm: styles.sizeSm,
+  md: styles.sizeMd,
+  lg: styles.sizeLg,
 }
 
 export function Button({
@@ -39,7 +33,7 @@ export function Button({
   iconEnd,
   loading = false,
   children,
-  className = '',
+  className,
   disabled,
   ...props
 }: ButtonProps) {
@@ -47,18 +41,10 @@ export function Button({
     <button
       {...props}
       disabled={disabled || loading}
-      className={[
-        'inline-flex items-center justify-center font-medium transition-all duration-150',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60',
-        'disabled:opacity-40 disabled:pointer-events-none',
-        'cursor-pointer select-none',
-        variants[variant],
-        sizes[size],
-        className,
-      ].join(' ')}
+      className={[styles.base, variants[variant], sizes[size], className].filter(Boolean).join(' ')}
     >
       {loading
-        ? <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        ? <span className={styles.spinner} />
         : icon
       }
       {children && <span>{children}</span>}

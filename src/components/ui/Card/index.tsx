@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
+import styles from './styles.module.css'
 
 export type CardProps = HTMLAttributes<HTMLDivElement> & {
   children:  ReactNode
@@ -8,10 +9,10 @@ export type CardProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 const paddings = {
-  none: '',
-  sm:   'p-3',
-  md:   'p-5',
-  lg:   'p-7',
+  none: undefined,
+  sm:   styles.paddingSm,
+  md:   styles.paddingMd,
+  lg:   styles.paddingLg,
 }
 
 export function Card({
@@ -19,21 +20,19 @@ export function Card({
   glow     = false,
   elevated = false,
   padding  = 'md',
-  className = '',
+  className,
   ...props
 }: CardProps) {
   return (
     <div
       {...props}
       className={[
-        'rounded-[var(--radius-lg)] border border-border',
-        elevated
-          ? 'bg-elevated shadow-[var(--shadow-elevated)]'
-          : 'bg-surface shadow-[var(--shadow-card)]',
-        glow && 'shadow-[var(--shadow-glow)]',
+        styles.base,
+        elevated ? styles.elevated : styles.surface,
+        glow && styles.glow,
         paddings[padding],
         className,
-      ].join(' ')}
+      ].filter(Boolean).join(' ')}
     >
       {children}
     </div>
