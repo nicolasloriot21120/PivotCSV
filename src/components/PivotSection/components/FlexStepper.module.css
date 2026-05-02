@@ -1,0 +1,18 @@
+@reference "../../../index.css";
+
+.stepper {
+  @apply flex items-center gap-0.5;
+}
+
+.label {
+  @apply text-[10px] text-subtle mr-0.5;
+}
+
+.button {
+  @apply w-4 h-4 flex items-center justify-center rounded;
+  @apply text-subtle hover:text-text hover:bg-elevated transition-colors text-[11px];
+}
+
+.value {
+  @apply w-4 text-center tabular-nums text-[11px] text-muted;
+}
