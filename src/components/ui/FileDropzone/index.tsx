@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
 import { Upload, File, X, AlertCircle, Plus } from 'lucide-react'
+import styles from './styles.module.css'
 
 export type FileDropzoneProps = {
   accept?:        string
@@ -77,16 +78,22 @@ export function FileDropzone({
     setState('idle')
   }
 
-  const borderColor = {
-    idle:  'border-border-strong hover:border-accent/50',
-    hover: 'border-accent shadow-[var(--shadow-glow)]',
-    error: 'border-danger/60',
+  const dropzoneClass = {
+    idle:  styles.dropzoneIdle,
+    hover: styles.dropzoneHover,
+    error: styles.dropzoneError,
+  }[state]
+
+  const iconBoxClass = {
+    idle:  styles.iconBox,
+    hover: styles.iconBoxHover,
+    error: styles.iconBoxError,
   }[state]
 
   const hint_ = hint ?? `Formats acceptés : ${accept} — max ${maxSizeMb} Mo`
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={styles.root}>
 
       <div
         role="button"
@@ -97,33 +104,21 @@ export function FileDropzone({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={[
-          'relative flex flex-col items-center justify-center gap-3',
-          'rounded-[var(--radius-lg)] border-2 border-dashed',
-          'bg-surface cursor-pointer transition-all duration-200',
-          'px-6 py-10 text-center select-none outline-none',
-          'focus-visible:ring-2 focus-visible:ring-accent/60',
-          borderColor,
-        ].join(' ')}
+        className={dropzoneClass}
       >
-        <div className={[
-          'w-12 h-12 rounded-[var(--radius-md)] flex items-center justify-center',
-          'bg-accent/10 border border-accent/20',
-          state === 'hover' && 'bg-accent/20 border-accent/40',
-          state === 'error' && 'bg-danger/10 border-danger/30',
-        ].join(' ')}>
+        <div className={iconBoxClass}>
           {state === 'error'
-            ? <AlertCircle size={22} className="text-danger" />
-            : <Upload size={22} className={state === 'hover' ? 'text-accent-hi' : 'text-accent'} />
+            ? <AlertCircle size={22} className={styles.iconDanger} />
+            : <Upload size={22} className={state === 'hover' ? styles.iconAccentHi : styles.iconAccent} />
           }
         </div>
 
         <div>
-          <p className="text-text text-sm font-medium">{label}</p>
-          <p className="text-muted text-xs mt-0.5">ou cliquez pour parcourir</p>
+          <p className={styles.label}>{label}</p>
+          <p className={styles.sublabel}>ou cliquez pour parcourir</p>
         </div>
 
-        <p className="text-subtle text-xs">{hint_}</p>
+        <p className={styles.hint}>{hint_}</p>
 
         <input
           ref={inputRef}
@@ -131,45 +126,36 @@ export function FileDropzone({
           accept={accept}
           multiple={multiple}
           onChange={onChange}
-          className="sr-only"
+          className={styles.hiddenInput}
         />
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] bg-danger/10 border border-danger/30">
-          <AlertCircle size={14} className="text-danger flex-shrink-0" />
-          <p className="text-danger text-xs">{error}</p>
+        <div className={styles.errorBox}>
+          <AlertCircle size={14} className={styles.errorIcon} />
+          <p className={styles.errorText}>{error}</p>
         </div>
       )}
 
       {!hideList && dropped.length > 0 && (
-        <ul className="flex flex-col gap-1.5">
+        <ul className={styles.fileList}>
           {dropped.map(f => {
             const isSelected = selectedFile?.name === f.name
             return (
               <li
                 key={f.name}
                 onClick={() => onFileSelect?.(f)}
-                className={[
-                  'flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border',
-                  'cursor-pointer transition-all duration-150',
-                  isSelected
-                    ? 'bg-accent/10 border-accent/40'
-                    : 'bg-elevated border-border hover:border-border-strong',
-                ].join(' ')}
+                className={isSelected ? styles.fileItemSelected : styles.fileItemIdle}
               >
-                <File size={14} className={isSelected ? 'text-accent-hi' : 'text-accent'} />
-                <span className={[
-                  'text-xs font-medium truncate flex-1',
-                  isSelected ? 'text-accent-hi' : 'text-text',
-                ].join(' ')}>{f.name}</span>
-                <span className="text-muted text-xs flex-shrink-0">
+                <File size={14} className={isSelected ? styles.iconAccentHi : styles.iconAccent} />
+                <span className={isSelected ? styles.fileNameSelected : styles.fileNameIdle}>{f.name}</span>
+                <span className={styles.fileSize}>
                   {(f.size / 1024).toFixed(0)} Ko
                 </span>
                 {onAddPivot && (
                   <button
                     onClick={e => { e.stopPropagation(); onAddPivot(f) }}
-                    className="text-subtle hover:text-accent transition-colors flex-shrink-0"
+                    className={styles.fileActionAdd}
                     aria-label={`Nouveau pivot pour ${f.name}`}
                     title="Ajouter un pivot"
                   >
@@ -178,7 +164,7 @@ export function FileDropzone({
                 )}
                 <button
                   onClick={e => { e.stopPropagation(); removeFile(f.name) }}
-                  className="text-subtle hover:text-danger transition-colors flex-shrink-0"
+                  className={styles.fileActionRemove}
                   aria-label={`Retirer ${f.name}`}
                 >
                   <X size={13} />
