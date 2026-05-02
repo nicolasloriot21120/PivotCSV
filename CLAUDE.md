@@ -6,8 +6,6 @@
 - Tailwind v4 (pas de `tailwind.config.js`)
 - @dnd-kit/core + @dnd-kit/sortable — drag-and-drop sections
 - Recharts — graphiques (BarChart, LineChart, PieChart)
-- @react-pdf/renderer — export PDF (import dynamique obligatoire, voir ci-dessous)
-- html2canvas-pro — capture DOM (html2canvas standard ne supporte pas Tailwind v4)
 - Alias `@` → `src/`
 
 ---
@@ -24,25 +22,6 @@ ComponentName/
   types/             ← types locaux (index.ts)
   lib/               ← utilitaires locaux
 ```
-
----
-
-## Points de vigilance
-
-### html2canvas-pro (pas html2canvas)
-Tailwind v4 génère des couleurs `oklab()` que `html2canvas` ne sait pas parser → erreur à l'exécution.
-Toujours importer `html2canvas-pro` à la place.
-
-### @react-pdf/renderer — import dynamique obligatoire
-Le package a un sous-dépendance CJS (`base64-js`) qui provoque une erreur Vite au chargement de page si importé statiquement.
-**Ne jamais importer en haut de fichier.** Toujours en dynamique :
-```ts
-const { buildAndDownloadPdf } = await import('../lib/buildPdf')
-```
-
-### data-export-target
-Les containers tableau et graphique ont `data-export-target="${sectionId}-table"` et `data-export-target="${sectionId}-chart"`.
-`captureBlocks.ts` les utilise pour html2canvas. Ne pas retirer ces attributs.
 
 ---
 
@@ -77,11 +56,6 @@ Overlay full-screen sur ReportPage (pas de route séparée — pour conserver la
 - Loader pendant le calcul, puis `PresentationMode` s'ouvre
 - Navigation ◄/► + touches ←/→ + Échap
 - Notes locales par section (non persistées)
-
-### Export PDF
-`src/components/PdfExport/` — layout éditeur en lignes/cellules flex.
-- `captureBlocks.ts` : capture les vrais éléments depuis la page (data-export-target)
-- `buildPdf.tsx` : import dynamique, dimensions PDF depuis ratios flex
 
 ---
 
@@ -133,4 +107,3 @@ Format de PR avec cases à cocher dans le plan de test :
 | Branche | Contenu |
 |---|---|
 | `main` | Base stable |
-| `feat/export-pdf` | Mode présentation + export PDF layout éditeur |
