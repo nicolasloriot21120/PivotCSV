@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight }         from 'lucide-react'
 import { PivotTable }  from '@/components/ui/PivotTable'
 import { PivotChart }  from '@/components/ui/PivotChart'
 import { CloseButton } from '@/components/ui/CloseButton'
+import { ModalHeader } from '@/components/ui/ModalHeader'
 import { makeFormatter } from '@/lib/pivot/format'
 import type { Section } from '@/types/app'
 
@@ -76,25 +77,24 @@ export function PresentationMode({ sections, onClose }: Props) {
     }}>
 
       {/* ── Header ── */}
-      <div style={{
-        display:         'flex',
-        alignItems:      'center',
-        justifyContent:  'space-between',
-        padding:         '0 24px',
-        height:          52,
-        flexShrink:      0,
-        borderBottom:    '1px solid #1e293b',
-      }}>
-        <span style={{ fontSize: 12, color: '#475569', minWidth: 60 }}>
-          {index + 1} / {sections.length}
-        </span>
-        <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
-          {section.label}
-        </span>
-        <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
-          <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="#475569" />
-        </div>
-      </div>
+      <ModalHeader
+        height={52}
+        left={
+          <span style={{ fontSize: 12, color: '#475569', minWidth: 60 }}>
+            {index + 1} / {sections.length}
+          </span>
+        }
+        center={
+          <span style={{ fontSize: 15, fontWeight: 600, color: 'white' }}>
+            {section.label}
+          </span>
+        }
+        right={
+          <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
+            <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="#475569" />
+          </div>
+        }
+      />
 
       {/* ── Tableau + Graphique ── */}
       <div style={{ flex: 3, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
