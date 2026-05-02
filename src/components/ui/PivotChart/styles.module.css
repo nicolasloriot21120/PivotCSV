@@ -1,0 +1,5 @@
+@reference "../../../index.css";
+
+.root {
+  @apply w-full h-full min-h-[280px];
+}

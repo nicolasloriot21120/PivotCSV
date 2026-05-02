@@ -2,6 +2,7 @@ import type { PivotData }  from '@/lib/pivot/types'
 import { BarChart }  from './components/BarChart'
 import { LineChart } from './components/LineChart'
 import { PieChart }  from './components/PieChart'
+import styles from './styles.module.css'
 
 export type ChartType = 'bar' | 'line' | 'pie'
 
@@ -19,7 +20,7 @@ type Props = {
 
 export function PivotChart({ data, chartType, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: Props) {
   return (
-    <div className="w-full h-full min-h-[280px]">
+    <div className={styles.root}>
       {chartType === 'bar'  && <BarChart  data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} transpose={transpose} />}
       {chartType === 'line' && <LineChart data={data} collapsedRows={collapsedRows} collapsedCols={collapsedCols} formatValue={formatValue} chartColors={chartColors} transpose={transpose} />}
       {chartType === 'pie'  && <PieChart  data={data} collapsedRows={collapsedRows} formatValue={formatValue} chartColors={chartColors} />}

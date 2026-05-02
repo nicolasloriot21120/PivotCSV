@@ -3,6 +3,7 @@ import { ResponsiveBar } from '@nivo/bar'
 import type { PivotData } from '@/lib/pivot/types'
 import { toBarData }     from '@/lib/pivot/chart'
 import { theme, COLORS, MARGIN } from '../lib/theme'
+import { EmptyChart }    from './EmptyChart'
 
 type Props = {
   data:          PivotData
@@ -13,17 +14,9 @@ type Props = {
   transpose:     boolean
 }
 
-function Empty() {
-  return (
-    <div className="flex items-center justify-center h-full text-xs text-subtle italic">
-      Aucune donnée à afficher
-    </div>
-  )
-}
-
 export function BarChart({ data, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: Props) {
   const { barData, keys } = toBarData(data, collapsedRows, collapsedCols, transpose)
-  if (!barData.length) return <Empty />
+  if (!barData.length) return <EmptyChart />
   const colorMap = Object.fromEntries(keys.map((k, i) => [k, chartColors[k] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsiveBar

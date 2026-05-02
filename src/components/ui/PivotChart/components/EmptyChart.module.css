@@ -1,0 +1,5 @@
+@reference "../../../../index.css";
+
+.empty {
+  @apply flex items-center justify-center h-full text-xs text-subtle italic;
+}
