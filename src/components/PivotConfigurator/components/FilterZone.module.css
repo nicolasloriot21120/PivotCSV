@@ -1,0 +1,134 @@
+@reference "../../../index.css";
+
+/* ── Conteneur de la zone "Filtres" ── */
+
+.section {
+  composes: section from '../styles.module.css';
+}
+
+.header {
+  composes: sectionHeader from '../styles.module.css';
+}
+
+.icon {
+  composes: sectionIcon from '../styles.module.css';
+}
+
+.label {
+  composes: sectionLabel from '../styles.module.css';
+}
+
+.hint {
+  composes: sectionHint from '../styles.module.css';
+}
+
+.areaIdle {
+  composes: zoneAreaIdle from '../styles.module.css';
+  @apply p-2 flex flex-col gap-2;
+}
+
+.areaIdleEmpty {
+  composes: areaIdle;
+  @apply min-h-[64px];
+}
+
+.areaActive {
+  composes: zoneAreaActive from '../styles.module.css';
+  @apply p-2 flex flex-col gap-2;
+}
+
+.areaActiveEmpty {
+  composes: areaActive;
+  @apply min-h-[64px];
+}
+
+.placeholder {
+  composes: zonePlaceholder from '../styles.module.css';
+}
+
+/* ── FilterItem (item draggable dans la zone) ── */
+
+.item {
+  composes: chipBase from '../styles.module.css';
+  @apply px-2.5 py-2 flex flex-col gap-2 transition-opacity duration-150;
+}
+
+.itemDragging {
+  composes: item;
+  composes: chipDragging from '../styles.module.css';
+}
+
+.itemHeader {
+  @apply flex items-center gap-1.5;
+}
+
+.dragHandle {
+  composes: dragHandle from '../../../styles/shared.module.css';
+}
+
+.fieldName {
+  @apply text-xs font-medium truncate flex-1;
+}
+
+.fieldNameString {
+  composes: fieldName;
+  @apply text-text;
+}
+
+.fieldNameNumber {
+  composes: fieldName;
+  @apply text-accent-hi;
+}
+
+.numberHash {
+  composes: numberHash from '../styles.module.css';
+  @apply ml-1;
+}
+
+.removeButton {
+  composes: removeButton from '../styles.module.css';
+}
+
+/* ── Body : chips de valeurs (string) ── */
+
+.valueChips {
+  @apply flex flex-wrap gap-1 pl-4;
+}
+
+.valueChip {
+  @apply px-2 py-0.5 rounded-full text-[11px] font-medium transition-all duration-100;
+}
+
+.valueChipSelected {
+  composes: valueChip;
+  @apply bg-accent text-white;
+}
+
+.valueChipIdle {
+  composes: valueChip;
+  @apply bg-border text-muted hover:bg-border-strong hover:text-text;
+}
+
+.valuesLoading {
+  @apply text-subtle text-[11px];
+}
+
+/* ── Body : inputs min/max (number) ── */
+
+.rangeRow {
+  @apply flex items-center gap-2 pl-4;
+}
+
+.rangeField {
+  @apply flex flex-col gap-0.5 flex-1;
+}
+
+.rangeLabel {
+  @apply text-[10px] text-subtle;
+}
+
+.rangeInput {
+  @apply w-full bg-surface border border-border rounded-[var(--radius-sm)];
+  @apply px-2 py-1 text-xs text-text placeholder:text-subtle;
+  @apply focus:outline-none focus:border-accent/50 transition-colors;
+}

@@ -1,0 +1,19 @@
+@reference "../../../index.css";
+
+.bar {
+  @apply flex items-center gap-0.5 ml-1;
+}
+
+.button {
+  @apply text-[9px] font-semibold px-1 py-0.5 rounded border transition-all duration-100;
+}
+
+.buttonActive {
+  composes: button;
+  @apply bg-accent/20 border-accent/50 text-accent-hi;
+}
+
+.buttonIdle {
+  composes: button;
+  @apply bg-surface border-border text-subtle hover:text-text hover:border-border-strong;
+}

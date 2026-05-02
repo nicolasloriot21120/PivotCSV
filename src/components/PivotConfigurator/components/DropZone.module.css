@@ -1,0 +1,31 @@
+@reference "../../../index.css";
+
+.section {
+  composes: section from '../styles.module.css';
+}
+
+.header {
+  composes: sectionHeader from '../styles.module.css';
+}
+
+.icon {
+  composes: sectionIcon from '../styles.module.css';
+}
+
+.label {
+  composes: sectionLabel from '../styles.module.css';
+}
+
+.areaIdle {
+  composes: zoneAreaIdle from '../styles.module.css';
+  @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
+}
+
+.areaActive {
+  composes: zoneAreaActive from '../styles.module.css';
+  @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
+}
+
+.placeholder {
+  composes: zonePlaceholder from '../styles.module.css';
+}

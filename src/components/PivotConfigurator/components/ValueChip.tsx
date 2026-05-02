@@ -3,6 +3,7 @@ import { CSS }                 from '@dnd-kit/utilities'
 import { GripVertical, X }     from 'lucide-react'
 import type { AggregationType } from '@/lib/pivot/types'
 import type { ValueField }      from '../types'
+import styles                   from './ValueChip.module.css'
 
 const AGGS: { id: AggregationType; label: string; title: string }[] = [
   { id: 'sum',   label: 'Σ', title: 'Somme'   },
@@ -30,40 +31,31 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      className={[
-        'flex flex-col gap-1 bg-elevated border border-border rounded-[var(--radius-md)] px-2.5 py-1.5',
-        'transition-opacity duration-150',
-        isDragging ? 'opacity-40' : '',
-      ].join(' ')}
+      className={isDragging ? styles.chipDragging : styles.chip}
     >
-      <div className="flex items-center gap-1.5">
+      <div className={styles.header}>
         <span
           {...attributes}
           {...listeners}
-          className="text-subtle hover:text-muted cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
+          className={styles.dragHandle}
         >
           <GripVertical size={12} />
         </span>
-        <span className="text-xs font-medium text-accent-hi truncate max-w-[100px]">{field.field}</span>
+        <span className={styles.fieldName}>{field.field}</span>
         <button
           onClick={onRemove}
-          className="text-subtle hover:text-danger transition-colors ml-auto flex-shrink-0"
+          className={styles.removeButton}
         >
           <X size={11} />
         </button>
       </div>
-      <div className="flex gap-0.5 pl-4">
+      <div className={styles.aggBar}>
         {AGGS.map(a => (
           <button
             key={a.id}
             onClick={() => onAggChange(a.id)}
             title={a.title}
-            className={[
-              'px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all duration-100',
-              field.aggregation === a.id
-                ? 'bg-accent text-white'
-                : 'text-subtle hover:text-text hover:bg-border',
-            ].join(' ')}
+            className={field.aggregation === a.id ? styles.aggButtonActive : styles.aggButtonIdle}
           >
             {a.label}
           </button>

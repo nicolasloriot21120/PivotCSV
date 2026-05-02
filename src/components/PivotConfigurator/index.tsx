@@ -11,8 +11,9 @@ import { DropZone }        from './components/DropZone'
 import { ValueChip }       from './components/ValueChip'
 import { FilterZone }      from './components/FilterZone'
 import { DateGroupPicker } from './components/DateGroupPicker'
-import type { ConfiguratorState, ValueField } from './types'
+import type { ConfiguratorState } from './types'
 import { usePivotConfigurator } from './hooks/usePivotConfigurator'
+import styles from './styles.module.css'
 
 type Props = {
   value:          ConfiguratorState
@@ -30,21 +31,27 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
   const {
     sensors, dragging, available,
     canCompute, computing,
-    removeFromZone, addToZone, updateDateGroup,
+    removeFromZone, updateDateGroup,
     onDragStart, onDragEnd, handleCompute,
   } = usePivotConfigurator({ value, onChange, headers, preview, distinctValues, status, onCompute })
 
+  const computeButtonClass = computing
+    ? styles.computeButtonComputing
+    : canCompute
+      ? styles.computeButtonReady
+      : styles.computeButtonDisabled
+
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <div className="flex flex-col gap-6">
+      <div className={styles.root}>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted">
+        <div className={styles.section}>
+          <span className={styles.sectionLabel}>
             Champs disponibles
           </span>
-          <div className="flex flex-wrap gap-1.5 p-3 rounded-[var(--radius-md)] bg-surface border border-border min-h-[52px]">
+          <div className={styles.availableArea}>
             {available.length === 0 && (
-              <p className="text-subtle text-xs self-center">Tous les champs sont placés</p>
+              <p className={styles.availableEmpty}>Tous les champs sont placés</p>
             )}
             {available.map(f => (
               <FieldChip
@@ -57,10 +64,10 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className={styles.zonesGrid}>
           <DropZone id="rows" label="Lignes" icon={<Rows3 size={12} />} placeholder="Glissez un champ ici">
             {value.rows.map(f => (
-              <div key={f.field} className="flex flex-col gap-0.5">
+              <div key={f.field} className={styles.zoneItem}>
                 <FieldChip
                   field={f.field}
                   type={f.type}
@@ -79,7 +86,7 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
 
           <DropZone id="columns" label="Colonnes" icon={<Columns3 size={12} />} placeholder="Glissez un champ ici">
             {value.columns.map(f => (
-              <div key={f.field} className="flex flex-col gap-0.5">
+              <div key={f.field} className={styles.zoneItem}>
                 <FieldChip
                   field={f.field}
                   type={f.type}
@@ -124,19 +131,11 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
           />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className={styles.actions}>
           <button
             onClick={computing ? onCancel : handleCompute}
             disabled={!canCompute && !computing}
-            className={[
-              'flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)]',
-              'text-sm font-semibold transition-all duration-150',
-              computing
-                ? 'bg-danger/10 border border-danger/40 text-danger hover:bg-danger/20'
-                : canCompute
-                  ? 'bg-accent text-white hover:bg-accent-hi shadow-[var(--shadow-glow)]'
-                  : 'bg-elevated border border-border text-subtle cursor-not-allowed',
-            ].join(' ')}
+            className={computeButtonClass}
           >
             {computing
               ? <><Loader2 size={14} className="animate-spin" /> Annuler</>
@@ -145,19 +144,19 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
           </button>
 
           {computing && (
-            <div className="flex items-center gap-2 flex-1">
-              <div className="flex-1 h-1.5 bg-elevated rounded-full overflow-hidden">
+            <div className={styles.progressWrap}>
+              <div className={styles.progressTrack}>
                 <div
-                  className="h-full bg-accent rounded-full transition-all duration-300"
+                  className={styles.progressFill}
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-xs text-muted tabular-nums">{progress}%</span>
+              <span className={styles.progressLabel}>{progress}%</span>
             </div>
           )}
 
           {!canCompute && !computing && (
-            <p className="text-xs text-subtle">Au moins une ligne et une valeur requises</p>
+            <p className={styles.requirementHint}>Au moins une ligne et une valeur requises</p>
           )}
         </div>
 
@@ -169,7 +168,7 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
             field={dragging.field}
             type={dragging.type}
             draggableId="overlay"
-            className="shadow-[var(--shadow-elevated)] opacity-90 rotate-1 scale-105"
+            className={styles.dragOverlayChip}
           />
         )}
       </DragOverlay>
