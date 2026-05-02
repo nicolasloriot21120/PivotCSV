@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight }         from 'lucide-react'
 import { PivotTable }  from '@/components/ui/PivotTable'
 import { PivotChart }  from '@/components/ui/PivotChart'
 import { CloseButton } from '@/components/ui/CloseButton'
 import { ModalHeader } from '@/components/ui/ModalHeader'
+import { NavigationButton } from './NavigationButton'
 import { makeFormatter } from '@/lib/pivot/format'
 import type { Section } from '@/types/app'
 
@@ -47,24 +47,6 @@ export function PresentationMode({ sections, onClose }: Props) {
   const isFirst = index === 0
   const isLast  = index === sections.length - 1
 
-  const chevronStyle = (disabled: boolean) => ({
-    position:        'absolute' as const,
-    top:             '50%',
-    transform:       'translateY(-50%)',
-    zIndex:          10,
-    width:           40,
-    height:          40,
-    borderRadius:    8,
-    display:         'flex',
-    alignItems:      'center',
-    justifyContent:  'center',
-    cursor:          disabled ? 'default' : 'pointer',
-    background:      disabled ? 'transparent' : 'rgba(30,41,59,0.9)',
-    border:          `1px solid ${disabled ? 'transparent' : '#334155'}`,
-    color:           disabled ? '#1e293b' : '#94a3b8',
-    transition:      'background 0.15s, color 0.15s',
-  })
-
   return (
     <div style={{
       position:       'fixed',
@@ -99,15 +81,7 @@ export function PresentationMode({ sections, onClose }: Props) {
       {/* ── Tableau + Graphique ── */}
       <div style={{ flex: 3, display: 'flex', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
 
-        <button
-          onClick={isFirst ? undefined : prev}
-          disabled={isFirst}
-          style={{ ...chevronStyle(isFirst), left: 10 }}
-          onMouseEnter={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
-          onMouseLeave={e => { if (!isFirst) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
-        >
-          <ChevronLeft size={20} />
-        </button>
+        <NavigationButton direction="prev" disabled={isFirst} onClick={prev} />
 
         <div style={{ flex: 1, display: 'flex', padding: '16px 60px', gap: 12, overflow: 'hidden' }}>
 
@@ -153,15 +127,7 @@ export function PresentationMode({ sections, onClose }: Props) {
           </div>
         </div>
 
-        <button
-          onClick={isLast ? undefined : next}
-          disabled={isLast}
-          style={{ ...chevronStyle(isLast), right: 10 }}
-          onMouseEnter={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(51,65,85,0.9)'; (e.currentTarget as HTMLElement).style.color = 'white' }}}
-          onMouseLeave={e => { if (!isLast) { (e.currentTarget as HTMLElement).style.background = 'rgba(30,41,59,0.9)'; (e.currentTarget as HTMLElement).style.color = '#94a3b8' }}}
-        >
-          <ChevronRight size={20} />
-        </button>
+        <NavigationButton direction="next" disabled={isLast} onClick={next} />
       </div>
 
       <div style={{ height: 1, background: '#1e293b', flexShrink: 0 }} />
