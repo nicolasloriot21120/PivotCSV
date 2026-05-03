@@ -4,8 +4,8 @@ import {
 } from 'lucide-react'
 
 import type { ChartType } from '@/components/ui/PivotChart'
-import type { Section }   from '@/types/app'
-import { FlexStepper }    from './FlexStepper'
+import type { Section }   from '@/types/app.ts'
+import { FlexStepper }    from '@/components/PivotSection/components/flexStepper/FlexStepper.tsx'
 import shared             from '@/styles/shared.module.css'
 import styles             from './ResultsToolbar.module.css'
 
@@ -31,8 +31,7 @@ const SCALE_TITLES: Record<'none' | 'K' | 'M' | 'G', string> = {
 
 export function ResultsToolbar({
   section,
-  showRowTotals, showColTotals, showColorPicker,
-  seriesLabels, canTranspose,
+  showRowTotals, showColTotals, showColorPicker, canTranspose,
   onUpdate, onToggleRowTotals, onToggleColTotals, onToggleColorPicker,
 }: Props) {
   const isHorizontal = section.chartLayout === 'horizontal'

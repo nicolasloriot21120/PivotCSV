@@ -1,5 +1,5 @@
 import { COLORS } from '@/components/ui/PivotChart'
-import type { Section } from '@/types/app'
+import type { Section } from '@/types/app.ts'
 import styles from './ColorPickerPanel.module.css'
 
 type Props = {

@@ -1,8 +1,8 @@
 import { useDraggable }        from '@dnd-kit/core'
 import { CSS }                 from '@dnd-kit/utilities'
 import { GripVertical, X }     from 'lucide-react'
-import type { AggregationType } from '@/lib/pivot/types'
-import type { ValueField }      from '../types'
+import type { AggregationType } from '@/lib/pivot/types.ts'
+import type { ValueField }      from '../../types'
 import styles                   from './ValueChip.module.css'
 
 const AGGS: { id: AggregationType; label: string; title: string }[] = [

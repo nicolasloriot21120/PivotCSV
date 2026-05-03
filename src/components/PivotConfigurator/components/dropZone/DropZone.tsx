@@ -1,6 +1,6 @@
 import { useDroppable }          from '@dnd-kit/core'
 import type { ReactNode }        from 'react'
-import type { ZoneId }           from '../types'
+import type { ZoneId }           from '../../types'
 import styles                    from './DropZone.module.css'
 
 type Props = {

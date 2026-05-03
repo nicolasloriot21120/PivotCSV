@@ -1,7 +1,7 @@
 import { useDroppable, useDraggable } from '@dnd-kit/core'
 import { CSS }                        from '@dnd-kit/utilities'
 import { GripVertical, X, Filter }    from 'lucide-react'
-import type { FilterField }           from '../types'
+import type { FilterField }           from '../../types'
 import styles                         from './FilterZone.module.css'
 
 type FilterItemProps = {

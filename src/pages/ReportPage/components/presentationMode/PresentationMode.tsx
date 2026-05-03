@@ -2,9 +2,9 @@ import { PivotTable }       from '@/components/ui/PivotTable'
 import { PivotChart }       from '@/components/ui/PivotChart'
 import { CloseButton }      from '@/components/ui/CloseButton'
 import { ModalHeader }      from '@/components/ui/ModalHeader'
-import { NavigationButton } from './NavigationButton'
-import { usePresentationMode } from './usePresentationMode'
-import type { Section }     from '@/types/app'
+import { NavigationButton } from '../navigationButton/NavigationButton.tsx'
+import { usePresentationMode } from './usePresentationMode.ts'
+import type { Section }     from '@/types/app.ts'
 
 type Props = {
   sections: Section[]  // uniquement les sections avec result !== null

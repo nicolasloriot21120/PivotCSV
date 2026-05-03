@@ -1,7 +1,7 @@
 @reference "../../../index.css";
 
 .chip {
-  composes: chipBase from '../styles.module.css';
+  composes: chipBase from '../../styles.module.css';
   @apply flex items-center gap-1.5 px-2.5 py-1.5;
   @apply text-xs font-medium select-none transition-all duration-150;
   @apply hover:border-border-strong;
@@ -9,11 +9,11 @@
 
 .chipDragging {
   composes: chip;
-  composes: chipDragging from '../styles.module.css';
+  composes: chipDragging from '../../styles.module.css';
 }
 
 .dragHandle {
-  composes: dragHandle from '../../../styles/shared.module.css';
+  composes: dragHandle from '../../../../styles/shared.module.css';
 }
 
 .label {
@@ -31,11 +31,11 @@
 }
 
 .numberHash {
-  composes: numberHash from '../styles.module.css';
+  composes: numberHash from '../../styles.module.css';
   @apply text-[10px];
 }
 
 .removeButton {
-  composes: removeButton from '../styles.module.css';
+  composes: removeButton from '../../styles.module.css';
   @apply ml-0.5;
 }

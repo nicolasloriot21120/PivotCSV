@@ -1,7 +1,7 @@
 import { useDraggable }    from '@dnd-kit/core'
 import { CSS }             from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
-import type { FieldType }  from '../types'
+import type { FieldType }  from '../../types'
 import styles              from './FieldChip.module.css'
 
 type Props = {

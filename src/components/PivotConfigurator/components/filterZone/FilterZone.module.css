@@ -3,27 +3,27 @@
 /* ── Conteneur de la zone "Filtres" ── */
 
 .section {
-  composes: section from '../styles.module.css';
+  composes: section from '../../styles.module.css';
 }
 
 .header {
-  composes: sectionHeader from '../styles.module.css';
+  composes: sectionHeader from '../../styles.module.css';
 }
 
 .icon {
-  composes: sectionIcon from '../styles.module.css';
+  composes: sectionIcon from '../../styles.module.css';
 }
 
 .label {
-  composes: sectionLabel from '../styles.module.css';
+  composes: sectionLabel from '../../styles.module.css';
 }
 
 .hint {
-  composes: sectionHint from '../styles.module.css';
+  composes: sectionHint from '../../styles.module.css';
 }
 
 .areaIdle {
-  composes: zoneAreaIdle from '../styles.module.css';
+  composes: zoneAreaIdle from '../../styles.module.css';
   @apply p-2 flex flex-col gap-2;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .areaActive {
-  composes: zoneAreaActive from '../styles.module.css';
+  composes: zoneAreaActive from '../../styles.module.css';
   @apply p-2 flex flex-col gap-2;
 }
 
@@ -43,19 +43,19 @@
 }
 
 .placeholder {
-  composes: zonePlaceholder from '../styles.module.css';
+  composes: zonePlaceholder from '../../styles.module.css';
 }
 
 /* ── FilterItem (item draggable dans la zone) ── */
 
 .item {
-  composes: chipBase from '../styles.module.css';
+  composes: chipBase from '../../styles.module.css';
   @apply px-2.5 py-2 flex flex-col gap-2 transition-opacity duration-150;
 }
 
 .itemDragging {
   composes: item;
-  composes: chipDragging from '../styles.module.css';
+  composes: chipDragging from '../../styles.module.css';
 }
 
 .itemHeader {
@@ -63,7 +63,7 @@
 }
 
 .dragHandle {
-  composes: dragHandle from '../../../styles/shared.module.css';
+  composes: dragHandle from '../../../../styles/shared.module.css';
 }
 
 .fieldName {
@@ -81,12 +81,12 @@
 }
 
 .numberHash {
-  composes: numberHash from '../styles.module.css';
+  composes: numberHash from '../../styles.module.css';
   @apply ml-1;
 }
 
 .removeButton {
-  composes: removeButton from '../styles.module.css';
+  composes: removeButton from '../../styles.module.css';
 }
 
 /* ── Body : chips de valeurs (string) ── */

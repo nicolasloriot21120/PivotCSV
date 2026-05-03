@@ -1,13 +1,13 @@
 @reference "../../../index.css";
 
 .chip {
-  composes: chipBase from '../styles.module.css';
+  composes: chipBase from '../../styles.module.css';
   @apply flex flex-col gap-1 px-2.5 py-1.5 transition-opacity duration-150;
 }
 
 .chipDragging {
   composes: chip;
-  composes: chipDragging from '../styles.module.css';
+  composes: chipDragging from '../../styles.module.css';
 }
 
 .header {
@@ -15,7 +15,7 @@
 }
 
 .dragHandle {
-  composes: dragHandle from '../../../styles/shared.module.css';
+  composes: dragHandle from '../../../../styles/shared.module.css';
 }
 
 .fieldName {
@@ -23,7 +23,7 @@
 }
 
 .removeButton {
-  composes: removeButton from '../styles.module.css';
+  composes: removeButton from '../../styles.module.css';
   @apply ml-auto;
 }
 

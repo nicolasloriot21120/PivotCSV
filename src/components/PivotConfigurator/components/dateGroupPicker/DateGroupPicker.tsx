@@ -1,4 +1,4 @@
-import type { DateGrouping } from '@/lib/pivot/dateGroup'
+import type { DateGrouping } from '@/lib/pivot/dateGroup.ts'
 import styles               from './DateGroupPicker.module.css'
 
 const DATE_GROUPS: { key: DateGrouping; label: string; title: string }[] = [
