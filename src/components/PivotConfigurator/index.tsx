@@ -160,12 +160,13 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
 
       <DragOverlay>
         {dragging && (
-          <FieldChip
-            field={dragging.field}
-            type={dragging.type}
-            draggableId="overlay"
-            className={styles.dragOverlayChip}
-          />
+          <div className={styles.dragOverlayChip}>
+            <FieldChip
+              field={dragging.field}
+              type={dragging.type}
+              draggableId="overlay"
+            />
+          </div>
         )}
       </DragOverlay>
     </DndContext>

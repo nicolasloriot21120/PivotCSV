@@ -58,7 +58,7 @@ export function PivotSection({
   const statusDotClass = STATUS_DOT_CLASS[section.status]
 
   return (
-    <div className={`${styles.card} ${isDragging ? styles.cardDragging : ''}`}>
+    <div data-dragging={isDragging || undefined} className={styles.card}>
 
       {/* ── Header ── */}
       <div className={styles.headerBar}>

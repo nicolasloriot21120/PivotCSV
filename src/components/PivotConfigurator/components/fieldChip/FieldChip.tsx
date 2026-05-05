@@ -1,18 +1,27 @@
 import { useDraggable }    from '@dnd-kit/core'
 import { CSS }             from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
+import type { ReactNode }  from 'react'
 import type { FieldType }  from '../../types'
 import styles              from './FieldChip.module.css'
 
 type Props = {
-  field:     string
-  type:      FieldType
-  draggableId: string
-  onRemove?: () => void
-  className?: string
+  field:           string
+  type:            FieldType
+  draggableId:     string
+  onRemove?:       () => void
+  showNumberHash?: boolean
+  children?:       ReactNode
 }
 
-export function FieldChip({ field, type, draggableId, onRemove, className }: Props) {
+export function FieldChip({
+  field,
+  type,
+  draggableId,
+  onRemove,
+  showNumberHash = true,
+  children,
+}: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id:   draggableId,
     data: { field, type },
@@ -24,32 +33,37 @@ export function FieldChip({ field, type, draggableId, onRemove, className }: Pro
     <div
       ref={setNodeRef}
       style={style}
-      className={[isDragging ? styles.chipDragging : styles.chip, className].filter(Boolean).join(' ')}
+      data-dragging={isDragging || undefined}
+      className={styles.chip}
     >
-      <span
-        {...attributes}
-        {...listeners}
-        className={styles.dragHandle}
-      >
-        <GripVertical size={12} />
-      </span>
-
-      <span className={type === 'number' ? styles.labelNumber : styles.labelString}>
-        {field}
-      </span>
-
-      {type === 'number' && (
-        <span className={styles.numberHash}>#</span>
-      )}
-
-      {onRemove && (
-        <button
-          onClick={e => { e.stopPropagation(); onRemove() }}
-          className={styles.removeButton}
+      <div className={styles.header}>
+        <span
+          {...attributes}
+          {...listeners}
+          className={styles.dragHandle}
         >
-          <X size={11} />
-        </button>
-      )}
+          <GripVertical size={12} />
+        </span>
+
+        <span data-type={type} className={styles.label}>
+          {field}
+        </span>
+
+        {showNumberHash && type === 'number' && (
+          <span className={styles.numberHash}>#</span>
+        )}
+
+        {onRemove && (
+          <button
+            onClick={e => { e.stopPropagation(); onRemove() }}
+            className={styles.removeButton}
+          >
+            <X size={11} />
+          </button>
+        )}
+      </div>
+
+      {children}
     </div>
   )
 }

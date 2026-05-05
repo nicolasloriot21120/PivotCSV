@@ -1,31 +1,36 @@
 @reference "../../../index.css";
 
 .section {
-  composes: section from '../../styles.module.css';
+  @apply flex flex-col gap-2;
 }
 
 .header {
-  composes: sectionHeader from '../../styles.module.css';
+  @apply flex items-center gap-1.5;
 }
 
 .icon {
-  composes: sectionIcon from '../../styles.module.css';
+  @apply text-accent/70;
 }
 
 .label {
-  composes: sectionLabel from '../../styles.module.css';
+  @apply text-xs font-semibold uppercase tracking-widest text-muted;
+}
+
+.area {
+  @apply rounded-[var(--radius-md)] border-2 border-dashed transition-all duration-150;
+  @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
 }
 
 .areaIdle {
-  composes: zoneAreaIdle from '../../styles.module.css';
-  @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
+  composes: area;
+  @apply border-border hover:border-border-strong;
 }
 
 .areaActive {
-  composes: zoneAreaActive from '../../styles.module.css';
-  @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
+  composes: area;
+  @apply border-accent/60 bg-accent/5;
 }
 
 .placeholder {
-  composes: zonePlaceholder from '../../styles.module.css';
+  @apply text-subtle text-xs self-center w-full text-center py-1;
 }

@@ -1,34 +1,5 @@
 @reference "../../../index.css";
 
-.chip {
-  composes: chipBase from '../../styles.module.css';
-  @apply flex flex-col gap-1 px-2.5 py-1.5 transition-opacity duration-150;
-}
-
-.chipDragging {
-  composes: chip;
-  composes: chipDragging from '../../styles.module.css';
-}
-
-.header {
-  @apply flex items-center gap-1.5;
-}
-
-.dragHandle {
-  composes: dragHandle from '../../../../styles/shared.module.css';
-}
-
-.fieldName {
-  @apply text-xs font-medium text-accent-hi truncate max-w-[100px];
-}
-
-.removeButton {
-  composes: removeButton from '../../styles.module.css';
-  @apply ml-auto;
-}
-
-/* ── Sélecteur d'agrégation ── */
-
 .aggBar {
   @apply flex gap-0.5 pl-4;
 }

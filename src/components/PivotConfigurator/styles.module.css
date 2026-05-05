@@ -12,22 +12,8 @@
   @apply flex flex-col gap-2;
 }
 
-/* ── En-tête de section (label + icône optionnelle) ── */
-
 .sectionLabel {
   @apply text-xs font-semibold uppercase tracking-widest text-muted;
-}
-
-.sectionHeader {
-  @apply flex items-center gap-1.5;
-}
-
-.sectionIcon {
-  @apply text-accent/70;
-}
-
-.sectionHint {
-  @apply text-[10px] text-subtle ml-1;
 }
 
 /* ── Zone "Champs disponibles" ── */
@@ -45,55 +31,6 @@
 
 .zonesGrid {
   @apply grid grid-cols-2 gap-4;
-}
-
-/* ============================================================
-   Primitives composables par les sous-composants
-   ============================================================ */
-
-/* ── Chip de base (FieldChip, ValueChip, FilterItem) ── */
-
-.chipBase {
-  @apply bg-elevated border border-border rounded-[var(--radius-md)];
-}
-
-.chipDragging {
-  @apply opacity-40;
-}
-
-/* ── Bouton de fermeture des chips ── */
-
-.removeButton {
-  @apply text-subtle hover:text-danger transition-colors flex-shrink-0;
-}
-
-/* ── Indicateur de type number (#) ── */
-
-.numberHash {
-  @apply text-accent/60 font-mono;
-}
-
-/* ── Zone de drop (DropZone + FilterZone) ── */
-
-.zoneArea {
-  @apply rounded-[var(--radius-md)] border-2 border-dashed;
-  @apply transition-all duration-150;
-}
-
-.zoneAreaIdle {
-  composes: zoneArea;
-  @apply border-border hover:border-border-strong;
-}
-
-.zoneAreaActive {
-  composes: zoneArea;
-  @apply border-accent/60 bg-accent/5;
-}
-
-/* ── Texte placeholder dans une zone vide ── */
-
-.zonePlaceholder {
-  @apply text-subtle text-xs self-center w-full text-center py-1;
 }
 
 /* ── Item dans une DropZone (chip + sous-pickers éventuels) ── */

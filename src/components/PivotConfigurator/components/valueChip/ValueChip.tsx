@@ -1,8 +1,6 @@
-import { useDraggable }        from '@dnd-kit/core'
-import { CSS }                 from '@dnd-kit/utilities'
-import { GripVertical, X }     from 'lucide-react'
 import type { AggregationType } from '@/lib/pivot/types.ts'
 import type { ValueField }      from '../../types'
+import { FieldChip }            from '../fieldChip/FieldChip'
 import styles                   from './ValueChip.module.css'
 
 const AGGS: { id: AggregationType; label: string; title: string }[] = [
@@ -20,35 +18,14 @@ type Props = {
 }
 
 export function ValueChip({ field, onRemove, onAggChange }: Props) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id:   `values::${field.field}`,
-    data: { field: field.field, type: field.type },
-  })
-
-  const style = { transform: CSS.Translate.toString(transform) }
-
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={isDragging ? styles.chipDragging : styles.chip}
+    <FieldChip
+      field={field.field}
+      type={field.type}
+      draggableId={`values::${field.field}`}
+      onRemove={onRemove}
+      showNumberHash={false}
     >
-      <div className={styles.header}>
-        <span
-          {...attributes}
-          {...listeners}
-          className={styles.dragHandle}
-        >
-          <GripVertical size={12} />
-        </span>
-        <span className={styles.fieldName}>{field.field}</span>
-        <button
-          onClick={onRemove}
-          className={styles.removeButton}
-        >
-          <X size={11} />
-        </button>
-      </div>
       <div className={styles.aggBar}>
         {AGGS.map(a => (
           <button
@@ -61,6 +38,6 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
           </button>
         ))}
       </div>
-    </div>
+    </FieldChip>
   )
 }
