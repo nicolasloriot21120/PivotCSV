@@ -1,7 +1,7 @@
 @reference "../../../index.css";
 
 .chip {
-  composes: chipBase from '../../styles.module.css';
+  @apply bg-elevated border border-border rounded-[var(--radius-md)];
   @apply flex items-center gap-1.5 px-2.5 py-1.5;
   @apply text-xs font-medium select-none transition-all duration-150;
   @apply hover:border-border-strong;
@@ -24,11 +24,9 @@
 }
 
 .numberHash {
-  composes: numberHash from '../../styles.module.css';
-  @apply text-[10px];
+  @apply text-accent/60 font-mono text-[10px];
 }
 
 .removeButton {
-  composes: removeButton from '../../styles.module.css';
-  @apply ml-0.5;
+  @apply text-subtle hover:text-danger transition-colors flex-shrink-0 ml-0.5;
 }

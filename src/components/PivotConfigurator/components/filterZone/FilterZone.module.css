@@ -3,28 +3,33 @@
 /* ── Conteneur de la zone "Filtres" ── */
 
 .section {
-  composes: section from '../../styles.module.css';
+  @apply flex flex-col gap-2;
 }
 
 .header {
-  composes: sectionHeader from '../../styles.module.css';
+  @apply flex items-center gap-1.5;
 }
 
 .icon {
-  composes: sectionIcon from '../../styles.module.css';
+  @apply text-accent/70;
 }
 
 .label {
-  composes: sectionLabel from '../../styles.module.css';
+  @apply text-xs font-semibold uppercase tracking-widest text-muted;
 }
 
 .hint {
-  composes: sectionHint from '../../styles.module.css';
+  @apply text-[10px] text-subtle ml-1;
+}
+
+.area {
+  @apply rounded-[var(--radius-md)] border-2 border-dashed transition-all duration-150;
+  @apply p-2 flex flex-col gap-2;
 }
 
 .areaIdle {
-  composes: zoneAreaIdle from '../../styles.module.css';
-  @apply p-2 flex flex-col gap-2;
+  composes: area;
+  @apply border-border hover:border-border-strong;
 }
 
 .areaIdleEmpty {
@@ -33,8 +38,8 @@
 }
 
 .areaActive {
-  composes: zoneAreaActive from '../../styles.module.css';
-  @apply p-2 flex flex-col gap-2;
+  composes: area;
+  @apply border-accent/60 bg-accent/5;
 }
 
 .areaActiveEmpty {
@@ -43,13 +48,13 @@
 }
 
 .placeholder {
-  composes: zonePlaceholder from '../../styles.module.css';
+  @apply text-subtle text-xs self-center w-full text-center py-1;
 }
 
 /* ── FilterItem (item draggable dans la zone) ── */
 
 .item {
-  composes: chipBase from '../../styles.module.css';
+  @apply bg-elevated border border-border rounded-[var(--radius-md)];
   @apply px-2.5 py-2 flex flex-col gap-2 transition-opacity duration-150;
 }
 
@@ -80,12 +85,11 @@
 }
 
 .numberHash {
-  composes: numberHash from '../../styles.module.css';
-  @apply ml-1;
+  @apply text-accent/60 font-mono ml-1;
 }
 
 .removeButton {
-  composes: removeButton from '../../styles.module.css';
+  @apply text-subtle hover:text-danger transition-colors flex-shrink-0;
 }
 
 /* ── Body : chips de valeurs (string) ── */

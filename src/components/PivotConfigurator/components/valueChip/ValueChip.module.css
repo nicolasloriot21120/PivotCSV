@@ -1,7 +1,7 @@
 @reference "../../../index.css";
 
 .chip {
-  composes: chipBase from '../../styles.module.css';
+  @apply bg-elevated border border-border rounded-[var(--radius-md)];
   @apply flex flex-col gap-1 px-2.5 py-1.5 transition-opacity duration-150;
 }
 
@@ -22,8 +22,7 @@
 }
 
 .removeButton {
-  composes: removeButton from '../../styles.module.css';
-  @apply ml-auto;
+  @apply text-subtle hover:text-danger transition-colors flex-shrink-0 ml-auto;
 }
 
 /* ── Sélecteur d'agrégation ── */
