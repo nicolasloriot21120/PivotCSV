@@ -7,7 +7,7 @@
   @apply transition-all duration-200 shadow-[var(--shadow-card)];
 }
 
-.cardDragging {
+.card[data-dragging="true"] {
   @apply shadow-[var(--shadow-elevated)] opacity-80;
 }
 

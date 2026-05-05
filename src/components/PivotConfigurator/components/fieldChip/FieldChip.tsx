@@ -5,14 +5,13 @@ import type { FieldType }  from '../../types'
 import styles              from './FieldChip.module.css'
 
 type Props = {
-  field:     string
-  type:      FieldType
+  field:       string
+  type:        FieldType
   draggableId: string
-  onRemove?: () => void
-  className?: string
+  onRemove?:   () => void
 }
 
-export function FieldChip({ field, type, draggableId, onRemove, className }: Props) {
+export function FieldChip({ field, type, draggableId, onRemove }: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id:   draggableId,
     data: { field, type },
@@ -24,7 +23,8 @@ export function FieldChip({ field, type, draggableId, onRemove, className }: Pro
     <div
       ref={setNodeRef}
       style={style}
-      className={[isDragging ? styles.chipDragging : styles.chip, className].filter(Boolean).join(' ')}
+      data-dragging={isDragging || undefined}
+      className={styles.chip}
     >
       <span
         {...attributes}
@@ -34,7 +34,7 @@ export function FieldChip({ field, type, draggableId, onRemove, className }: Pro
         <GripVertical size={12} />
       </span>
 
-      <span className={type === 'number' ? styles.labelNumber : styles.labelString}>
+      <span data-type={type} className={styles.label}>
         {field}
       </span>
 

@@ -57,10 +57,6 @@
   @apply bg-elevated border border-border rounded-[var(--radius-md)];
 }
 
-.chipDragging {
-  @apply opacity-40;
-}
-
 /* ── Bouton de fermeture des chips ── */
 
 .removeButton {

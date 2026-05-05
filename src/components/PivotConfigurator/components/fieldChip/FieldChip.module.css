@@ -7,9 +7,8 @@
   @apply hover:border-border-strong;
 }
 
-.chipDragging {
-  composes: chip;
-  composes: chipDragging from '../../styles.module.css';
+.chip[data-dragging="true"] {
+  @apply opacity-40;
 }
 
 .dragHandle {
@@ -17,16 +16,10 @@
 }
 
 .label {
-  @apply truncate max-w-[120px];
+  @apply truncate max-w-[120px] text-text;
 }
 
-.labelString {
-  composes: label;
-  @apply text-text;
-}
-
-.labelNumber {
-  composes: label;
+.label[data-type="number"] {
   @apply text-accent-hi;
 }
 

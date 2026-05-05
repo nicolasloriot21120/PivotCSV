@@ -22,7 +22,8 @@ function FilterItem({ f, onRemove, onUpdate }: FilterItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={isDragging ? styles.itemDragging : styles.item}
+      data-dragging={isDragging || undefined}
+      className={styles.item}
     >
       <div className={styles.itemHeader}>
         <span

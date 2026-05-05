@@ -5,9 +5,8 @@
   @apply flex flex-col gap-1 px-2.5 py-1.5 transition-opacity duration-150;
 }
 
-.chipDragging {
-  composes: chip;
-  composes: chipDragging from '../../styles.module.css';
+.chip[data-dragging="true"] {
+  @apply opacity-40;
 }
 
 .header {

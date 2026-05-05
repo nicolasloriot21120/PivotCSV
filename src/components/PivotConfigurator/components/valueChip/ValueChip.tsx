@@ -31,7 +31,8 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
     <div
       ref={setNodeRef}
       style={style}
-      className={isDragging ? styles.chipDragging : styles.chip}
+      data-dragging={isDragging || undefined}
+      className={styles.chip}
     >
       <div className={styles.header}>
         <span
