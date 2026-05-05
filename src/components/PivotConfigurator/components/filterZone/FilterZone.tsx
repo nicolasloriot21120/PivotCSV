@@ -1,8 +1,8 @@
-import { useDroppable, useDraggable } from '@dnd-kit/core'
-import { CSS }                        from '@dnd-kit/utilities'
-import { GripVertical, X, Filter }    from 'lucide-react'
-import type { FilterField }           from '../../types'
-import styles                         from './FilterZone.module.css'
+import { useDroppable } from '@dnd-kit/core'
+import { Filter }       from 'lucide-react'
+import type { FilterField } from '../../types'
+import { FieldChip }        from '../fieldChip/FieldChip'
+import styles               from './FilterZone.module.css'
 
 type FilterItemProps = {
   f:        FilterField
@@ -11,40 +11,13 @@ type FilterItemProps = {
 }
 
 function FilterItem({ f, onRemove, onUpdate }: FilterItemProps) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id:   `filters::${f.field}`,
-    data: { field: f.field, type: f.type },
-  })
-
-  const style = { transform: CSS.Translate.toString(transform) }
-
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      data-dragging={isDragging || undefined}
-      className={styles.item}
+    <FieldChip
+      field={f.field}
+      type={f.type}
+      draggableId={`filters::${f.field}`}
+      onRemove={onRemove}
     >
-      <div className={styles.itemHeader}>
-        <span
-          {...attributes}
-          {...listeners}
-          className={styles.dragHandle}
-        >
-          <GripVertical size={12} />
-        </span>
-        <span className={f.type === 'number' ? styles.fieldNameNumber : styles.fieldNameString}>
-          {f.field}
-          {f.type === 'number' && <span className={styles.numberHash}>#</span>}
-        </span>
-        <button
-          onClick={onRemove}
-          className={styles.removeButton}
-        >
-          <X size={11} />
-        </button>
-      </div>
-
       {f.type === 'string' ? (
         <div className={styles.valueChips}>
           {(f.distinctValues ?? []).map(v => {
@@ -90,7 +63,7 @@ function FilterItem({ f, onRemove, onUpdate }: FilterItemProps) {
           </div>
         </div>
       )}
-    </div>
+    </FieldChip>
   )
 }
 

@@ -2,13 +2,17 @@
 
 .chip {
   @apply bg-elevated border border-border rounded-[var(--radius-md)];
-  @apply flex items-center gap-1.5 px-2.5 py-1.5;
+  @apply flex flex-col gap-2 px-2.5 py-1.5;
   @apply text-xs font-medium select-none transition-all duration-150;
   @apply hover:border-border-strong;
 }
 
 .chip[data-dragging="true"] {
   @apply opacity-40;
+}
+
+.header {
+  @apply flex items-center gap-1.5;
 }
 
 .dragHandle {

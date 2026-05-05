@@ -51,47 +51,6 @@
   @apply text-subtle text-xs self-center w-full text-center py-1;
 }
 
-/* ── FilterItem (item draggable dans la zone) ── */
-
-.item {
-  @apply bg-elevated border border-border rounded-[var(--radius-md)];
-  @apply px-2.5 py-2 flex flex-col gap-2 transition-opacity duration-150;
-}
-
-.item[data-dragging="true"] {
-  @apply opacity-40;
-}
-
-.itemHeader {
-  @apply flex items-center gap-1.5;
-}
-
-.dragHandle {
-  composes: dragHandle from '../../../../styles/shared.module.css';
-}
-
-.fieldName {
-  @apply text-xs font-medium truncate flex-1;
-}
-
-.fieldNameString {
-  composes: fieldName;
-  @apply text-text;
-}
-
-.fieldNameNumber {
-  composes: fieldName;
-  @apply text-accent-hi;
-}
-
-.numberHash {
-  @apply text-accent/60 font-mono ml-1;
-}
-
-.removeButton {
-  @apply text-subtle hover:text-danger transition-colors flex-shrink-0;
-}
-
 /* ── Body : chips de valeurs (string) ── */
 
 .valueChips {

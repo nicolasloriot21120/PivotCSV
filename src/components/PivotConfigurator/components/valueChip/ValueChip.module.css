@@ -1,32 +1,5 @@
 @reference "../../../index.css";
 
-.chip {
-  @apply bg-elevated border border-border rounded-[var(--radius-md)];
-  @apply flex flex-col gap-1 px-2.5 py-1.5 transition-opacity duration-150;
-}
-
-.chip[data-dragging="true"] {
-  @apply opacity-40;
-}
-
-.header {
-  @apply flex items-center gap-1.5;
-}
-
-.dragHandle {
-  composes: dragHandle from '../../../../styles/shared.module.css';
-}
-
-.fieldName {
-  @apply text-xs font-medium text-accent-hi truncate max-w-[100px];
-}
-
-.removeButton {
-  @apply text-subtle hover:text-danger transition-colors flex-shrink-0 ml-auto;
-}
-
-/* ── Sélecteur d'agrégation ── */
-
 .aggBar {
   @apply flex gap-0.5 pl-4;
 }
