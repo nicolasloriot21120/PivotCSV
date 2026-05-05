@@ -1,7 +1,8 @@
 import { useDraggable }    from '@dnd-kit/core'
 import { CSS }             from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
-import type { FieldType }  from '../types'
+import type { FieldType }  from '../../types'
+import styles              from './FieldChip.module.css'
 
 type Props = {
   field:     string
@@ -11,7 +12,7 @@ type Props = {
   className?: string
 }
 
-export function FieldChip({ field, type, draggableId, onRemove, className = '' }: Props) {
+export function FieldChip({ field, type, draggableId, onRemove, className }: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id:   draggableId,
     data: { field, type },
@@ -23,39 +24,28 @@ export function FieldChip({ field, type, draggableId, onRemove, className = '' }
     <div
       ref={setNodeRef}
       style={style}
-      className={[
-        'flex items-center gap-1.5 px-2.5 py-1.5',
-        'rounded-[var(--radius-md)] border text-xs font-medium',
-        'select-none transition-all duration-150',
-        isDragging
-          ? 'opacity-40'
-          : 'bg-elevated border-border hover:border-border-strong',
-        className,
-      ].join(' ')}
+      className={[isDragging ? styles.chipDragging : styles.chip, className].filter(Boolean).join(' ')}
     >
       <span
         {...attributes}
         {...listeners}
-        className="text-subtle hover:text-muted cursor-grab active:cursor-grabbing touch-none"
+        className={styles.dragHandle}
       >
         <GripVertical size={12} />
       </span>
 
-      <span className={[
-        'truncate max-w-[120px]',
-        type === 'number' ? 'text-accent-hi' : 'text-text',
-      ].join(' ')}>
+      <span className={type === 'number' ? styles.labelNumber : styles.labelString}>
         {field}
       </span>
 
       {type === 'number' && (
-        <span className="text-accent/60 text-[10px] font-mono">#</span>
+        <span className={styles.numberHash}>#</span>
       )}
 
       {onRemove && (
         <button
           onClick={e => { e.stopPropagation(); onRemove() }}
-          className="text-subtle hover:text-danger transition-colors flex-shrink-0 ml-0.5"
+          className={styles.removeButton}
         >
           <X size={11} />
         </button>

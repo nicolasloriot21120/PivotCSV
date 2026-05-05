@@ -4,6 +4,7 @@ import { FileDropzone }       from '@/components/ui/FileDropzone'
 import { ThemePicker }        from '@/components/ui/ThemePicker'
 import type { ThemeOption }   from '@/components/ui/ThemePicker'
 import type { FileEntry }     from '@/types/app'
+import styles                 from './styles.module.css'
 
 type Props<T extends string = string> = {
   open:           boolean
@@ -24,16 +25,16 @@ export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFi
       open={open}
       onToggle={onToggle}
       header={
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-baseline gap-2">
-            <h1 className="text-base font-bold text-text">PivotCSV</h1>
-            <span className="text-[11px] text-subtle">Analyse CSV</span>
+        <div className={styles.header}>
+          <div className={styles.titleGroup}>
+            <h1 className={styles.title}>PivotCSV</h1>
+            <span className={styles.subtitle}>Analyse CSV</span>
           </div>
           <ThemePicker themes={themes} value={theme} onChange={onThemeChange} />
         </div>
       }
       footer={
-        <div className="px-3 py-3">
+        <div className={styles.footer}>
           <FileDropzone
             accept=".csv"
             multiple
@@ -45,39 +46,35 @@ export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFi
         </div>
       }
     >
-      <div className="px-3 py-3 flex flex-col gap-1">
+      <div className={styles.list}>
         {fileEntries.length === 0 && (
-          <p className="text-subtle text-xs text-center py-4">Aucun fichier importé</p>
+          <p className={styles.empty}>Aucun fichier importé</p>
         )}
         {fileEntries.map(entry => (
           <div
             key={entry.id}
             onClick={() => onFileSelect(entry.file)}
-            className={[
-              'flex items-center gap-2 px-2.5 py-2 rounded-[var(--radius-md)]',
-              'cursor-pointer transition-all duration-150 group',
-              'hover:bg-elevated',
-            ].join(' ')}
+            className={styles.row}
           >
-            <FileText size={13} className="text-accent flex-shrink-0" />
-            <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-xs font-medium text-text truncate">{entry.file.name}</span>
-              <span className="text-[10px] text-subtle">
+            <FileText size={13} className={styles.fileIcon} />
+            <div className={styles.rowText}>
+              <span className={styles.fileName}>{entry.file.name}</span>
+              <span className={styles.meta}>
                 {entry.rowCount === null ? '…' : entry.rowCount.toLocaleString('fr-FR')} lignes
                 {entry.pivotCount > 0 && ` · ${entry.pivotCount} pivot${entry.pivotCount > 1 ? 's' : ''}`}
               </span>
             </div>
-            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100">
+            <div className={styles.actions}>
               <button
                 onClick={e => { e.stopPropagation(); onAddPivot(entry.file) }}
-                className="w-5 h-5 rounded flex items-center justify-center text-subtle hover:text-accent hover:bg-accent/10 transition-all duration-150"
+                className={styles.actionButtonAdd}
                 title="Nouveau pivot"
               >
                 <Plus size={12} />
               </button>
               <button
                 onClick={e => { e.stopPropagation(); onRemoveFile(entry.file) }}
-                className="w-5 h-5 rounded flex items-center justify-center text-subtle hover:text-danger hover:bg-danger/10 transition-all duration-150"
+                className={styles.actionButtonRemove}
                 title="Retirer le fichier"
               >
                 <X size={12} />

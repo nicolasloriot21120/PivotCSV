@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import type { PivotData, AggregationType } from '@/lib/pivot/types'
-import { usePivotTable, AGG_SYM, allGroupKeys } from './hooks/usePivotTable'
-import type { TreeNode } from './hooks/usePivotTable'
+import type { PivotData } from '@/lib/pivot/types'
+import { usePivotTable, AGG_SYM } from './hooks/usePivotTable'
+import styles from './styles.module.css'
 
 // =============================================================================
 // PROPS DU COMPOSANT
@@ -32,10 +32,9 @@ export function PivotTable({
   formatValue,
 }: PivotTableProps) {
   const {
-    rowTree, colTree,
     rowSlots, colSlots,
     colHdrs,
-    nVal, nRF, nCF, multiVal, hasCols,
+    nVal, multiVal, hasCols,
     hasRowGroups, hasColGroups,
     nHeaderRows, colHeaderRows,
     getCellVals, getRowTotalVals, getColTotalVals,
@@ -47,12 +46,8 @@ export function PivotTable({
   const { values } = config
 
   if (!rowSlots.length) {
-    return <p className="text-xs text-subtle italic">Aucune donnée à afficher.</p>
+    return <p className={styles.empty}>Aucune donnée à afficher.</p>
   }
-
-  // Classes CSS partagées pour éviter la répétition
-  const thBase = 'border border-border bg-elevated px-3 py-2 font-medium whitespace-nowrap'
-  const tdBase = 'border border-border px-3 py-1.5 whitespace-nowrap'
 
   // true = au moins un groupe est replié → le bouton proposera "Ouvrir"
   const rowHasClosed = collapsedRowGroups.length > 0
@@ -63,46 +58,34 @@ export function PivotTable({
   // ============================================================================
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={styles.root}>
 
       {/* ── Toolbar toggle par axe ──────────────────────────────────────── */}
       {(hasRowGroups || hasColGroups) && (
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className={styles.toolbar}>
           {hasRowGroups && (
             <button
               onClick={() => rowHasClosed ? onSetCollapsedRows([]) : onSetCollapsedRows(allRowGroupKeys)}
-              className={[
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-                'text-[11px] font-medium border transition-all duration-150',
-                rowHasClosed
-                  ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                  : 'bg-elevated border-border text-subtle hover:text-text',
-              ].join(' ')}
+              className={rowHasClosed ? styles.toggleButtonActive : styles.toggleButtonIdle}
             >
-              <span className={['w-1.5 h-1.5 rounded-full flex-shrink-0', rowHasClosed ? 'bg-accent' : 'bg-border-strong'].join(' ')} />
+              <span className={rowHasClosed ? styles.toggleDotActive : styles.toggleDotIdle} />
               Lignes — {rowHasClosed ? 'Ouvrir' : 'Fermer'}
             </button>
           )}
           {hasColGroups && (
             <button
               onClick={() => colHasClosed ? onSetCollapsedCols([]) : onSetCollapsedCols(allColGroupKeys)}
-              className={[
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)]',
-                'text-[11px] font-medium border transition-all duration-150',
-                colHasClosed
-                  ? 'bg-accent/10 border-accent/40 text-accent-hi'
-                  : 'bg-elevated border-border text-subtle hover:text-text',
-              ].join(' ')}
+              className={colHasClosed ? styles.toggleButtonActive : styles.toggleButtonIdle}
             >
-              <span className={['w-1.5 h-1.5 rounded-full flex-shrink-0', colHasClosed ? 'bg-accent' : 'bg-border-strong'].join(' ')} />
+              <span className={colHasClosed ? styles.toggleDotActive : styles.toggleDotIdle} />
               Colonnes — {colHasClosed ? 'Ouvrir' : 'Fermer'}
             </button>
           )}
         </div>
       )}
 
-    <div className="overflow-auto rounded-[var(--radius-md)] border border-border">
-      <table className="border-collapse text-xs w-full">
+    <div className={styles.tableContainer}>
+      <table className={styles.table}>
 
         <thead>
 
@@ -111,10 +94,7 @@ export function PivotTable({
             <tr key={di}>
 
               {di === 0 && (
-                <th
-                  rowSpan={nHeaderRows}
-                  className={`${thBase} text-left text-subtle`}
-                >
+                <th rowSpan={nHeaderRows} className={styles.thRowsLabel}>
                   {config.rows.map(f => f.field).join(' › ')}
                 </th>
               )}
@@ -125,18 +105,13 @@ export function PivotTable({
                   colSpan={cell.colSpan}
                   rowSpan={cell.rowSpan}
                   onClick={cell.prefixKey ? () => onToggleColGroup(cell.prefixKey!) : undefined}
-                  className={[
-                    thBase, 'text-center',
-                    cell.prefixKey
-                      ? 'cursor-pointer select-none hover:bg-elevated/80 text-text'
-                      : 'text-text font-semibold',
-                  ].join(' ')}
+                  className={cell.prefixKey ? styles.thColCellClickable : styles.thColCell}
                 >
-                  <span className="flex items-center justify-center gap-1">
+                  <span className={styles.thInner}>
                     {cell.prefixKey && (
                       cell.collapsed
-                        ? <ChevronRight size={11} className="text-accent flex-shrink-0" />
-                        : <ChevronDown  size={11} className="text-accent flex-shrink-0" />
+                        ? <ChevronRight size={11} className={styles.thChevron} />
+                        : <ChevronDown  size={11} className={styles.thChevron} />
                     )}
                     {cell.label}
                   </span>
@@ -147,7 +122,7 @@ export function PivotTable({
                 <th
                   rowSpan={colHeaderRows}
                   colSpan={nVal}
-                  className={`${thBase} text-center text-accent-hi font-semibold`}
+                  className={styles.thTotalRoot}
                 >
                   Total
                 </th>
@@ -158,14 +133,14 @@ export function PivotTable({
           {/* CAS SANS CHAMP COLONNE */}
           {!hasCols && (
             <tr>
-              <th rowSpan={nHeaderRows} className={`${thBase} text-left text-subtle`}>
+              <th rowSpan={nHeaderRows} className={styles.thRowsLabel}>
                 {config.rows.map(f => f.field).join(' › ')}
               </th>
               {showRowTotals && (
                 <th
                   rowSpan={colHeaderRows}
                   colSpan={nVal}
-                  className={`${thBase} text-center text-accent-hi font-semibold`}
+                  className={styles.thTotalRoot}
                 >
                   Total
                 </th>
@@ -178,19 +153,13 @@ export function PivotTable({
             <tr>
               {hasCols && colSlots.flatMap((_, ci) =>
                 values.map((vc, vi) => (
-                  <th
-                    key={`${ci}-${vi}`}
-                    className={`${thBase} text-center text-subtle font-medium text-[10px]`}
-                  >
+                  <th key={`${ci}-${vi}`} className={styles.thValueLabel}>
                     {AGG_SYM[vc.aggregation]} {vc.label ?? vc.field}
                   </th>
                 ))
               )}
               {showRowTotals && values.map((vc, vi) => (
-                <th
-                  key={`rt-${vi}`}
-                  className={`${thBase} text-center text-subtle font-medium text-[10px]`}
-                >
+                <th key={`rt-${vi}`} className={styles.thValueLabel}>
                   {AGG_SYM[vc.aggregation]} {vc.label ?? vc.field}
                 </th>
               ))}
@@ -205,30 +174,32 @@ export function PivotTable({
             const depth = isGroup ? rs.depth : (rs as { key: string[] }).key.length - 1
             const label = isGroup ? rs.label : (rs as { key: string[] }).key[(rs as { key: string[] }).key.length - 1]
 
+            const rowClass = isGroup
+              ? styles.rowGroup
+              : ri % 2 === 0 ? undefined : styles.rowLeafOdd
+
+            const labelCellClass = isGroup ? styles.tdRowLabelGroup : styles.tdRowLabelLeaf
+            const valueCellClass = isGroup ? styles.tdValueGroup    : styles.tdValueLeaf
+            const rowTotalClass  = isGroup ? styles.tdRowTotalGroup : styles.tdRowTotalLeaf
+
             return (
               <tr
                 key={isGroup ? rs.prefixKey : (rs as { key: string[] }).key.join('\x00')}
-                className={isGroup ? 'bg-elevated/60' : ri % 2 === 0 ? '' : 'bg-elevated/20'}
+                className={rowClass}
               >
 
                 <td
-                  className={[
-                    tdBase,
-                    'text-text',
-                    isGroup
-                      ? 'font-semibold !border-l-2 !border-l-accent/50'
-                      : 'font-medium text-muted/90',
-                  ].join(' ')}
+                  className={labelCellClass}
                   style={{ paddingLeft: `${12 + depth * 14}px` }}
                 >
                   {isGroup ? (
                     <button
                       onClick={() => onToggleRowGroup(rs.prefixKey)}
-                      className="flex items-center gap-1 w-full text-left"
+                      className={styles.tdRowLabelButton}
                     >
                       {rs.collapsed
-                        ? <ChevronRight size={11} className="text-accent flex-shrink-0" />
-                        : <ChevronDown  size={11} className="text-accent flex-shrink-0" />
+                        ? <ChevronRight size={11} className={styles.thChevron} />
+                        : <ChevronDown  size={11} className={styles.thChevron} />
                       }
                       {label}
                     </button>
@@ -238,20 +209,14 @@ export function PivotTable({
                 {hasCols && colSlots.flatMap((cs, ci) => {
                   const vals = getCellVals(rs, cs)
                   return values.map((vc, vi) => (
-                    <td
-                      key={`${ci}-${vi}`}
-                      className={`${tdBase} text-right tabular-nums ${isGroup ? 'text-text font-medium' : 'text-muted'}`}
-                    >
+                    <td key={`${ci}-${vi}`} className={valueCellClass}>
                       {fmtCell(vals[vi], vc.aggregation)}
                     </td>
                   ))
                 })}
 
                 {showRowTotals && getRowTotalVals(rs).map((v, vi) => (
-                  <td
-                    key={`rt-${vi}`}
-                    className={`${tdBase} text-right tabular-nums bg-elevated/30 ${isGroup ? 'font-bold text-text' : 'font-semibold text-text'}`}
-                  >
+                  <td key={`rt-${vi}`} className={rowTotalClass}>
                     {fmtCell(v, values[vi].aggregation)}
                   </td>
                 ))}
@@ -264,27 +229,21 @@ export function PivotTable({
         {showColTotals && (
           <tfoot>
             <tr>
-              <td className={`${tdBase} font-semibold text-accent-hi bg-elevated/30`}>
+              <td className={styles.tdFooterLabel}>
                 Total
               </td>
 
               {hasCols && colSlots.flatMap((cs, ci) => {
                 const vals = getColTotalVals(cs)
                 return values.map((vc, vi) => (
-                  <td
-                    key={`ct-${ci}-${vi}`}
-                    className={`${tdBase} text-right tabular-nums font-semibold text-text bg-elevated/30`}
-                  >
+                  <td key={`ct-${ci}-${vi}`} className={styles.tdColTotal}>
                     {fmtCell(vals[vi], vc.aggregation)}
                   </td>
                 ))
               })}
 
               {showRowTotals && values.map((vc, vi) => (
-                <td
-                  key={`gt-${vi}`}
-                  className={`${tdBase} text-right tabular-nums font-bold text-accent-hi bg-accent/10`}
-                >
+                <td key={`gt-${vi}`} className={styles.tdGrandTotal}>
                   {fmtCell(grandTotal[vi] ?? null, vc.aggregation)}
                 </td>
               ))}

@@ -1,0 +1,137 @@
+@reference "../../../index.css";
+
+.root {
+  @apply flex flex-col gap-3;
+}
+
+/* ── Zone de drop ── */
+
+.dropzone {
+  @apply relative flex flex-col items-center justify-center gap-3;
+  @apply rounded-[var(--radius-lg)] border-2 border-dashed;
+  @apply bg-surface cursor-pointer transition-all duration-200;
+  @apply px-6 py-10 text-center select-none outline-none;
+  @apply focus-visible:ring-2 focus-visible:ring-accent/60;
+}
+
+.dropzoneIdle {
+  composes: dropzone;
+  @apply border-border-strong hover:border-accent/50;
+}
+
+.dropzoneHover {
+  composes: dropzone;
+  @apply border-accent shadow-[var(--shadow-glow)];
+}
+
+.dropzoneError {
+  composes: dropzone;
+  @apply border-danger/60;
+}
+
+/* ── Icône centrale ── */
+
+.iconBox {
+  @apply w-12 h-12 rounded-[var(--radius-md)] flex items-center justify-center;
+  @apply bg-accent/10 border border-accent/20;
+}
+
+.iconBoxHover {
+  composes: iconBox;
+  @apply bg-accent/20 border-accent/40;
+}
+
+.iconBoxError {
+  composes: iconBox;
+  @apply bg-danger/10 border-danger/30;
+}
+
+.iconAccent { @apply text-accent; }
+.iconAccentHi { @apply text-accent-hi; }
+.iconDanger { @apply text-danger; }
+
+/* ── Textes ── */
+
+.label {
+  @apply text-text text-sm font-medium;
+}
+
+.sublabel {
+  @apply text-muted text-xs mt-0.5;
+}
+
+.hint {
+  @apply text-subtle text-xs;
+}
+
+.hiddenInput {
+  @apply sr-only;
+}
+
+/* ── Bloc d'erreur ── */
+
+.errorBox {
+  @apply flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)];
+  @apply bg-danger/10 border border-danger/30;
+}
+
+.errorIcon {
+  @apply text-danger flex-shrink-0;
+}
+
+.errorText {
+  @apply text-danger text-xs;
+}
+
+/* ── Liste des fichiers ── */
+
+.fileList {
+  @apply flex flex-col gap-1.5;
+}
+
+.fileItem {
+  @apply flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border;
+  @apply cursor-pointer transition-all duration-150;
+}
+
+.fileItemSelected {
+  composes: fileItem;
+  @apply bg-accent/10 border-accent/40;
+}
+
+.fileItemIdle {
+  composes: fileItem;
+  @apply bg-elevated border-border hover:border-border-strong;
+}
+
+.fileName {
+  @apply text-xs font-medium truncate flex-1;
+}
+
+.fileNameSelected {
+  composes: fileName;
+  @apply text-accent-hi;
+}
+
+.fileNameIdle {
+  composes: fileName;
+  @apply text-text;
+}
+
+.fileSize {
+  @apply text-muted text-xs flex-shrink-0;
+}
+
+.fileAction {
+  @apply transition-colors flex-shrink-0;
+}
+
+.fileActionAdd {
+  composes: fileAction;
+  @apply text-subtle hover:text-accent;
+}
+
+.fileActionRemove {
+  composes: fileAction;
+  @apply text-subtle hover:text-danger;
+}

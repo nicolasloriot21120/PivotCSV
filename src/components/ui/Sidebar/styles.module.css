@@ -1,0 +1,35 @@
+@reference "../../../index.css";
+
+.root {
+  @apply relative flex-shrink-0 h-full;
+}
+
+.toggleButton {
+  @apply absolute top-1/2 -translate-y-1/2 z-20;
+  @apply w-7 h-7 rounded-full flex items-center justify-center;
+  @apply bg-elevated border border-border text-muted;
+  @apply hover:text-text hover:border-border-strong transition-all duration-150;
+  @apply shadow-[var(--shadow-card)];
+}
+
+.aside {
+  @apply flex flex-col h-full;
+  @apply bg-surface border-r border-border;
+  @apply transition-[width] duration-300 ease-in-out overflow-hidden;
+}
+
+.inner {
+  @apply flex flex-col h-full;
+}
+
+.header {
+  @apply px-4 h-12 flex items-center border-b border-border flex-shrink-0;
+}
+
+.body {
+  @apply flex-1 overflow-y-auto;
+}
+
+.footer {
+  @apply border-t border-border flex-shrink-0;
+}

@@ -1,0 +1,21 @@
+@reference "../../../index.css";
+
+.base {
+  @apply rounded-[var(--radius-lg)] border border-border;
+}
+
+.surface {
+  @apply bg-surface shadow-[var(--shadow-card)];
+}
+
+.elevated {
+  @apply bg-elevated shadow-[var(--shadow-elevated)];
+}
+
+.glow {
+  @apply shadow-[var(--shadow-glow)];
+}
+
+.paddingSm { @apply p-3; }
+.paddingMd { @apply p-5; }
+.paddingLg { @apply p-7; }

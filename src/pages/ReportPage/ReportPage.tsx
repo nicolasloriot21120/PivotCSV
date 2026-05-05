@@ -10,9 +10,8 @@ import { LayoutGrid, Presentation } from 'lucide-react'
 
 import { AppSidebar }           from '@/components/AppSidebar'
 import { LoadingOverlay }       from '@/components/ui/LoadingSpinner'
-import { SortablePivotSection } from './components/SortablePivotSection'
+import { SortablePivotSection, PresentationMode } from './components'
 import { useReportPage }        from './useReportPage'
-import { PresentationMode }     from './components/PresentationMode'
 import styles                   from './styles.module.css'
 
 export function ReportPage() {

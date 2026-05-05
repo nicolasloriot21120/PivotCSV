@@ -1,0 +1,41 @@
+@reference "../index.css";
+
+/* ============================================================
+   Patterns visuels partagés entre plusieurs composants.
+   À étendre uniquement quand un pattern apparaît sur 3+
+   composants distincts (sinon : co-localiser).
+   ============================================================ */
+
+/* ── Toggles : couleurs uniquement ──
+   Pattern utilisé pour tout bouton ON/OFF / sélection mutuelle.
+   Composer avec une classe locale qui apporte le sizing
+   (padding, layout, etc.) :
+     composes: iconToggle;
+     composes: toggleActive from '../../../styles/shared.module.css';
+*/
+
+.toggleActive {
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
+}
+
+.toggleIdle {
+  @apply bg-elevated border-border text-subtle hover:text-text;
+}
+
+/* ── Divider vertical fin pour barres d'outils ── */
+
+.toolbarDivider {
+  @apply w-px h-4 bg-border mx-0.5 flex-shrink-0;
+}
+
+/* ── Poignée de drag (GripVertical) ──
+   Utilisé partout où un élément est draggable via @dnd-kit.
+   Composer avec une classe locale si besoin de tailles/marges
+   spécifiques :
+     composes: dragHandle from '../../styles/shared.module.css';
+*/
+
+.dragHandle {
+  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing;
+  @apply touch-none flex-shrink-0;
+}

@@ -3,11 +3,11 @@ import { CSS }          from '@dnd-kit/utilities'
 
 import { PivotSection } from '@/components/PivotSection'
 import type { RawRow }            from '@/lib/loader'
-import type { PivotConfig }       from '@/lib/pivot/types'
-import type { Section }           from '@/types/app'
+import type { PivotConfig }       from '@/lib/pivot/types.ts'
+import type { Section }           from '@/types/app.ts'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 
-export type SortablePivotSectionProps = {
+type SortablePivotSectionProps = {
   section:        Section
   headers:        string[]
   preview:        RawRow[]

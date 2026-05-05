@@ -1,0 +1,31 @@
+@reference "../../../index.css";
+
+.panel {
+  @apply flex flex-wrap gap-3 px-3 py-2.5;
+  @apply rounded-[var(--radius-md)] border border-border bg-elevated/50;
+}
+
+.swatchLabel {
+  @apply flex items-center gap-1.5 cursor-pointer;
+}
+
+.swatch {
+  @apply w-5 h-5 rounded-sm border border-white/20 flex-shrink-0;
+  @apply ring-offset-1 transition-all;
+}
+
+.swatchLabel:hover .swatch {
+  @apply ring-2 ring-accent/50;
+}
+
+.colorInput {
+  @apply sr-only;
+}
+
+.swatchName {
+  @apply text-[11px] text-muted max-w-[100px] truncate;
+}
+
+.resetButton {
+  @apply text-[10px] text-subtle hover:text-danger transition-colors ml-auto;
+}

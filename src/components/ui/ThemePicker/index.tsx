@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Palette, Check }              from 'lucide-react'
+import styles                          from './styles.module.css'
 
 export type ThemeOption<T extends string = string> = {
   id:       T
@@ -28,51 +29,34 @@ export function ThemePicker<T extends string>({ themes, value, onChange }: Theme
   const current = themes.find(t => t.id === value)
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className={styles.root}>
       <button
         onClick={() => setOpen(o => !o)}
-        className={[
-          'flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-md)]',
-          'border text-xs font-medium transition-all duration-150',
-          open
-            ? 'bg-accent/15 border-accent/40 text-accent-hi'
-            : 'bg-elevated border-border text-muted hover:border-border-strong hover:text-text',
-        ].join(' ')}
+        className={open ? styles.triggerOpen : styles.triggerClosed}
       >
         <Palette size={13} />
         <span>{current?.label ?? '—'}</span>
       </button>
 
       {open && (
-        <div className={[
-          'absolute right-0 top-full mt-2 z-50 min-w-[200px]',
-          'rounded-[var(--radius-lg)] border border-border',
-          'bg-surface shadow-[var(--shadow-elevated)]',
-          'p-1.5 flex flex-col gap-0.5',
-        ].join(' ')}>
+        <div className={styles.menu}>
           {themes.map(t => (
             <button
               key={t.id}
               onClick={() => { onChange(t.id); setOpen(false) }}
-              className={[
-                'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)]',
-                'text-xs font-medium transition-all duration-150 text-left w-full',
-                value === t.id
-                  ? 'bg-accent/10 text-accent-hi'
-                  : 'text-muted hover:bg-elevated hover:text-text',
-              ].join(' ')}
+              className={value === t.id ? styles.optionActive : styles.optionIdle}
             >
-              <div className="flex gap-1 flex-shrink-0">
+              <div className={styles.swatchRow}>
                 {t.swatches.map((color, i) => (
                   <span
                     key={i}
-                    className="w-3.5 h-3.5 rounded-full border border-white/10 flex-shrink-0"
+                    className={styles.swatch}
                     style={{ backgroundColor: color }}
                   />
                 ))}
               </div>
-              <span className="flex-1">{t.label}</span>
-              {value === t.id && <Check size={12} className="text-accent flex-shrink-0" />}
+              <span className={styles.optionLabel}>{t.label}</span>
+              {value === t.id && <Check size={12} className={styles.checkIcon} />}
             </button>
           ))}
         </div>

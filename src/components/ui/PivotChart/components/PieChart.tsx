@@ -3,6 +3,7 @@ import { ResponsivePie } from '@nivo/pie'
 import type { PivotData } from '@/lib/pivot/types'
 import { toPieData }     from '@/lib/pivot/chart'
 import { theme, COLORS } from '../lib/theme'
+import { EmptyChart }    from './EmptyChart'
 
 type Props = {
   data:          PivotData
@@ -11,17 +12,9 @@ type Props = {
   chartColors:   Record<string, string>
 }
 
-function Empty() {
-  return (
-    <div className="flex items-center justify-center h-full text-xs text-subtle italic">
-      Aucune donnée à afficher
-    </div>
-  )
-}
-
 export function PieChart({ data, collapsedRows, formatValue, chartColors }: Props) {
   const pieData = toPieData(data, collapsedRows)
-  if (!pieData.length) return <Empty />
+  if (!pieData.length) return <EmptyChart />
   const colorMap = Object.fromEntries(pieData.map((d, i) => [d.id, chartColors[d.id] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsivePie

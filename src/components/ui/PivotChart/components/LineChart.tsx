@@ -3,6 +3,7 @@ import { ResponsiveLine } from '@nivo/line'
 import type { PivotData } from '@/lib/pivot/types'
 import { toLineData }    from '@/lib/pivot/chart'
 import { theme, COLORS, MARGIN } from '../lib/theme'
+import { EmptyChart }    from './EmptyChart'
 
 type Props = {
   data:          PivotData
@@ -13,17 +14,9 @@ type Props = {
   transpose:     boolean
 }
 
-function Empty() {
-  return (
-    <div className="flex items-center justify-center h-full text-xs text-subtle italic">
-      Aucune donnée à afficher
-    </div>
-  )
-}
-
 export function LineChart({ data, collapsedRows, collapsedCols, formatValue, chartColors, transpose }: Props) {
   const series = toLineData(data, collapsedRows, collapsedCols, transpose)
-  if (!series.length) return <Empty />
+  if (!series.length) return <EmptyChart />
   const colorMap = Object.fromEntries(series.map((s, i) => [String(s.id), chartColors[String(s.id)] ?? COLORS[i % COLORS.length]]))
   return (
     <ResponsiveLine

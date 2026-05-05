@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { makeFormatter } from '@/lib/pivot/format'
-import type { Section }  from '@/types/app'
+import { makeFormatter } from '@/lib/pivot/format.ts'
+import type { Section }  from '@/types/app.ts'
 
 export function usePresentationMode(sections: Section[], onClose: () => void) {
   const [index, setIndex] = useState(0)
