@@ -17,10 +17,6 @@
   @apply flex items-center gap-2 px-4 py-3 border-b border-border;
 }
 
-.dragHandle {
-  composes: dragHandle from '../../styles/shared.module.css';
-}
-
 .fileIcon {
   @apply text-accent/60 flex-shrink-0;
 }

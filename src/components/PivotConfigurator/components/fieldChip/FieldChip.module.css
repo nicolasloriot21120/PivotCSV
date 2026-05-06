@@ -15,10 +15,6 @@
   @apply flex items-center gap-1.5;
 }
 
-.dragHandle {
-  composes: dragHandle from '../../../../styles/shared.module.css';
-}
-
 .label {
   @apply truncate max-w-[120px] text-text;
 }

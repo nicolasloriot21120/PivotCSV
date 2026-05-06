@@ -27,12 +27,12 @@
 
 .labelToggleActive {
   composes: labelToggle;
-  composes: toggleActive from '../../../../styles/shared.module.css';
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
 }
 
 .labelToggleIdle {
   composes: labelToggle;
-  composes: toggleIdle from '../../../../styles/shared.module.css';
+  @apply bg-elevated border-border text-subtle hover:text-text;
 }
 
 /* Pastille à l'intérieur des toggles label */
@@ -59,12 +59,12 @@
 
 .iconToggleActive {
   composes: iconToggle;
-  composes: toggleActive from '../../../../styles/shared.module.css';
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
 }
 
 .iconToggleIdle {
   composes: iconToggle;
-  composes: toggleIdle from '../../../../styles/shared.module.css';
+  @apply bg-elevated border-border text-subtle hover:text-text;
 }
 
 /* ── Toggles texte court (échelles K/M/G — px-1.5 py-1) ── */
@@ -76,10 +76,10 @@
 
 .scaleToggleActive {
   composes: scaleToggle;
-  composes: toggleActive from '../../../../styles/shared.module.css';
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
 }
 
 .scaleToggleIdle {
   composes: scaleToggle;
-  composes: toggleIdle from '../../../../styles/shared.module.css';
+  @apply bg-elevated border-border text-subtle hover:text-text;
 }
