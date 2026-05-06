@@ -3,6 +3,7 @@ import { CSS }             from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
 import type { ReactNode }  from 'react'
 import type { FieldType }  from '../../types'
+import shared              from '@/styles/shared.module.css'
 import styles              from './FieldChip.module.css'
 
 type Props = {
@@ -40,7 +41,7 @@ export function FieldChip({
         <span
           {...attributes}
           {...listeners}
-          className={styles.dragHandle}
+          className={shared.dragHandle}
         >
           <GripVertical size={12} />
         </span>

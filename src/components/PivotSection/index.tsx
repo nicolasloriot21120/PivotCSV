@@ -16,6 +16,7 @@ import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 import { ResultsToolbar, ColorPickerPanel }       from './components'
 import { usePivotSectionUI }    from './hooks/usePivotSectionUI'
+import shared                   from '@/styles/shared.module.css'
 import styles                   from './styles.module.css'
 
 type Props = {
@@ -65,7 +66,7 @@ export function PivotSection({
         <button
           {...dragHandleAttrs}
           {...dragHandleListeners}
-          className={styles.dragHandle}
+          className={shared.dragHandle}
         >
           <GripVertical size={15} />
         </button>

@@ -23,12 +23,12 @@
 
 .toggleButtonActive {
   composes: toggleButton;
-  composes: toggleActive from '../../../styles/shared.module.css';
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
 }
 
 .toggleButtonIdle {
   composes: toggleButton;
-  composes: toggleIdle from '../../../styles/shared.module.css';
+  @apply bg-elevated border-border text-subtle hover:text-text;
 }
 
 .toggleDot {

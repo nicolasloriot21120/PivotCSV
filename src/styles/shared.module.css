@@ -2,40 +2,31 @@
 
 /* ============================================================
    Patterns visuels partagés entre plusieurs composants.
-   À étendre uniquement quand un pattern apparaît sur 3+
-   composants distincts (sinon : co-localiser).
+
+   Important : à consommer EXCLUSIVEMENT via import JS dans le
+   .tsx (`import shared from '@/styles/shared.module.css'` puis
+   `className={shared.x}`), JAMAIS via `composes: x from`.
+   Le plugin @tailwindcss/vite genere des hashes differents
+   pour un meme fichier selon qu'il est importe directement ou
+   reference via composes cross-file → la regle CSS ne s'applique
+   pas au DOM. Cf. PR #15 et docs/composes-cross-file-bug.
+
+   Pour cette raison, ne placer ici QUE des classes
+   "delegation pure" qui n'ont pas besoin d'etre combinees avec
+   du sizing/layout local. Sinon, inliner les @apply dans le
+   consommateur.
    ============================================================ */
 
-/* ── Toggles : couleurs uniquement ──
-   Pattern utilisé pour tout bouton ON/OFF / sélection mutuelle.
-   Composer avec une classe locale qui apporte le sizing
-   (padding, layout, etc.) :
-     composes: iconToggle;
-     composes: toggleActive from '../../../styles/shared.module.css';
-*/
+/* ── Poignee de drag (GripVertical) ──
+   Utilise partout ou un element est draggable via @dnd-kit. */
 
-.toggleActive {
-  @apply bg-accent/10 border-accent/40 text-accent-hi;
-}
-
-.toggleIdle {
-  @apply bg-elevated border-border text-subtle hover:text-text;
+.dragHandle {
+  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing;
+  @apply touch-none flex-shrink-0;
 }
 
 /* ── Divider vertical fin pour barres d'outils ── */
 
 .toolbarDivider {
   @apply w-px h-4 bg-border mx-0.5 flex-shrink-0;
-}
-
-/* ── Poignée de drag (GripVertical) ──
-   Utilisé partout où un élément est draggable via @dnd-kit.
-   Composer avec une classe locale si besoin de tailles/marges
-   spécifiques :
-     composes: dragHandle from '../../styles/shared.module.css';
-*/
-
-.dragHandle {
-  @apply text-subtle hover:text-muted cursor-grab active:cursor-grabbing;
-  @apply touch-none flex-shrink-0;
 }
