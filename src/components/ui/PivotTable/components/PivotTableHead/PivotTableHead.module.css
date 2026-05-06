@@ -1,0 +1,33 @@
+@reference "../../../../../index.css";
+
+.th {
+  @apply border border-border bg-elevated px-3 py-2 font-medium whitespace-nowrap;
+}
+
+.thRowsLabel {
+  composes: th;
+  @apply text-left text-subtle;
+}
+
+.thColCell {
+  composes: th;
+  @apply text-center text-text font-semibold;
+}
+
+.thColCell[data-clickable="true"] {
+  @apply font-normal cursor-pointer select-none hover:bg-elevated/80;
+}
+
+.thTotalRoot {
+  composes: th;
+  @apply text-center text-accent-hi font-semibold;
+}
+
+.thValueLabel {
+  composes: th;
+  @apply text-center text-subtle font-medium text-[10px];
+}
+
+.thInner {
+  @apply flex items-center justify-center gap-1;
+}
