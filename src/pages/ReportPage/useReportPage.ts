@@ -5,16 +5,13 @@ import {
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove }           from '@dnd-kit/sortable'
 import { useTheme, THEMES }    from '@/context/ThemeContext'
-import { CSVLoader }           from '@/lib/loader'
 import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
-import type { FileEntry }      from '@/types/app'
 import { usePivotComputation } from './hooks/usePivotComputation'
 import { useSections }         from './hooks/useSections'
+import { useFileEntries, loader } from './hooks/useFileEntries'
 
 type QueueItem = { sectionId: string; file: File; config: PivotConfig }
-
-const loader = new CSVLoader()
 
 // Migration : anciens configs persistés avaient rows/columns: string[]
 function normalizeConfig(config: PivotConfig | null): PivotConfig | null {
@@ -30,7 +27,6 @@ export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
 
   const [sidebarOpen,  setSidebarOpen]      = useState(true)
-  const [fileEntries,  setFileEntries]      = useState<FileEntry[]>([])
   const [draggingId,   setDraggingId]       = useState<string | null>(null)
 
   const {
@@ -38,6 +34,13 @@ export function useReportPage() {
     updateSection, removeSection,
     addPivotForFile, removeSectionsByFileId,
   } = useSections()
+
+  const {
+    fileEntries, setFileEntries,
+    loadPreview, syncDistinctValues,
+    addFiles, removeFile,
+    incrementPivotCount, decrementPivotCount,
+  } = useFileEntries({ setSections })
 
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const restoredRef  = useRef(false)
@@ -67,18 +70,8 @@ export function useReportPage() {
           chartTranspose:     s.chartTranspose  ?? false,
         })))
         // Rescanner les valeurs distinctes pour les fichiers restaurés (non persistées).
-        // Met aussi à jour les FilterField des sections associées.
         for (const entry of state.fileEntries) {
-          loader.scanDistinctValues(entry.file).then(dv => {
-            setFileEntries(fs => fs.map(f => f.id === entry.id ? { ...f, distinctValues: dv } : f))
-            setSections(ss => ss.map(s => {
-              if (s.fileId !== entry.id) return s
-              const updatedFilters = s.configuratorState.filters.map(f =>
-                f.type === 'string' ? { ...f, distinctValues: dv[f.field] ?? f.distinctValues } : f
-              )
-              return { ...s, configuratorState: { ...s.configuratorState, filters: updatedFilters } }
-            }))
-          })
+          loader.scanDistinctValues(entry.file).then(dv => syncDistinctValues(entry.id, dv))
         }
       }
       restoredRef.current = true
@@ -99,46 +92,6 @@ export function useReportPage() {
 
   // ── File ─────────────────────────────────────────────────────────────────
 
-  const updateFileEntry = (fileId: string, patch: Partial<FileEntry>) =>
-    setFileEntries(fs => fs.map(f => f.id === fileId ? { ...f, ...patch } : f))
-
-  const loadPreview = async (fileId: string, file: File) => {
-    const [preview, count] = await Promise.all([
-      loader.parsePreview(file),
-      loader.countRows(file),
-    ])
-    updateFileEntry(fileId, {
-      headers:     preview.rows[0] ? Object.keys(preview.rows[0]) : [],
-      preview:     preview.rows,
-      parseErrors: preview.errors,
-      rowCount:    count,
-    })
-    // Scan des valeurs distinctes en arrière-plan — non-bloquant.
-    // Met à jour FileEntry ET les FilterField des sections qui utilisent ce fichier,
-    // pour que les filtres ajoutés avant la fin du scan voient toutes les valeurs.
-    loader.scanDistinctValues(file).then(dv => {
-      updateFileEntry(fileId, { distinctValues: dv })
-      setSections(ss => ss.map(s => {
-        if (s.fileId !== fileId) return s
-        const updatedFilters = s.configuratorState.filters.map(f =>
-          f.type === 'string' ? { ...f, distinctValues: dv[f.field] ?? f.distinctValues } : f
-        )
-        return { ...s, configuratorState: { ...s.configuratorState, filters: updatedFilters } }
-      }))
-    })
-  }
-
-  const handleFiles = (newFiles: File[]) => {
-    setFileEntries(prev => {
-      const prevMap = new Map(prev.map(e => [e.file.name, e]))
-      return newFiles.map(f => prevMap.get(f.name) ?? {
-        id: crypto.randomUUID(), file: f,
-        headers: [], preview: [], parseErrors: [], rowCount: null, pivotCount: 0,
-        distinctValues: {},
-      })
-    })
-  }
-
   const handleFileSelect = (file: File) => {
     setFileEntries(prev => {
       const entry = prev.find(e => e.file.name === file.name)
@@ -151,14 +104,14 @@ export function useReportPage() {
     const entry = fileEntries.find(e => e.file.name === file.name)
     if (!entry) return
     removeSectionsByFileId(entry.id)
-    setFileEntries(fs => fs.filter(e => e.id !== entry.id))
+    removeFile(entry.id)
   }
 
   const handleAddPivot = (file: File) => {
     const entry = fileEntries.find(e => e.file.name === file.name)
     if (!entry) return
     addPivotForFile(entry.id, file.name)
-    setFileEntries(fs => fs.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e))
+    incrementPivotCount(entry.id)
     if (entry.headers.length === 0) loadPreview(entry.id, file)
   }
 
@@ -166,11 +119,7 @@ export function useReportPage() {
 
   const deleteSection = (sectionId: string) => {
     const section = removeSection(sectionId)
-    if (section) {
-      setFileEntries(fs => fs.map(f =>
-        f.id === section.fileId ? { ...f, pivotCount: Math.max(0, f.pivotCount - 1) } : f
-      ))
-    }
+    if (section) decrementPivotCount(section.fileId)
   }
 
   // ── Compute ───────────────────────────────────────────────────────────────
@@ -242,7 +191,7 @@ export function useReportPage() {
     // sensors
     sensors,
     // handlers — fichiers
-    handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
+    handleFiles: addFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     // handlers — sections
     updateSection, deleteSection, computeSection, cancelSection,
     // présentation
