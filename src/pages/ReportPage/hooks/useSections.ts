@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import type { Section } from '@/types/app'
 
-export function makeSection(fileId: string, fileName: string, index: number): Section {
+function makeSection(fileId: string, fileName: string, index: number): Section {
   return {
     id:                crypto.randomUUID(),
     fileId,
