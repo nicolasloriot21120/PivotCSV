@@ -5,3 +5,5 @@ dist/
 .DS_Store
 Thumbs.db
 .idea/
+todo.txt
+prompt_next_session.txt
