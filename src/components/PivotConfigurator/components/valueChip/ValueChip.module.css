@@ -6,14 +6,9 @@
 
 .aggButton {
   @apply px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all duration-100;
-}
-
-.aggButtonActive {
-  composes: aggButton;
-  @apply bg-accent text-white;
-}
-
-.aggButtonIdle {
-  composes: aggButton;
   @apply text-subtle hover:text-text hover:bg-border;
+}
+
+.aggButton[data-active="true"] {
+  @apply bg-accent text-white;
 }

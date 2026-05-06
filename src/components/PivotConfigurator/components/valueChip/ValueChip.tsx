@@ -32,7 +32,8 @@ export function ValueChip({ field, onRemove, onAggChange }: Props) {
             key={a.id}
             onClick={() => onAggChange(a.id)}
             title={a.title}
-            className={field.aggregation === a.id ? styles.aggButtonActive : styles.aggButtonIdle}
+            data-active={field.aggregation === a.id || undefined}
+            className={styles.aggButton}
           >
             {a.label}
           </button>

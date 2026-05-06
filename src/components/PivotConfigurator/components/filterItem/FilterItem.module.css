@@ -8,16 +8,11 @@
 
 .valueChip {
   @apply px-2 py-0.5 rounded-full text-[11px] font-medium transition-all duration-100;
-}
-
-.valueChipSelected {
-  composes: valueChip;
-  @apply bg-accent text-white;
-}
-
-.valueChipIdle {
-  composes: valueChip;
   @apply bg-border text-muted hover:bg-border-strong hover:text-text;
+}
+
+.valueChip[data-active="true"] {
+  @apply bg-accent text-white;
 }
 
 .valuesLoading {

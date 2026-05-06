@@ -27,7 +27,8 @@ export function FilterItem({ field, onRemove, onUpdate }: Props) {
                   const current = field.selectedValues ?? []
                   onUpdate({ selectedValues: selected ? current.filter(x => x !== v) : [...current, v] })
                 }}
-                className={selected ? styles.valueChipSelected : styles.valueChipIdle}
+                data-active={selected || undefined}
+                className={styles.valueChip}
               >
                 {v}
               </button>
