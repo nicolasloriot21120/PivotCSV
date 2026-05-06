@@ -122,22 +122,19 @@ export function PivotSection({
 
           {/* Onglets */}
           <div className={styles.tabsBar}>
-            {(['config', 'result'] as const).map(tab => {
-              const tabClass = ui.activeTab === tab
-                ? styles.tabActive
-                : tab === 'result' && !ui.hasResult
-                  ? styles.tabDisabled
-                  : styles.tabIdle
-              return (
-                <button
-                  key={tab}
-                  onClick={() => { if (tab === 'config' || ui.hasResult) ui.setActiveTab(tab) }}
-                  className={tabClass}
-                >
-                  {tab === 'config' ? 'Configuration' : 'Résultats'}
-                </button>
-              )
-            })}
+            {(['config', 'result'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => { if (tab === 'config' || ui.hasResult) ui.setActiveTab(tab) }}
+                data-state={
+                  ui.activeTab === tab ? 'active' :
+                  tab === 'result' && !ui.hasResult ? 'disabled' : 'idle'
+                }
+                className={styles.tab}
+              >
+                {tab === 'config' ? 'Configuration' : 'Résultats'}
+              </button>
+            ))}
           </div>
 
           {/* ── Onglet Configuration ── */}
@@ -190,7 +187,10 @@ export function PivotSection({
                   )}
 
                   {/* Tableau + Graphique */}
-                  <div className={ui.isHorizontal ? styles.resultsLayoutHorizontal : styles.resultsLayoutVertical}>
+                  <div
+                    className={styles.resultsLayout}
+                    data-layout={ui.isHorizontal ? 'horizontal' : 'vertical'}
+                  >
 
                     <div
                       className={styles.tableContainer}
@@ -210,7 +210,10 @@ export function PivotSection({
                       />
                     </div>
 
-                    <div className={ui.isHorizontal ? styles.dividerVertical : styles.dividerHorizontal} />
+                    <div
+                      className={styles.divider}
+                      data-orientation={ui.isHorizontal ? 'vertical' : 'horizontal'}
+                    />
 
                     <div
                       className={styles.chartContainer}
