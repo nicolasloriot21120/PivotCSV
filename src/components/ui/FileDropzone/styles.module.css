@@ -12,20 +12,14 @@
   @apply bg-surface cursor-pointer transition-all duration-200;
   @apply px-6 py-10 text-center select-none outline-none;
   @apply focus-visible:ring-2 focus-visible:ring-accent/60;
-}
-
-.dropzoneIdle {
-  composes: dropzone;
   @apply border-border-strong hover:border-accent/50;
 }
 
-.dropzoneHover {
-  composes: dropzone;
+.dropzone[data-state="hover"] {
   @apply border-accent shadow-[var(--shadow-glow)];
 }
 
-.dropzoneError {
-  composes: dropzone;
+.dropzone[data-state="error"] {
   @apply border-danger/60;
 }
 
@@ -36,19 +30,25 @@
   @apply bg-accent/10 border border-accent/20;
 }
 
-.iconBoxHover {
-  composes: iconBox;
+.dropzone[data-state="hover"] .iconBox {
   @apply bg-accent/20 border-accent/40;
 }
 
-.iconBoxError {
-  composes: iconBox;
+.dropzone[data-state="error"] .iconBox {
   @apply bg-danger/10 border-danger/30;
 }
 
-.iconAccent { @apply text-accent; }
-.iconAccentHi { @apply text-accent-hi; }
-.iconDanger { @apply text-danger; }
+.icon {
+  @apply text-accent;
+}
+
+.dropzone[data-state="hover"] .icon {
+  @apply text-accent-hi;
+}
+
+.dropzone[data-state="error"] .icon {
+  @apply text-danger;
+}
 
 /* ── Textes ── */
 
@@ -92,30 +92,27 @@
 .fileItem {
   @apply flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border;
   @apply cursor-pointer transition-all duration-150;
-}
-
-.fileItemSelected {
-  composes: fileItem;
-  @apply bg-accent/10 border-accent/40;
-}
-
-.fileItemIdle {
-  composes: fileItem;
   @apply bg-elevated border-border hover:border-border-strong;
 }
 
-.fileName {
-  @apply text-xs font-medium truncate flex-1;
+.fileItem[data-selected="true"] {
+  @apply bg-accent/10 border-accent/40;
 }
 
-.fileNameSelected {
-  composes: fileName;
+.fileIcon {
+  @apply text-accent;
+}
+
+.fileItem[data-selected="true"] .fileIcon {
   @apply text-accent-hi;
 }
 
-.fileNameIdle {
-  composes: fileName;
-  @apply text-text;
+.fileName {
+  @apply text-xs font-medium truncate flex-1 text-text;
+}
+
+.fileItem[data-selected="true"] .fileName {
+  @apply text-accent-hi;
 }
 
 .fileSize {

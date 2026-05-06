@@ -19,15 +19,10 @@
 .area {
   @apply rounded-[var(--radius-md)] border-2 border-dashed transition-all duration-150;
   @apply min-h-[64px] p-2 flex flex-wrap gap-1.5;
-}
-
-.areaIdle {
-  composes: area;
   @apply border-border hover:border-border-strong;
 }
 
-.areaActive {
-  composes: area;
+.area[data-over="true"] {
   @apply border-accent/60 bg-accent/5;
 }
 

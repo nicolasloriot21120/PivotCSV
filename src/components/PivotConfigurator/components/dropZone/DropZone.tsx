@@ -24,7 +24,8 @@ export function DropZone({ id, label, icon, children, placeholder }: Props) {
 
       <div
         ref={setNodeRef}
-        className={isOver ? styles.areaActive : styles.areaIdle}
+        data-over={isOver || undefined}
+        className={styles.area}
       >
         {children ?? (
           <p className={styles.placeholder}>

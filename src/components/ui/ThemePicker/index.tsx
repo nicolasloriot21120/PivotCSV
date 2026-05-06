@@ -32,7 +32,8 @@ export function ThemePicker<T extends string>({ themes, value, onChange }: Theme
     <div ref={ref} className={styles.root}>
       <button
         onClick={() => setOpen(o => !o)}
-        className={open ? styles.triggerOpen : styles.triggerClosed}
+        data-open={open || undefined}
+        className={styles.trigger}
       >
         <Palette size={13} />
         <span>{current?.label ?? '—'}</span>
@@ -40,25 +41,29 @@ export function ThemePicker<T extends string>({ themes, value, onChange }: Theme
 
       {open && (
         <div className={styles.menu}>
-          {themes.map(t => (
-            <button
-              key={t.id}
-              onClick={() => { onChange(t.id); setOpen(false) }}
-              className={value === t.id ? styles.optionActive : styles.optionIdle}
-            >
-              <div className={styles.swatchRow}>
-                {t.swatches.map((color, i) => (
-                  <span
-                    key={i}
-                    className={styles.swatch}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              <span className={styles.optionLabel}>{t.label}</span>
-              {value === t.id && <Check size={12} className={styles.checkIcon} />}
-            </button>
-          ))}
+          {themes.map(t => {
+            const active = value === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => { onChange(t.id); setOpen(false) }}
+                data-active={active || undefined}
+                className={styles.option}
+              >
+                <div className={styles.swatchRow}>
+                  {t.swatches.map((color, i) => (
+                    <span
+                      key={i}
+                      className={styles.swatch}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+                <span className={styles.optionLabel}>{t.label}</span>
+                {active && <Check size={12} className={styles.checkIcon} />}
+              </button>
+            )
+          })}
         </div>
       )}
     </div>

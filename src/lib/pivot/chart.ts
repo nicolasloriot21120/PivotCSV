@@ -163,7 +163,17 @@ export function getSeriesLabels(
   transpose = false,
 ): string[] {
   if (chartType === 'pie') return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
-  if (!data.colKeys.length)  return [data.config.values[0]?.field ?? '']
+  if (chartType === 'bar') {
+    // Aligné sur la logique de coloration de BarChart : avec une seule série
+    // effective (cas "pas de vraie colonne" ou colonne au label vide),
+    // BarChart colore par ligne (colorBy=indexValue) → le color picker doit
+    // proposer une teinte par ligne.
+    const { keys } = toBarData(data, collapsedRows, collapsedCols, transpose)
+    if (keys.length <= 1) return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
+    return keys
+  }
+  // line chart
+  if (!data.colKeys.length) return [data.config.values[0]?.field ?? '']
   if (transpose) return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
   return getVisible(data.colKeys, collapsedCols).map(v => v.label)
 }

@@ -22,7 +22,8 @@ export function DateGroupPicker({ value, onChange }: Props) {
           key={key}
           title={title}
           onClick={() => onChange(value === key ? undefined : key)}
-          className={value === key ? styles.buttonActive : styles.buttonIdle}
+          data-active={value === key || undefined}
+          className={styles.button}
         >
           {label}
         </button>

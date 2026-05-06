@@ -7,16 +7,11 @@
 .trigger {
   @apply flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-md)];
   @apply border text-xs font-medium transition-all duration-150;
-}
-
-.triggerOpen {
-  composes: trigger;
-  @apply bg-accent/15 border-accent/40 text-accent-hi;
-}
-
-.triggerClosed {
-  composes: trigger;
   @apply bg-elevated border-border text-muted hover:border-border-strong hover:text-text;
+}
+
+.trigger[data-open="true"] {
+  @apply bg-accent/15 border-accent/40 text-accent-hi;
 }
 
 .menu {
@@ -29,16 +24,11 @@
 .option {
   @apply flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)];
   @apply text-xs font-medium transition-all duration-150 text-left w-full;
-}
-
-.optionActive {
-  composes: option;
-  @apply bg-accent/10 text-accent-hi;
-}
-
-.optionIdle {
-  composes: option;
   @apply text-muted hover:bg-elevated hover:text-text;
+}
+
+.option[data-active="true"] {
+  @apply bg-accent/10 text-accent-hi;
 }
 
 .swatchRow {
