@@ -1,0 +1,5 @@
+@reference "../../../../../index.css";
+
+.chevron {
+  @apply text-accent flex-shrink-0;
+}

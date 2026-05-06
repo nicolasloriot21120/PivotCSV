@@ -1,0 +1,62 @@
+@reference "../../../../../index.css";
+
+.td {
+  @apply border border-border px-3 py-1.5 whitespace-nowrap;
+}
+
+.tdRowLabel {
+  composes: td;
+  @apply text-text;
+}
+
+.tdRowLabelGroup {
+  composes: tdRowLabel;
+  @apply font-semibold !border-l-2 !border-l-accent/50;
+}
+
+.tdRowLabelLeaf {
+  composes: tdRowLabel;
+  @apply font-medium text-muted/90;
+}
+
+.tdRowLabelButton {
+  @apply flex items-center gap-1 w-full text-left;
+}
+
+.tdValue {
+  composes: td;
+  @apply text-right tabular-nums;
+}
+
+.tdValueGroup {
+  composes: tdValue;
+  @apply text-text font-medium;
+}
+
+.tdValueLeaf {
+  composes: tdValue;
+  @apply text-muted;
+}
+
+.tdRowTotal {
+  composes: tdValue;
+  @apply bg-elevated/30 text-text;
+}
+
+.tdRowTotalGroup {
+  composes: tdRowTotal;
+  @apply font-bold;
+}
+
+.tdRowTotalLeaf {
+  composes: tdRowTotal;
+  @apply font-semibold;
+}
+
+.tableRow[data-row="group"] {
+  @apply bg-elevated/60;
+}
+
+.tableRow[data-row="odd"] {
+  @apply bg-elevated/20;
+}

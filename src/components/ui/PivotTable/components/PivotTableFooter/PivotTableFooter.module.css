@@ -1,0 +1,25 @@
+@reference "../../../../../index.css";
+
+.td {
+  @apply border border-border px-3 py-1.5 whitespace-nowrap;
+}
+
+.tdValue {
+  composes: td;
+  @apply text-right tabular-nums;
+}
+
+.tdFooterLabel {
+  composes: td;
+  @apply font-semibold text-accent-hi bg-elevated/30;
+}
+
+.tdColTotal {
+  composes: tdValue;
+  @apply font-semibold text-text bg-elevated/30;
+}
+
+.tdGrandTotal {
+  composes: tdValue;
+  @apply font-bold text-accent-hi bg-accent/10;
+}
