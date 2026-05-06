@@ -78,18 +78,6 @@ export function FileDropzone({
     setState('idle')
   }
 
-  const dropzoneClass = {
-    idle:  styles.dropzoneIdle,
-    hover: styles.dropzoneHover,
-    error: styles.dropzoneError,
-  }[state]
-
-  const iconBoxClass = {
-    idle:  styles.iconBox,
-    hover: styles.iconBoxHover,
-    error: styles.iconBoxError,
-  }[state]
-
   const hint_ = hint ?? `Formats acceptés : ${accept} — max ${maxSizeMb} Mo`
 
   return (
@@ -104,12 +92,13 @@ export function FileDropzone({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={dropzoneClass}
+        data-state={state}
+        className={styles.dropzone}
       >
-        <div className={iconBoxClass}>
+        <div className={styles.iconBox}>
           {state === 'error'
-            ? <AlertCircle size={22} className={styles.iconDanger} />
-            : <Upload size={22} className={state === 'hover' ? styles.iconAccentHi : styles.iconAccent} />
+            ? <AlertCircle size={22} className={styles.icon} />
+            : <Upload size={22} className={styles.icon} />
           }
         </div>
 
@@ -145,10 +134,11 @@ export function FileDropzone({
               <li
                 key={f.name}
                 onClick={() => onFileSelect?.(f)}
-                className={isSelected ? styles.fileItemSelected : styles.fileItemIdle}
+                data-selected={isSelected || undefined}
+                className={styles.fileItem}
               >
-                <File size={14} className={isSelected ? styles.iconAccentHi : styles.iconAccent} />
-                <span className={isSelected ? styles.fileNameSelected : styles.fileNameIdle}>{f.name}</span>
+                <File size={14} className={styles.fileIcon} />
+                <span className={styles.fileName}>{f.name}</span>
                 <span className={styles.fileSize}>
                   {(f.size / 1024).toFixed(0)} Ko
                 </span>
