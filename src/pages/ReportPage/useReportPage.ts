@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import {
   PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core'
@@ -10,8 +10,7 @@ import type { PivotConfig }    from '@/lib/pivot/types'
 import { usePivotComputation } from './hooks/usePivotComputation'
 import { useSections }         from './hooks/useSections'
 import { useFileEntries, loader } from './hooks/useFileEntries'
-
-type QueueItem = { sectionId: string; file: File; config: PivotConfig }
+import { usePresentationQueue } from './hooks/usePresentationQueue'
 
 // Migration : anciens configs persistés avaient rows/columns: string[]
 function normalizeConfig(config: PivotConfig | null): PivotConfig | null {
@@ -44,10 +43,6 @@ export function useReportPage() {
 
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const restoredRef  = useRef(false)
-
-  const [presentationLoading, setPresentationLoading] = useState(false)
-  const [presentationOpen,    setPresentationOpen]    = useState(false)
-  const presentationQueueRef = useRef<QueueItem[]>([])
 
   // Restauration initiale (async — IndexedDB)
   useEffect(() => {
@@ -130,41 +125,10 @@ export function useReportPage() {
 
   // ── Mode présentation ─────────────────────────────────────────────────────
 
-  const computeNextInQueue = useCallback(() => {
-    const queue = presentationQueueRef.current
-    if (queue.length === 0) {
-      setPresentationLoading(false)
-      setPresentationOpen(true)
-      return
-    }
-    const { sectionId, file, config } = queue[0]
-    runWorker({
-      sectionId, file, config,
-      onDone: () => {
-        presentationQueueRef.current = presentationQueueRef.current.slice(1)
-        computeNextInQueue()
-      },
-    })
-  }, [runWorker])
-
-  const openPresentation = useCallback(() => {
-    const toCompute: QueueItem[] = []
-    for (const s of sections) {
-      if (s.config && !s.result) {
-        const entry = fileEntries.find(f => f.id === s.fileId)
-        if (entry) toCompute.push({ sectionId: s.id, file: entry.file, config: s.config })
-      }
-    }
-    if (toCompute.length === 0) {
-      setPresentationOpen(true)
-      return
-    }
-    presentationQueueRef.current = toCompute
-    setPresentationLoading(true)
-    computeNextInQueue()
-  }, [sections, fileEntries, computeNextInQueue])
-
-  const closePresentation = useCallback(() => setPresentationOpen(false), [])
+  const {
+    presentationOpen, presentationLoading,
+    openPresentation, closePresentation,
+  } = usePresentationQueue({ sections, fileEntries, runWorker })
 
   // ── DnD ───────────────────────────────────────────────────────────────────
 
