@@ -5,12 +5,12 @@ import {
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove }           from '@dnd-kit/sortable'
 import { useTheme, THEMES }    from '@/context/ThemeContext'
-import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }           from '@/lib/loader'
 import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
-import type { FileEntry, Section } from '@/types/app'
+import type { FileEntry }      from '@/types/app'
 import { usePivotComputation } from './hooks/usePivotComputation'
+import { useSections }         from './hooks/useSections'
 
 type QueueItem = { sectionId: string; file: File; config: PivotConfig }
 
@@ -26,41 +26,18 @@ function normalizeConfig(config: PivotConfig | null): PivotConfig | null {
   }
 }
 
-export function makeSection(fileId: string, fileName: string, index: number): Section {
-  return {
-    id:                crypto.randomUUID(),
-    fileId,
-    fileName,
-    label:             `Pivot ${index}`,
-    collapsed:         false,
-    configuratorOpen:  true,
-    configuratorState: emptyConfiguratorState(),
-    result:            null,
-    errors:            [],
-    errorMessage:      null,
-    status:            'idle',
-    progress:          0,
-    config:             null,
-    collapsedRowGroups: [],
-    collapsedColGroups: [],
-    chartType:          'bar',
-    chartLayout:        'horizontal',
-    tableFlex:          5,
-    chartFlex:          5,
-    valueScale:         'none',
-    valueDecimals:      2,
-    chartColors:        {},
-    chartTranspose:     false,
-  }
-}
-
 export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
 
   const [sidebarOpen,  setSidebarOpen]      = useState(true)
   const [fileEntries,  setFileEntries]      = useState<FileEntry[]>([])
-  const [sections,     setSections]         = useState<Section[]>([])
   const [draggingId,   setDraggingId]       = useState<string | null>(null)
+
+  const {
+    sections, setSections,
+    updateSection, removeSection,
+    addPivotForFile, removeSectionsByFileId,
+  } = useSections()
 
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const restoredRef  = useRef(false)
@@ -173,30 +150,22 @@ export function useReportPage() {
   const handleRemoveFile = (file: File) => {
     const entry = fileEntries.find(e => e.file.name === file.name)
     if (!entry) return
-    setSections(ss => ss.filter(s => s.fileId !== entry.id))
+    removeSectionsByFileId(entry.id)
     setFileEntries(fs => fs.filter(e => e.id !== entry.id))
   }
 
   const handleAddPivot = (file: File) => {
     const entry = fileEntries.find(e => e.file.name === file.name)
     if (!entry) return
-
-    const pivotIndex = sections.filter(s => s.fileId === entry.id).length + 1
-    const section    = makeSection(entry.id, file.name, pivotIndex)
-
-    setSections(ss => [...ss, section])
+    addPivotForFile(entry.id, file.name)
     setFileEntries(fs => fs.map(e => e.id === entry.id ? { ...e, pivotCount: e.pivotCount + 1 } : e))
     if (entry.headers.length === 0) loadPreview(entry.id, file)
   }
 
   // ── Sections ──────────────────────────────────────────────────────────────
 
-  const updateSection = (sectionId: string, patch: Partial<Section>) =>
-    setSections(ss => ss.map(s => s.id === sectionId ? { ...s, ...patch } : s))
-
   const deleteSection = (sectionId: string) => {
-    const section = sections.find(s => s.id === sectionId)
-    setSections(ss => ss.filter(s => s.id !== sectionId))
+    const section = removeSection(sectionId)
     if (section) {
       setFileEntries(fs => fs.map(f =>
         f.id === section.fileId ? { ...f, pivotCount: Math.max(0, f.pivotCount - 1) } : f
