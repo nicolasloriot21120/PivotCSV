@@ -19,30 +19,19 @@
 .toggleButton {
   @apply flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)];
   @apply text-[11px] font-medium border transition-all duration-150;
-}
-
-.toggleButtonActive {
-  composes: toggleButton;
-  @apply bg-accent/10 border-accent/40 text-accent-hi;
-}
-
-.toggleButtonIdle {
-  composes: toggleButton;
   @apply bg-elevated border-border text-subtle hover:text-text;
 }
 
+.toggleButton[data-active="true"] {
+  @apply bg-accent/10 border-accent/40 text-accent-hi;
+}
+
 .toggleDot {
-  @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+  @apply w-1.5 h-1.5 rounded-full flex-shrink-0 bg-border-strong;
 }
 
-.toggleDotActive {
-  composes: toggleDot;
+.toggleButton[data-active="true"] .toggleDot {
   @apply bg-accent;
-}
-
-.toggleDotIdle {
-  composes: toggleDot;
-  @apply bg-border-strong;
 }
 
 /* ============================================================
@@ -73,9 +62,8 @@
   @apply text-center text-text font-semibold;
 }
 
-.thColCellClickable {
-  composes: th;
-  @apply text-center cursor-pointer select-none hover:bg-elevated/80 text-text;
+.thColCell[data-clickable="true"] {
+  @apply font-normal cursor-pointer select-none hover:bg-elevated/80;
 }
 
 .thTotalRoot {
@@ -176,10 +164,10 @@
 
 /* ── Lignes ── */
 
-.rowGroup {
+.tableRow[data-row="group"] {
   @apply bg-elevated/60;
 }
 
-.rowLeafOdd {
+.tableRow[data-row="odd"] {
   @apply bg-elevated/20;
 }

@@ -41,7 +41,8 @@ export function ResultsToolbar({
       key={type}
       title={title}
       onClick={() => onUpdate({ chartType: type })}
-      className={section.chartType === type ? styles.iconToggleActive : styles.iconToggleIdle}
+      data-active={section.chartType === type || undefined}
+      className={styles.iconToggle}
     >
       <Icon size={13} />
     </button>
@@ -59,9 +60,10 @@ export function ResultsToolbar({
           <button
             key={label}
             onClick={toggle}
-            className={value ? styles.labelToggleActive : styles.labelToggleIdle}
+            data-active={value || undefined}
+            className={styles.labelToggle}
           >
-            <span className={value ? styles.labelToggleDotActive : styles.labelToggleDotIdle} />
+            <span className={styles.labelToggleDot} />
             {label}
           </button>
         ))}
@@ -75,7 +77,8 @@ export function ResultsToolbar({
               key={s}
               title={SCALE_TITLES[s]}
               onClick={() => onUpdate({ valueScale: s })}
-              className={section.valueScale === s ? styles.scaleToggleActive : styles.scaleToggleIdle}
+              data-active={section.valueScale === s || undefined}
+              className={styles.scaleToggle}
             >
               {s === 'none' ? '—' : s}
             </button>
@@ -106,7 +109,8 @@ export function ResultsToolbar({
           <button
             title="Intervertir lignes/colonnes dans le graphique"
             onClick={() => onUpdate({ chartTranspose: !section.chartTranspose })}
-            className={section.chartTranspose ? styles.iconToggleActive : styles.iconToggleIdle}
+            data-active={section.chartTranspose || undefined}
+            className={styles.iconToggle}
           >
             <ArrowLeftRight size={13} />
           </button>
@@ -124,7 +128,8 @@ export function ResultsToolbar({
               key={layout}
               title={title}
               onClick={() => onUpdate({ chartLayout: layout })}
-              className={section.chartLayout === layout ? styles.iconToggleActive : styles.iconToggleIdle}
+              data-active={section.chartLayout === layout || undefined}
+              className={styles.iconToggle}
             >
               <Icon size={13} />
             </button>
@@ -154,7 +159,8 @@ export function ResultsToolbar({
         <button
           title="Couleurs des séries"
           onClick={onToggleColorPicker}
-          className={showColorPicker ? styles.iconToggleActive : styles.iconToggleIdle}
+          data-active={showColorPicker || undefined}
+          className={styles.iconToggle}
         >
           <Palette size={13} />
         </button>

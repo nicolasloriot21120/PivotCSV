@@ -66,18 +66,20 @@ export function PivotTable({
           {hasRowGroups && (
             <button
               onClick={() => rowHasClosed ? onSetCollapsedRows([]) : onSetCollapsedRows(allRowGroupKeys)}
-              className={rowHasClosed ? styles.toggleButtonActive : styles.toggleButtonIdle}
+              data-active={rowHasClosed || undefined}
+              className={styles.toggleButton}
             >
-              <span className={rowHasClosed ? styles.toggleDotActive : styles.toggleDotIdle} />
+              <span className={styles.toggleDot} />
               Lignes — {rowHasClosed ? 'Ouvrir' : 'Fermer'}
             </button>
           )}
           {hasColGroups && (
             <button
               onClick={() => colHasClosed ? onSetCollapsedCols([]) : onSetCollapsedCols(allColGroupKeys)}
-              className={colHasClosed ? styles.toggleButtonActive : styles.toggleButtonIdle}
+              data-active={colHasClosed || undefined}
+              className={styles.toggleButton}
             >
-              <span className={colHasClosed ? styles.toggleDotActive : styles.toggleDotIdle} />
+              <span className={styles.toggleDot} />
               Colonnes — {colHasClosed ? 'Ouvrir' : 'Fermer'}
             </button>
           )}
@@ -105,7 +107,8 @@ export function PivotTable({
                   colSpan={cell.colSpan}
                   rowSpan={cell.rowSpan}
                   onClick={cell.prefixKey ? () => onToggleColGroup(cell.prefixKey!) : undefined}
-                  className={cell.prefixKey ? styles.thColCellClickable : styles.thColCell}
+                  data-clickable={cell.prefixKey ? true : undefined}
+                  className={styles.thColCell}
                 >
                   <span className={styles.thInner}>
                     {cell.prefixKey && (
@@ -174,10 +177,6 @@ export function PivotTable({
             const depth = isGroup ? rs.depth : (rs as { key: string[] }).key.length - 1
             const label = isGroup ? rs.label : (rs as { key: string[] }).key[(rs as { key: string[] }).key.length - 1]
 
-            const rowClass = isGroup
-              ? styles.rowGroup
-              : ri % 2 === 0 ? undefined : styles.rowLeafOdd
-
             const labelCellClass = isGroup ? styles.tdRowLabelGroup : styles.tdRowLabelLeaf
             const valueCellClass = isGroup ? styles.tdValueGroup    : styles.tdValueLeaf
             const rowTotalClass  = isGroup ? styles.tdRowTotalGroup : styles.tdRowTotalLeaf
@@ -185,7 +184,8 @@ export function PivotTable({
             return (
               <tr
                 key={isGroup ? rs.prefixKey : (rs as { key: string[] }).key.join('\x00')}
-                className={rowClass}
+                className={styles.tableRow}
+                data-row={isGroup ? "group" : ri % 2 !== 0 ? "odd" : undefined}
               >
 
                 <td

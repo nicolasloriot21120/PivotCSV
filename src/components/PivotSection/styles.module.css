@@ -91,18 +91,15 @@
   @apply px-3 py-2 text-[11px] font-medium border-b-2 -mb-px transition-all duration-150;
 }
 
-.tabActive {
-  composes: tab;
+.tab[data-state="active"] {
   @apply border-accent text-accent-hi;
 }
 
-.tabIdle {
-  composes: tab;
+.tab[data-state="idle"] {
   @apply border-transparent text-muted hover:text-text;
 }
 
-.tabDisabled {
-  composes: tab;
+.tab[data-state="disabled"] {
   @apply border-transparent text-subtle cursor-default;
 }
 
@@ -133,13 +130,11 @@
   @apply flex gap-3;
 }
 
-.resultsLayoutHorizontal {
-  composes: resultsLayout;
+.resultsLayout[data-layout="horizontal"] {
   @apply flex-row items-stretch;
 }
 
-.resultsLayoutVertical {
-  composes: resultsLayout;
+.resultsLayout[data-layout="vertical"] {
   @apply flex-col;
 }
 
@@ -151,13 +146,11 @@
   @apply bg-border flex-shrink-0;
 }
 
-.dividerVertical {
-  composes: divider;
+.divider[data-orientation="vertical"] {
   @apply w-px self-stretch;
 }
 
-.dividerHorizontal {
-  composes: divider;
+.divider[data-orientation="horizontal"] {
   @apply h-px w-full;
 }
 
