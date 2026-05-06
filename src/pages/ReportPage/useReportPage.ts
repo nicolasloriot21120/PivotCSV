@@ -1,9 +1,4 @@
 import { useRef, useState, useEffect } from 'react'
-import {
-  PointerSensor, useSensor, useSensors,
-} from '@dnd-kit/core'
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core'
-import { arrayMove }           from '@dnd-kit/sortable'
 import { useTheme, THEMES }    from '@/context/ThemeContext'
 import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
@@ -11,6 +6,7 @@ import { usePivotComputation } from './hooks/usePivotComputation'
 import { useSections }         from './hooks/useSections'
 import { useFileEntries, loader } from './hooks/useFileEntries'
 import { usePresentationQueue } from './hooks/usePresentationQueue'
+import { useSectionsDnD }      from './hooks/useSectionsDnD'
 
 // Migration : anciens configs persistés avaient rows/columns: string[]
 function normalizeConfig(config: PivotConfig | null): PivotConfig | null {
@@ -26,7 +22,6 @@ export function useReportPage() {
   const { theme, setTheme }                 = useTheme()
 
   const [sidebarOpen,  setSidebarOpen]      = useState(true)
-  const [draggingId,   setDraggingId]       = useState<string | null>(null)
 
   const {
     sections, setSections,
@@ -81,10 +76,6 @@ export function useReportPage() {
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
   }, [fileEntries, sections, sidebarOpen])
 
-  const sensors = useSensors(useSensor(PointerSensor, {
-    activationConstraint: { distance: 8 },
-  }))
-
   // ── File ─────────────────────────────────────────────────────────────────
 
   const handleFileSelect = (file: File) => {
@@ -132,17 +123,7 @@ export function useReportPage() {
 
   // ── DnD ───────────────────────────────────────────────────────────────────
 
-  const onDragStart = (e: DragStartEvent) => setDraggingId(String(e.active.id))
-
-  const onDragEnd = (e: DragEndEvent) => {
-    setDraggingId(null)
-    if (!e.over || e.active.id === e.over.id) return
-    setSections(ss => {
-      const from = ss.findIndex(s => s.id === e.active.id)
-      const to   = ss.findIndex(s => s.id === e.over!.id)
-      return arrayMove(ss, from, to)
-    })
-  }
+  const { sensors, draggingId, onDragStart, onDragEnd } = useSectionsDnD({ setSections })
 
   return {
     // theme
