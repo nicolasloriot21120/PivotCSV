@@ -1,0 +1,53 @@
+Bonjour. Voici le contexte du projet pour reprendre où on s'est arrêtés.
+
+== PROJET ==
+
+PivotCSV — React 19 + Vite 8 + TypeScript + Tailwind v4 + CSS Modules.
+On est dans une longue session de refacto qualité. Lis le fichier todo.txt
+à la racine pour l'état complet. Lis aussi les fichiers memory dans
+~/.claude/projects/-home-nicolas-depot-projets-PivotCSV/memory/ pour les
+conventions et préférences.
+
+== ÉTAT ACTUEL ==
+
+Toutes les PRs de nettoyage className sont terminées et mergées (PRs #15 à
+#18) sauf la PR 4 (commit fabc9aa sur main local, non pushée — Nicolas la
+validera visuellement et la poussera lui-même).
+
+Règle atteinte : zéro ternaire / concaténation Tailwind dans le JSX.
+Tout className est de la forme `{styles.x}` avec `data-*` pour les états.
+
+== PROCHAINE ÉTAPE ==
+
+Démarrer la Phase 3, PR A : split de useReportPage.ts (366 lignes, hook
+fourre-tout) en 6 hooks ciblés + orchestrateur.
+
+Fichier : src/pages/ReportPage/hooks/useReportPage.ts
+
+Les 6 hooks à extraire :
+  1. useFileEntries    — CRUD fichiers + loadPreview
+  2. useSections       — CRUD sections + makeSection
+  3. usePivotComputation — worker compute/cancel
+  4. usePresentationQueue — queue séquentielle + state ouvert/loading
+  5. useSectionsDnD    — sensors + onDragStart/End + draggingSection
+  6. usePersistence    — loadState/saveState/debounce + normalizeConfig
+
+Point CRITIQUE : le bloc worker (~30 lignes) est copié-collé entre
+computeSection (L220-251) et computeNextInQueue (L277-309) — factoriser
+en un helper interne avant ou pendant le split.
+
+IMPORTANT : normalizeConfig() dans usePersistence migre les anciens
+configs string[] en DimField[] — la conserver impérativement.
+
+Commence par lire useReportPage.ts en entier avant de proposer le plan
+de découpage.
+
+== CONVENTIONS À RESPECTER ==
+
+- 1 PR par groupe logique, branche feat/<nom> ou refacto/<nom>
+- Commits `refacto(scope): description` sans point final, sans emoji,
+  sans Co-Authored-By
+- `npx vite build` obligatoire après chaque changement
+- Ne pas merger sans validation explicite de Nicolas
+- Ne pas fermer les issues GitHub après merge
+- Voir todo.txt et memory pour tous les détails

@@ -1,0 +1,150 @@
+# PivotCSV — TODO refacto qualité (Phase 3)
+# Mis à jour : 2026-05-06
+# Auteur : conversation Claude/Nicolas — voir aussi MEMORY.md (~/.claude/projects/.../memory/)
+
+================================================================================
+ÉTAT DES LIEUX
+================================================================================
+
+Phase 1 (PR #12, mergée) — primitives UI réutilisables.
+Phase 2 (PR #13, mergée) — extraction logique vers hooks.
+Phase 2.5 (PR #14, mergée) — migration Tailwind → CSS Modules.
+PR pré-A (PR #15, mergée) — concaténations className éliminées.
+PR pré-A.2 (PR #16, mergée) — fix systémique composes cross-file.
+PR 2 (PR #17, mergée) — ternaires UI primitives (ThemePicker, FileDropzone,
+  DropZone, DateGroupPicker).
+PR 3 (PR #18, mergée) — ternaires PivotTable + PivotSection + ResultsToolbar.
+PR 4 (commit fabc9aa, local main — à pusher) — ternaires ValueChip + FilterItem.
+
+RÈGLE className ATTEINTE : zéro ternaire / concaténation / Tailwind inline
+dans le JSX. Tout est `className={styles.x}` avec `data-*` pour les états.
+
+================================================================================
+DOCTRINE (3 axes)
+================================================================================
+
+Axe 1 — zéro duplication JSX : dès qu'un pattern se répète (≥ 2-3×), extraire
+  un sous-composant présentationnel pur (props in, JSX out, pas de state métier).
+Axe 2 — logique métier uniquement dans pages/hooks. Composant avec useEffect
+  conditionnel, tri, fetch, ou plusieurs sources de state → hook `use…`.
+Axe 3 — CSS Modules co-localisés, `@reference` obligatoire, `composes` intra-
+  fichier uniquement, `data-*` pour états/variantes, `shared.module.css` via
+  import JS direct pour délégations pures transverses (≥ 3 composants).
+
+================================================================================
+PHASE 3 — Refacto profond (À FAIRE)
+================================================================================
+
+Ordre choisi pour maximiser l'impact / minimiser le risque.
+
+------------------------------------------------------------
+PR A — Split useReportPage.ts (366L → 6 hooks)
+------------------------------------------------------------
+Hook fourre-tout, mélange 6 préoccupations distinctes.
+
+[ ] useFileEntries.ts — CRUD fichiers + loadPreview
+[ ] useSections.ts — CRUD sections + makeSection
+[x] usePivotComputation.ts — worker compute/cancel
+[ ] usePresentationQueue.ts — queue séquentielle + state ouvert/loading
+[ ] useSectionsDnD.ts — sensors + onDragStart/End + draggingSection
+[ ] usePersistence.ts — loadState/saveState/debounce + normalizeConfig
+[ ] useReportPage devient orchestrateur (compose les 6)
+[x] CRITIQUE : worker dédupliqué via runWorker dans usePivotComputation
+
+------------------------------------------------------------
+PR B — Split PivotTable (258L → 4 sous-composants)
+------------------------------------------------------------
+[ ] <PivotTableToolbar /> — zones toggle row/col (lignes 64-85)
+[ ] <PivotTableHead />    — thead complet (lignes 90-167)
+[ ] <PivotTableBody />    — tbody (lignes 171-227)
+[ ] <PivotTableFooter />  — tfoot (lignes 229-252)
+[ ] <ChevronToggle collapsed /> — factorise ChevronRight/Down size={11}
+    (L113, L114, L201, L202)
+[ ] Helper si pertinent : depth → paddingLeft (12 + depth * 14)
+
+------------------------------------------------------------
+PR C — PivotConfigurator → <DimensionDropZone />
+------------------------------------------------------------
+[ ] Extraire <DimensionDropZone dim={'rows'|'columns'} /> qui encapsule le
+    mapping FieldChip + DateGroupPicker — élimine duplication 1:1 entre
+    L64-81 (rows) et L83-100 (columns) dans PivotConfigurator/index.tsx
+
+------------------------------------------------------------
+PR D — PivotSection header
+------------------------------------------------------------
+[ ] <PivotSectionHeader /> — extrait L64-116 (drag handle, file icon,
+    editable label, status dot, actions)
+[ ] <EditableLabel /> réutilisable — extrait L75-92 (double-click pour
+    éditer + Enter/Escape pour valider/annuler)
+
+------------------------------------------------------------
+PR E — FilterZone split (StringFilterValues + NumberFilterRange)
+------------------------------------------------------------
+[ ] <StringFilterValues /> — extrait du corps de FilterItem (chips valeurs)
+[ ] <NumberFilterRange />  — extrait du corps de FilterItem (inputs min/max)
+
+------------------------------------------------------------
+PR F — AppSidebar → <FileEntryRow />
+------------------------------------------------------------
+[ ] <FileEntryRow /> — extrait L53-83 de AppSidebar
+
+------------------------------------------------------------
+PR G — FileDropzone → useFileDropzone hook
+------------------------------------------------------------
+[ ] hook useFileDropzone() — state, error, dropped, onDrop, onDragOver,
+    onDragLeave, onChange, removeFile
+[ ] util pur validateFiles(files, accept, maxSizeMb)
+[ ] Le composant ne garde que du JSX
+
+------------------------------------------------------------
+PR H — ReportPage polish
+------------------------------------------------------------
+[ ] <ReportHeader /> — extrait L51-74 ReportPage.tsx
+[ ] <EmptyState />   — extrait L77-85
+[ ] Déplacer canPresent + presentableSections dans useReportPage (L29-30)
+[ ] Logique toggle collapsedRowGroups/Cols dans SortablePivotSection L45-54
+    → util toggleInArray ou remontée dans le hook approprié
+
+================================================================================
+WORKFLOW (rappels CLAUDE.md)
+================================================================================
+
+- 1 PR par dossier/groupe logique
+- Commits atomiques, messages `refacto(scope): description` ou
+  `feat(scope): description`, pas de point final, pas d'emoji
+- Cible PR : main
+- Format PR : ## Summary (3 bullets) / ## Test plan (checklist) /
+  🤖 Generated with Claude Code
+- PAS de Co-Authored-By dans les commits
+- Vérif obligatoire : `npx vite build` après chaque migration
+- Ne pas merger sans validation explicite de Nicolas
+- Ne pas fermer les issues GitHub après merge
+
+================================================================================
+À NE PAS TOUCHER
+================================================================================
+
+PresentationMode et son écosystème utilisent inline styles volontairement
+hors scope refacto CSS Modules :
+  - src/pages/ReportPage/components/presentationMode/PresentationMode.tsx
+  - src/components/ui/CloseButton/
+  - src/components/ui/ModalHeader/
+  - src/components/ui/LoadingSpinner/
+  - src/pages/ReportPage/components/navigationButton/
+
+================================================================================
+RAPPELS TECHNIQUES
+================================================================================
+
+- Tailwind v4 (pas de tailwind.config.js) — `@reference` requis en première
+  ligne de chaque .module.css
+- Alias `@` → `src/`
+- DimField : `{ field: string; dateGroup?: DateGrouping }`
+- normalizeConfig() dans useReportPage.ts migre les anciens string[] → à
+  conserver lors du split PR A
+- Worker pivot : un seul actif à la fois, terminate avant de relancer
+- composes cross-file CASSÉ avec @tailwindcss/vite (voir memory) —
+  shared.module.css consommé via import JS direct uniquement
+- Vérif double-hash post-build :
+  grep -oE '_<class>_[a-zA-Z0-9_]+' dist/assets/index-*.{js,css} | sort -u
+  → un seul hash par classe attendu

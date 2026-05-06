@@ -9,8 +9,8 @@ import { emptyConfiguratorState } from '@/components/PivotConfigurator/types'
 import { CSVLoader }           from '@/lib/loader'
 import { saveState, loadState } from '@/lib/persistence'
 import type { PivotConfig }    from '@/lib/pivot/types'
-import type { WorkerResponse } from '@/lib/pivot/worker'
 import type { FileEntry, Section } from '@/types/app'
+import { usePivotComputation } from './hooks/usePivotComputation'
 
 type QueueItem = { sectionId: string; file: File; config: PivotConfig }
 
@@ -62,8 +62,6 @@ export function useReportPage() {
   const [sections,     setSections]         = useState<Section[]>([])
   const [draggingId,   setDraggingId]       = useState<string | null>(null)
 
-  const workerRef    = useRef<Worker | null>(null)
-  const computingRef = useRef<{ sectionId: string } | null>(null)
   const saveTimer    = useRef<ReturnType<typeof setTimeout> | null>(null)
   const restoredRef  = useRef(false)
 
@@ -208,55 +206,9 @@ export function useReportPage() {
 
   // ── Compute ───────────────────────────────────────────────────────────────
 
-  const computeSection = (sectionId: string, config: PivotConfig) => {
-    const section = sections.find(s => s.id === sectionId)
-    const entry   = fileEntries.find(f => f.id === section?.fileId)
-    if (!section || !entry) return
-
-    workerRef.current?.terminate()
-    computingRef.current = { sectionId }
-    updateSection(sectionId, { status: 'computing', progress: 0, result: null, config })
-
-    const worker = new Worker(
-      new URL('../../lib/pivot/worker.ts', import.meta.url),
-      { type: 'module' },
-    )
-    workerRef.current = worker
-
-    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
-      const ctx = computingRef.current
-      if (!ctx) return
-      const msg = e.data
-      if (msg.type === 'progress') {
-        updateSection(ctx.sectionId, { progress: msg.percent })
-      } else if (msg.type === 'result') {
-        updateSection(ctx.sectionId, {
-          status: 'done', result: msg.data, errors: msg.errors,
-          progress: 100,
-        })
-        computingRef.current = null
-        worker.terminate()
-      } else if (msg.type === 'error') {
-        updateSection(ctx.sectionId, { status: 'error', errorMessage: msg.message })
-        computingRef.current = null
-        worker.terminate()
-      }
-    }
-    worker.onerror = () => {
-      const ctx = computingRef.current
-      if (ctx) updateSection(ctx.sectionId, { status: 'error' })
-      computingRef.current = null
-      worker.terminate()
-    }
-    worker.postMessage({ file: entry.file, config })
-  }
-
-  const cancelSection = (sectionId: string) => {
-    workerRef.current?.terminate()
-    workerRef.current    = null
-    computingRef.current = null
-    updateSection(sectionId, { status: 'idle', progress: 0 })
-  }
+  const { computeSection, cancelSection, runWorker } = usePivotComputation({
+    sections, fileEntries, updateSection,
+  })
 
   // ── Mode présentation ─────────────────────────────────────────────────────
 
@@ -267,49 +219,15 @@ export function useReportPage() {
       setPresentationOpen(true)
       return
     }
-
     const { sectionId, file, config } = queue[0]
-
-    workerRef.current?.terminate()
-    computingRef.current = { sectionId }
-    updateSection(sectionId, { status: 'computing', progress: 0, result: null, config })
-
-    const worker = new Worker(
-      new URL('../../lib/pivot/worker.ts', import.meta.url),
-      { type: 'module' },
-    )
-    workerRef.current = worker
-
-    const advance = () => {
-      presentationQueueRef.current = presentationQueueRef.current.slice(1)
-      computeNextInQueue()
-    }
-
-    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
-      const msg = e.data
-      if (msg.type === 'progress') {
-        updateSection(sectionId, { progress: msg.percent })
-      } else if (msg.type === 'result') {
-        updateSection(sectionId, { status: 'done', result: msg.data, errors: msg.errors, progress: 100 })
-        computingRef.current = null
-        worker.terminate()
-        advance()
-      } else if (msg.type === 'error') {
-        updateSection(sectionId, { status: 'error', errorMessage: msg.message })
-        computingRef.current = null
-        worker.terminate()
-        advance()
-      }
-    }
-    worker.onerror = () => {
-      if (computingRef.current) updateSection(sectionId, { status: 'error' })
-      computingRef.current = null
-      worker.terminate()
-      advance()
-    }
-
-    worker.postMessage({ file, config })
-  }, [updateSection]) // workerRef, computingRef, presentationQueueRef sont des refs stables
+    runWorker({
+      sectionId, file, config,
+      onDone: () => {
+        presentationQueueRef.current = presentationQueueRef.current.slice(1)
+        computeNextInQueue()
+      },
+    })
+  }, [runWorker])
 
   const openPresentation = useCallback(() => {
     const toCompute: QueueItem[] = []
