@@ -2,10 +2,7 @@ import { useSortable }           from '@dnd-kit/sortable'
 import type { DraggableAttributes } from '@dnd-kit/core'
 type SortableListeners = ReturnType<typeof useSortable>['listeners']
 
-import {
-  GripVertical, ChevronDown, ChevronRight,
-  X, FileText, AlertCircle,
-} from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 import { PivotConfigurator }    from '@/components/PivotConfigurator'
 import { PivotTable }           from '@/components/ui/PivotTable'
@@ -14,9 +11,8 @@ import type { Section }         from '@/types/app'
 import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
-import { ResultsToolbar, ColorPickerPanel }       from './components'
+import { PivotSectionHeader, ResultsToolbar, ColorPickerPanel } from './components'
 import { usePivotSectionUI }    from './hooks/usePivotSectionUI'
-import shared                   from '@/styles/shared.module.css'
 import styles                   from './styles.module.css'
 
 type Props = {
@@ -40,13 +36,6 @@ type Props = {
   onSetCollapsedCols:  (pks: string[]) => void
 }
 
-const STATUS_DOT_CLASS: Record<Section['status'], string | null> = {
-  idle:      null,
-  computing: styles.statusDotComputing,
-  done:      styles.statusDotDone,
-  error:     styles.statusDotError,
-}
-
 export function PivotSection({
   section, headers, preview, distinctValues,
   dragHandleAttrs, dragHandleListeners, isDragging,
@@ -56,71 +45,27 @@ export function PivotSection({
   onSetCollapsedRows, onSetCollapsedCols,
 }: Props) {
   const ui = usePivotSectionUI(section)
-  const statusDotClass = STATUS_DOT_CLASS[section.status]
 
   return (
     <div data-dragging={isDragging || undefined} className={styles.card}>
 
-      {/* ── Header ── */}
-      <div className={styles.headerBar}>
-        <button
-          {...dragHandleAttrs}
-          {...dragHandleListeners}
-          className={shared.dragHandle}
-        >
-          <GripVertical size={15} />
-        </button>
+      <PivotSectionHeader
+        label={section.label}
+        fileName={section.fileName}
+        status={section.status}
+        collapsed={section.collapsed}
+        editingLabel={ui.editingLabel}
+        dragHandleAttrs={dragHandleAttrs}
+        dragHandleListeners={dragHandleListeners}
+        onEditingLabelChange={ui.setEditingLabel}
+        onLabelChange={onLabelChange}
+        onToggleCollapse={onToggleCollapse}
+        onDelete={onDelete}
+      />
 
-        <FileText size={13} className={styles.fileIcon} />
-
-        {ui.editingLabel ? (
-          <input
-            autoFocus
-            value={section.label}
-            onChange={e => onLabelChange(e.target.value)}
-            onBlur={() => ui.setEditingLabel(false)}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') ui.setEditingLabel(false) }}
-            className={styles.labelInput}
-          />
-        ) : (
-          <span
-            className={styles.labelText}
-            onDoubleClick={() => ui.setEditingLabel(true)}
-            title="Double-cliquer pour renommer"
-          >
-            {section.label}
-          </span>
-        )}
-
-        <span className={styles.fileName}>
-          {section.fileName}
-        </span>
-
-        {statusDotClass && <span className={statusDotClass} />}
-
-        <div className={styles.headerActions}>
-          <button
-            onClick={onToggleCollapse}
-            className={styles.iconButtonNeutral}
-            title={section.collapsed ? 'Déplier' : 'Replier'}
-          >
-            {section.collapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
-          </button>
-          <button
-            onClick={onDelete}
-            className={styles.iconButtonDanger}
-            title="Supprimer"
-          >
-            <X size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Corps ── */}
       {!section.collapsed && (
         <div className={styles.body}>
 
-          {/* Onglets */}
           <div className={styles.tabsBar}>
             {(['config', 'result'] as const).map(tab => (
               <button
@@ -137,7 +82,6 @@ export function PivotSection({
             ))}
           </div>
 
-          {/* ── Onglet Configuration ── */}
           {ui.activeTab === 'config' && (
             <div className={styles.tabPanel}>
               {section.status === 'error' && section.errorMessage && (
@@ -160,7 +104,6 @@ export function PivotSection({
             </div>
           )}
 
-          {/* ── Onglet Résultats ── */}
           {ui.activeTab === 'result' && (
             <div className={styles.tabPanel}>
               {section.result ? (
@@ -186,12 +129,10 @@ export function PivotSection({
                     />
                   )}
 
-                  {/* Tableau + Graphique */}
                   <div
                     className={styles.resultsLayout}
                     data-layout={ui.isHorizontal ? 'horizontal' : 'vertical'}
                   >
-
                     <div
                       className={styles.tableContainer}
                       style={{ flex: ui.isHorizontal ? section.tableFlex : undefined }}

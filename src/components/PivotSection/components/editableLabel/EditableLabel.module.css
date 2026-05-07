@@ -1,0 +1,10 @@
+@reference "../../../index.css";
+
+.labelInput {
+  @apply flex-1 bg-transparent border-b border-accent/50 outline-none;
+  @apply text-sm font-semibold text-text px-0.5;
+}
+
+.labelText {
+  @apply flex-1 text-sm font-semibold text-text cursor-text truncate;
+}
