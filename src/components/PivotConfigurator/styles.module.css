@@ -33,12 +33,6 @@
   @apply grid grid-cols-2 gap-4;
 }
 
-/* ── Item dans une DropZone (chip + sous-pickers éventuels) ── */
-
-.zoneItem {
-  @apply flex flex-col gap-0.5;
-}
-
 /* ============================================================
    Bouton "Calculer / Annuler" + barre de progression
    ============================================================ */
