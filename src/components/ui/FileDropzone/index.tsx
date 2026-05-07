@@ -1,6 +1,5 @@
-import { useRef, useState, useCallback } from 'react'
-import type { DragEvent, ChangeEvent } from 'react'
 import { Upload, File, X, AlertCircle, Plus } from 'lucide-react'
+import { useFileDropzone } from './hooks/useFileDropzone'
 import styles from './styles.module.css'
 
 export type FileDropzoneProps = {
@@ -16,8 +15,6 @@ export type FileDropzoneProps = {
   hideList?:      boolean
 }
 
-type DropState = 'idle' | 'hover' | 'error'
-
 export function FileDropzone({
   accept        = '.csv',
   multiple      = false,
@@ -30,53 +27,8 @@ export function FileDropzone({
   hint,
   hideList      = false,
 }: FileDropzoneProps) {
-  const inputRef              = useRef<HTMLInputElement>(null)
-  const [state, setState]     = useState<DropState>('idle')
-  const [error, setError]     = useState<string | null>(null)
-  const [dropped, setDropped] = useState<File[]>([])
-
-  const validate = useCallback((files: File[]): File[] | null => {
-    const maxBytes     = maxSizeMb * 1024 * 1024
-    const acceptedExts = accept.split(',').map(s => s.trim().toLowerCase())
-
-    const invalid = files.find(f => {
-      const ext = '.' + f.name.split('.').pop()?.toLowerCase()
-      return !acceptedExts.includes(ext)
-    })
-    if (invalid) { setError(`Format non accepté : ${invalid.name}`); return null }
-
-    const tooBig = files.find(f => f.size > maxBytes)
-    if (tooBig) { setError(`Fichier trop lourd (max ${maxSizeMb} Mo) : ${tooBig.name}`); return null }
-
-    return files
-  }, [accept, maxSizeMb])
-
-  const handle = useCallback((files: File[]) => {
-    setError(null)
-    const valid = validate(files)
-    if (!valid) { setState('error'); return }
-    setState('idle')
-    const existing = new Set(dropped.map(f => f.name))
-    const newFiles = valid.filter(f => !existing.has(f.name))
-    const next     = [...dropped, ...newFiles]
-    setDropped(next)
-    onFiles(next)
-    onFileSelect?.(valid[0])
-  }, [validate, onFiles, onFileSelect, dropped])
-
-  const onDragOver  = (e: DragEvent) => { e.preventDefault(); setState('hover') }
-  const onDragLeave = ()             => setState('idle')
-  const onDrop      = (e: DragEvent) => { e.preventDefault(); handle(Array.from(e.dataTransfer.files)) }
-  const onChange    = (e: ChangeEvent<HTMLInputElement>) => { if (e.target.files) handle(Array.from(e.target.files)) }
-
-  const removeFile = (name: string) => {
-    const next = dropped.filter(f => f.name !== name)
-    setDropped(next)
-    onFiles(next)
-    if (selectedFile?.name === name) onFileSelect?.(next[0])
-    setError(null)
-    setState('idle')
-  }
+  const { inputRef, state, error, dropped, onDragOver, onDragLeave, onDrop, onChange, removeFile } =
+    useFileDropzone({ accept, multiple, maxSizeMb, onFiles, onFileSelect, selectedFile })
 
   const hint_ = hint ?? `Formats acceptés : ${accept} — max ${maxSizeMb} Mo`
 
