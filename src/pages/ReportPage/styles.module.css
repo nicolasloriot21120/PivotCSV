@@ -10,33 +10,6 @@
   @apply flex-1 flex flex-col min-w-0 overflow-hidden;
 }
 
-/* ── Header ── */
-
-.header {
-  @apply flex items-center justify-between px-6 h-12 border-b border-border bg-surface flex-shrink-0;
-}
-
-.headerLeft {
-  @apply flex items-center gap-2 text-muted;
-}
-
-.sectionsCount {
-  @apply text-xs font-medium;
-}
-
-.headerActions {
-  @apply flex items-center gap-3;
-}
-
-.actionButton {
-  @apply flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium;
-  @apply text-muted hover:text-text hover:bg-elevated transition-all;
-}
-
-.logo {
-  @apply h-9 w-auto opacity-50 hover:opacity-80 transition-opacity;
-}
-
 /* ── Contenu principal ── */
 
 .mainScroll {
@@ -45,28 +18,6 @@
 
 .sectionsList {
   @apply flex flex-col gap-4;
-}
-
-/* ── Empty state ── */
-
-.emptyState {
-  @apply flex flex-col items-center justify-center h-full gap-3 text-center;
-}
-
-.emptyStateIcon {
-  @apply text-subtle;
-}
-
-.emptyStateTitle {
-  @apply text-muted text-sm font-medium;
-}
-
-.emptyStateDescription {
-  @apply text-subtle text-xs max-w-xs;
-}
-
-.emptyStateHighlight {
-  @apply text-accent;
 }
 
 /* ── Drag overlay ── */
