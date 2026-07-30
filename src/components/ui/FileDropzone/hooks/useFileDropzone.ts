@@ -22,7 +22,7 @@ export function useFileDropzone({ accept, multiple: _multiple, maxSizeMb, onFile
   const handle = useCallback((files: File[]) => {
     setError(null)
     const result = validateFiles(files, accept, maxSizeMb)
-    if (result.error) { setError(result.error); setState('error'); return }
+    if (result.error !== null) { setError(result.error); setState('error'); return }
 
     setState('idle')
     const existing = new Set(dropped.map(f => f.name))

@@ -36,7 +36,7 @@ export function emptyConfiguratorState(): ConfiguratorState {
 }
 
 export function toPivotFilters(filters: FilterField[]): PivotFilter[] {
-  return filters.flatMap(f => {
+  return filters.flatMap<PivotFilter>(f => {
     if (f.type === 'string' || f.type === 'date') {
       if (!f.selectedValues?.length) return []
       return [{ field: f.field, type: 'categorical' as const, values: f.selectedValues }]

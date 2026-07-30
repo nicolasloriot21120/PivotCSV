@@ -7,9 +7,10 @@ import type { RawRow }          from '@/lib/loader'
 import type { PivotConfig }     from '@/lib/pivot/types'
 import type { AggregationType } from '@/lib/pivot/types'
 import { isDateLike }           from '@/lib/pivot/dateGroup'
+import type { DateGrouping }    from '@/lib/pivot/dateGroup'
 import { collectDistinctStringValues } from '@/lib/utils/records'
 import type {
-  ConfiguratorState, DateGrouping, FieldType,
+  ConfiguratorState, FieldType,
   FilterField, PlacedField, ValueField, ZoneId,
 } from '../types'
 import { toPivotFilters } from '../types'
