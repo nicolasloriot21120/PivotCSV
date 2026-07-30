@@ -30,7 +30,6 @@ export function ReportHeader({ sectionsCount, canPresent, onOpenPresentation }: 
             Présentation
           </button>
         )}
-        <img src="/finex-wordmark-dark.svg" alt="Finex" className={styles.logo} />
       </div>
     </header>
   )
