@@ -1,12 +1,12 @@
 import {
   DndContext, DragOverlay,
 } from '@dnd-kit/core'
-import { Rows3, Columns3, Hash, Play, Loader2 } from 'lucide-react'
+import { Hash, Play, Loader2 } from 'lucide-react'
 
 import type { RawRow }      from '@/lib/loader'
 import type { PivotConfig } from '@/lib/pivot/types'
 
-import { FieldChip, ValueChip, DateGroupPicker, DropZone, FilterZone } from './components'
+import { FieldChip, ValueChip, DimensionDropZone, DropZone, FilterZone } from './components'
 import type { ConfiguratorState } from './types'
 import { usePivotConfigurator } from './hooks/usePivotConfigurator'
 import styles from './styles.module.css'
@@ -61,43 +61,19 @@ export function PivotConfigurator({ value, onChange, headers, preview, distinctV
         </div>
 
         <div className={styles.zonesGrid}>
-          <DropZone id="rows" label="Lignes" icon={<Rows3 size={12} />} placeholder="Glissez un champ ici">
-            {value.rows.map(f => (
-              <div key={f.field} className={styles.zoneItem}>
-                <FieldChip
-                  field={f.field}
-                  type={f.type}
-                  draggableId={`rows::${f.field}`}
-                  onRemove={() => removeFromZone('rows', f.field)}
-                />
-                {f.type === 'date' && (
-                  <DateGroupPicker
-                    value={f.dateGroup}
-                    onChange={g => updateDateGroup('rows', f.field, g)}
-                  />
-                )}
-              </div>
-            ))}
-          </DropZone>
+          <DimensionDropZone
+            dim="rows"
+            fields={value.rows}
+            onRemove={field => removeFromZone('rows', field)}
+            onDateGroupChange={(field, g) => updateDateGroup('rows', field, g)}
+          />
 
-          <DropZone id="columns" label="Colonnes" icon={<Columns3 size={12} />} placeholder="Glissez un champ ici">
-            {value.columns.map(f => (
-              <div key={f.field} className={styles.zoneItem}>
-                <FieldChip
-                  field={f.field}
-                  type={f.type}
-                  draggableId={`columns::${f.field}`}
-                  onRemove={() => removeFromZone('columns', f.field)}
-                />
-                {f.type === 'date' && (
-                  <DateGroupPicker
-                    value={f.dateGroup}
-                    onChange={g => updateDateGroup('columns', f.field, g)}
-                  />
-                )}
-              </div>
-            ))}
-          </DropZone>
+          <DimensionDropZone
+            dim="columns"
+            fields={value.columns}
+            onRemove={field => removeFromZone('columns', field)}
+            onDateGroupChange={(field, g) => updateDateGroup('columns', field, g)}
+          />
 
           <DropZone id="values" label="Valeurs" icon={<Hash size={12} />} placeholder="Champs numériques">
             {value.values.map(f => (

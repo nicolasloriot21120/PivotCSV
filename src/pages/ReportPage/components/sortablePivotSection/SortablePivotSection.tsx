@@ -7,6 +7,10 @@ import type { PivotConfig }       from '@/lib/pivot/types.ts'
 import type { Section }           from '@/types/app.ts'
 import type { ConfiguratorState } from '@/components/PivotConfigurator/types'
 
+function toggleInArray(arr: string[], item: string): string[] {
+  return arr.includes(item) ? arr.filter(k => k !== item) : [...arr, item]
+}
+
 type SortablePivotSectionProps = {
   section:        Section
   headers:        string[]
@@ -42,16 +46,8 @@ export function SortablePivotSection({
         onCompute={onCompute}
         onCancel={onCancel}
         onDelete={onDelete}
-        onToggleRowGroup={pk => onUpdate({
-          collapsedRowGroups: section.collapsedRowGroups.includes(pk)
-            ? section.collapsedRowGroups.filter(k => k !== pk)
-            : [...section.collapsedRowGroups, pk],
-        })}
-        onToggleColGroup={pk => onUpdate({
-          collapsedColGroups: section.collapsedColGroups.includes(pk)
-            ? section.collapsedColGroups.filter(k => k !== pk)
-            : [...section.collapsedColGroups, pk],
-        })}
+        onToggleRowGroup={pk => onUpdate({ collapsedRowGroups: toggleInArray(section.collapsedRowGroups, pk) })}
+        onToggleColGroup={pk => onUpdate({ collapsedColGroups: toggleInArray(section.collapsedColGroups, pk) })}
         onSetCollapsedRows={pks => onUpdate({ collapsedRowGroups: pks })}
         onSetCollapsedCols={pks => onUpdate({ collapsedColGroups: pks })}
       />

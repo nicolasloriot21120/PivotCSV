@@ -78,7 +78,9 @@ export function useReportPage() {
     sidebarOpen, setSidebarOpen,
     // data
     fileEntries, sections,
-    draggingSection: sections.find(s => s.id === draggingId) ?? null,
+    draggingSection:    sections.find(s => s.id === draggingId) ?? null,
+    canPresent:         sections.some(s => s.config !== null),
+    presentableSections: sections.filter(s => s.result !== null),
     // sensors
     sensors,
     // handlers — fichiers

@@ -1,0 +1,50 @@
+@reference "../../../index.css";
+
+.headerBar {
+  @apply flex items-center gap-2 px-4 py-3 border-b border-border;
+}
+
+.fileIcon {
+  @apply text-accent/60 flex-shrink-0;
+}
+
+.fileName {
+  @apply text-[10px] text-subtle truncate max-w-[120px] flex-shrink-0 hidden sm:block;
+}
+
+.statusDot {
+  @apply w-1.5 h-1.5 rounded-full flex-shrink-0;
+}
+
+.statusDotDone {
+  composes: statusDot;
+  @apply bg-success;
+}
+
+.statusDotComputing {
+  composes: statusDot;
+  @apply bg-accent animate-pulse;
+}
+
+.statusDotError {
+  composes: statusDot;
+  @apply bg-danger;
+}
+
+.headerActions {
+  @apply flex items-center gap-1 flex-shrink-0;
+}
+
+.iconButton {
+  @apply p-1 rounded transition-all duration-150;
+}
+
+.iconButtonNeutral {
+  composes: iconButton;
+  @apply text-subtle hover:text-text hover:bg-elevated;
+}
+
+.iconButtonDanger {
+  composes: iconButton;
+  @apply text-subtle hover:text-danger hover:bg-danger/10;
+}

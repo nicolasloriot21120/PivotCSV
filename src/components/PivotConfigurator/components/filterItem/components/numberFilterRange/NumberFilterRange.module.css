@@ -1,0 +1,19 @@
+@reference "../../../../../../index.css";
+
+.row {
+  @apply flex items-center gap-2 pl-4;
+}
+
+.field {
+  @apply flex flex-col gap-0.5 flex-1;
+}
+
+.label {
+  @apply text-[10px] text-subtle;
+}
+
+.input {
+  @apply w-full bg-surface border border-border rounded-[var(--radius-sm)];
+  @apply px-2 py-1 text-xs text-text placeholder:text-subtle;
+  @apply focus:outline-none focus:border-accent/50 transition-colors;
+}

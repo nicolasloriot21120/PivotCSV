@@ -6,11 +6,10 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { LayoutGrid, Presentation } from 'lucide-react'
 
 import { AppSidebar }           from '@/components/AppSidebar'
 import { LoadingOverlay }       from '@/components/ui/LoadingSpinner'
-import { SortablePivotSection, PresentationMode } from './components'
+import { EmptyState, ReportHeader, SortablePivotSection, PresentationMode } from './components'
 import { useReportPage }        from './useReportPage'
 import styles                   from './styles.module.css'
 
@@ -19,15 +18,13 @@ export function ReportPage() {
     theme, setTheme, THEMES,
     sidebarOpen, setSidebarOpen,
     fileEntries, sections, draggingSection,
+    canPresent, presentableSections,
     sensors,
     handleFiles, handleFileSelect, handleAddPivot, handleRemoveFile,
     updateSection, deleteSection, computeSection, cancelSection,
     presentationLoading, presentationOpen, openPresentation, closePresentation,
     onDragStart, onDragEnd,
   } = useReportPage()
-
-  const canPresent          = sections.some(s => s.config !== null)
-  const presentableSections = sections.filter(s => s.result !== null)
 
   return (
     <>
@@ -48,41 +45,15 @@ export function ReportPage() {
 
       <div className={styles.mainArea}>
 
-        <header className={styles.header}>
-          <div className={styles.headerLeft}>
-            <LayoutGrid size={14} />
-            <span className={styles.sectionsCount}>
-              {sections.length === 0
-                ? 'Aucune section — ajoutez un pivot depuis la sidebar'
-                : `${sections.length} section${sections.length > 1 ? 's' : ''}`
-              }
-            </span>
-          </div>
-          <div className={styles.headerActions}>
-            {canPresent && (
-              <button
-                onClick={openPresentation}
-                className={styles.actionButton}
-                title="Mode présentation"
-              >
-                <Presentation size={13} />
-                Présentation
-              </button>
-            )}
-            <img src="/finex-wordmark-dark.svg" alt="Finex" className={styles.logo} />
-          </div>
-        </header>
+        <ReportHeader
+          sectionsCount={sections.length}
+          canPresent={canPresent}
+          onOpenPresentation={openPresentation}
+        />
 
         <main className={styles.mainScroll}>
           {sections.length === 0 ? (
-            <div className={styles.emptyState}>
-              <LayoutGrid size={32} className={styles.emptyStateIcon} />
-              <p className={styles.emptyStateTitle}>Aucune section</p>
-              <p className={styles.emptyStateDescription}>
-                Importez un fichier CSV dans la sidebar puis cliquez sur&nbsp;
-                <span className={styles.emptyStateHighlight}>+</span> pour créer votre premier pivot.
-              </p>
-            </div>
+            <EmptyState />
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={onDragStart} onDragEnd={onDragEnd}>
               <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>

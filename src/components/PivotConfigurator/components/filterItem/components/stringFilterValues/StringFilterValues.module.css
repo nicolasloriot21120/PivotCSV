@@ -1,0 +1,18 @@
+@reference "../../../../../../index.css";
+
+.chips {
+  @apply flex flex-wrap gap-1 pl-4;
+}
+
+.chip {
+  @apply px-2 py-0.5 rounded-full text-[11px] font-medium transition-all duration-100;
+  @apply bg-border text-muted hover:bg-border-strong hover:text-text;
+}
+
+.chip[data-active="true"] {
+  @apply bg-accent text-white;
+}
+
+.loading {
+  @apply text-subtle text-[11px];
+}

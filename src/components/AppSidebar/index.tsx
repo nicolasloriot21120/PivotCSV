@@ -1,9 +1,9 @@
-import { FileText, Plus, X }  from 'lucide-react'
 import { Sidebar }            from '@/components/ui/Sidebar'
 import { FileDropzone }       from '@/components/ui/FileDropzone'
 import { ThemePicker }        from '@/components/ui/ThemePicker'
 import type { ThemeOption }   from '@/components/ui/ThemePicker'
 import type { FileEntry }     from '@/types/app'
+import { FileEntryRow }       from './components/fileEntryRow/FileEntryRow'
 import styles                 from './styles.module.css'
 
 type Props<T extends string = string> = {
@@ -51,36 +51,13 @@ export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFi
           <p className={styles.empty}>Aucun fichier importé</p>
         )}
         {fileEntries.map(entry => (
-          <div
+          <FileEntryRow
             key={entry.id}
-            onClick={() => onFileSelect(entry.file)}
-            className={styles.row}
-          >
-            <FileText size={13} className={styles.fileIcon} />
-            <div className={styles.rowText}>
-              <span className={styles.fileName}>{entry.file.name}</span>
-              <span className={styles.meta}>
-                {entry.rowCount === null ? '…' : entry.rowCount.toLocaleString('fr-FR')} lignes
-                {entry.pivotCount > 0 && ` · ${entry.pivotCount} pivot${entry.pivotCount > 1 ? 's' : ''}`}
-              </span>
-            </div>
-            <div className={styles.actions}>
-              <button
-                onClick={e => { e.stopPropagation(); onAddPivot(entry.file) }}
-                className={styles.actionButtonAdd}
-                title="Nouveau pivot"
-              >
-                <Plus size={12} />
-              </button>
-              <button
-                onClick={e => { e.stopPropagation(); onRemoveFile(entry.file) }}
-                className={styles.actionButtonRemove}
-                title="Retirer le fichier"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          </div>
+            entry={entry}
+            onSelect={() => onFileSelect(entry.file)}
+            onAddPivot={() => onAddPivot(entry.file)}
+            onRemove={() => onRemoveFile(entry.file)}
+          />
         ))}
       </div>
     </Sidebar>

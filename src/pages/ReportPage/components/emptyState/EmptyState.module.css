@@ -1,0 +1,21 @@
+@reference "../../../../index.css";
+
+.root {
+  @apply flex flex-col items-center justify-center h-full gap-3 text-center;
+}
+
+.icon {
+  @apply text-subtle;
+}
+
+.title {
+  @apply text-muted text-sm font-medium;
+}
+
+.description {
+  @apply text-subtle text-xs max-w-xs;
+}
+
+.highlight {
+  @apply text-accent;
+}
