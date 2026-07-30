@@ -1,7 +1,7 @@
 @reference "../../../../index.css";
 
 .header {
-  @apply flex items-center justify-between px-6 h-12 border-b border-border bg-surface flex-shrink-0;
+  @apply flex items-center justify-between px-6 h-12 border-b border-border flex-shrink-0;
 }
 
 .headerLeft {

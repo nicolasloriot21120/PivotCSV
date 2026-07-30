@@ -1,4 +1,5 @@
 import { LayoutGrid, Presentation } from 'lucide-react'
+import shared from '@/styles/shared.module.css'
 import styles from './ReportHeader.module.css'
 
 export type ReportHeaderProps = {
@@ -9,7 +10,7 @@ export type ReportHeaderProps = {
 
 export function ReportHeader({ sectionsCount, canPresent, onOpenPresentation }: ReportHeaderProps) {
   return (
-    <header className={styles.header}>
+    <header className={`${shared.onAccent} ${styles.header}`}>
       <div className={styles.headerLeft}>
         <LayoutGrid size={14} />
         <span className={styles.sectionsCount}>

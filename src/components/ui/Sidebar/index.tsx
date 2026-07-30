@@ -3,15 +3,16 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import styles from './styles.module.css'
 
 export type SidebarProps = {
-  open:      boolean
-  onToggle:  () => void
-  width?:    number
-  header?:   ReactNode
-  footer?:   ReactNode
-  children:  ReactNode
+  open:            boolean
+  onToggle:        () => void
+  width?:          number
+  header?:         ReactNode
+  headerClassName?: string
+  footer?:         ReactNode
+  children:        ReactNode
 }
 
-export function Sidebar({ open, onToggle, width = 288, header, footer, children }: SidebarProps) {
+export function Sidebar({ open, onToggle, width = 288, header, headerClassName, footer, children }: SidebarProps) {
   return (
     <div className={styles.root}>
 
@@ -31,7 +32,7 @@ export function Sidebar({ open, onToggle, width = 288, header, footer, children 
       >
         <div className={styles.inner} style={{ width }}>
           {header && (
-            <div className={styles.header}>
+            <div className={`${styles.header} ${headerClassName ?? ''}`}>
               {header}
             </div>
           )}

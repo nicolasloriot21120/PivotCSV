@@ -37,7 +37,7 @@ export function PivotSectionHeader({
   const statusDotClass = STATUS_DOT_CLASS[status]
 
   return (
-    <div className={styles.headerBar}>
+    <div className={`${shared.onAccent} ${styles.headerBar}`}>
       <button
         {...dragHandleAttrs}
         {...dragHandleListeners}

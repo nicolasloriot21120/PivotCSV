@@ -30,3 +30,19 @@
 .toolbarDivider {
   @apply w-px h-4 bg-border mx-0.5 flex-shrink-0;
 }
+
+/* ── Zone à fond vert (headers de carte, sidebar, barre principale) ──
+   Redéfinit les tokens de couleur locaux pour que text-text/text-subtle/
+   text-muted/text-accent/border-* restent lisibles sur --color-accent-lo,
+   sans avoir à retoucher les classes qui les consomment. */
+
+.onAccent {
+  @apply bg-accent-lo;
+  --color-text:          #F7F3EC;
+  --color-muted:         rgba(247, 243, 236, 0.75);
+  --color-subtle:        rgba(247, 243, 236, 0.55);
+  --color-accent:        #F7F3EC;
+  --color-border:        rgba(247, 243, 236, 0.16);
+  --color-border-strong: rgba(247, 243, 236, 0.30);
+  --color-elevated:      rgba(247, 243, 236, 0.10);
+}

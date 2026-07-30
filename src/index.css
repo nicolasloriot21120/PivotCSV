@@ -21,24 +21,24 @@
   --color-warning: #A9541A;
   --color-danger:  #C0392B;
 
-  /* ── Modaux / overlays sombres (constants) ── */
-  --color-modal-bg:                   #0F172A;     /* slate-900 — fond principal */
-  --color-modal-elevated:             #1E293B;     /* slate-800 — surface interne (input bg, hover bg) */
-  --color-modal-backdrop:             rgba(0, 0, 0, 0.70);
+  /* ── Modaux / overlays sombres (constants — mode présentation) ── */
+  --color-modal-bg:                   #162A14;     /* vert primaire foncé — fond principal */
+  --color-modal-elevated:             #1F3A1C;     /* vert un cran plus clair — surface interne (input bg, hover bg) */
+  --color-modal-backdrop:             rgba(22, 42, 20, 0.75);
 
-  --color-modal-border:               #1E293B;     /* slate-800 — bordures internes */
-  --color-modal-border-strong:        #334155;     /* slate-700 — bordures plus visibles */
+  --color-modal-border:               #24401F;     /* bordures internes */
+  --color-modal-border-strong:        #35592D;     /* bordures plus visibles */
 
-  --color-modal-text:                 #E2E8F0;     /* slate-200 — texte principal (inputs) */
-  --color-modal-text-strong:          #CBD5E1;     /* slate-300 — items de menu */
-  --color-modal-text-muted:           #94A3B8;     /* slate-400 — labels secondaires */
-  --color-modal-text-secondary:       #64748B;     /* slate-500 — labels uppercase */
-  --color-modal-text-faint:           #475569;     /* slate-600 — texte tertiaire */
-  --color-modal-text-disabled:        #1E293B;     /* slate-800 — état disabled */
+  --color-modal-text:                 #F7F3EC;     /* crème — texte principal (inputs) */
+  --color-modal-text-strong:          #EDE8DF;     /* items de menu */
+  --color-modal-text-muted:           #C9C2AE;     /* labels secondaires */
+  --color-modal-text-secondary:       #A79F89;     /* labels uppercase */
+  --color-modal-text-faint:           #7C8F6E;     /* texte tertiaire */
+  --color-modal-text-disabled:        #24401F;     /* état disabled */
 
-  --color-overlay:                    rgba(15, 23, 42, 0.93);
-  --color-overlay-button:             rgba(30, 41, 59, 0.9);
-  --color-overlay-button-hover:       rgba(51, 65, 85, 0.9);
+  --color-overlay:                    rgba(22, 42, 20, 0.93);
+  --color-overlay-button:             rgba(36, 64, 31, 0.9);
+  --color-overlay-button-hover:       rgba(53, 89, 45, 0.9);
 
   /* ── Ombres ── */
   --shadow-glow:     0 0 24px #3A5F2440;

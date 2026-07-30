@@ -5,6 +5,7 @@ import { LoadingSpinner }      from '@/components/ui/LoadingSpinner'
 import type { FileEntry }      from '@/types/app'
 import { FileEntryRow }        from './components/fileEntryRow/FileEntryRow'
 import { useSampleLoader }     from './hooks/useSampleLoader'
+import shared                  from '@/styles/shared.module.css'
 import styles                  from './styles.module.css'
 
 type Props = {
@@ -24,6 +25,7 @@ export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect,
     <Sidebar
       open={open}
       onToggle={onToggle}
+      headerClassName={shared.onAccent}
       header={
         <div className={styles.header}>
           <div className={styles.titleGroup}>
