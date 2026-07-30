@@ -5,6 +5,7 @@ import { ModalHeader }      from '@/components/ui/ModalHeader'
 import { NavigationButton } from '../navigationButton/NavigationButton.tsx'
 import { usePresentationMode } from './usePresentationMode.ts'
 import type { Section }     from '@/types/app.ts'
+import shared                from '@/styles/shared.module.css'
 
 type Props = {
   sections: Section[]  // uniquement les sections avec result !== null
@@ -19,7 +20,7 @@ export function PresentationMode({ sections, onClose }: Props) {
     <div style={{
       position:       'fixed',
       inset:          0,
-      background:     'var(--color-modal-bg)',
+      background:     'var(--color-base)',
       zIndex:         100,
       display:        'flex',
       flexDirection:  'column',
@@ -29,19 +30,20 @@ export function PresentationMode({ sections, onClose }: Props) {
       {/* ── Header ── */}
       <ModalHeader
         height={52}
+        className={shared.onAccent}
         left={
-          <span style={{ fontSize: 12, color: 'var(--color-modal-text-faint)', minWidth: 60 }}>
+          <span style={{ fontSize: 12, color: 'var(--color-subtle)', minWidth: 60 }}>
             {ui.sectionIndex + 1} / {ui.sectionsCount}
           </span>
         }
         center={
-          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-modal-text)' }}>
+          <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-text)' }}>
             {ui.section.label}
           </span>
         }
         right={
           <div style={{ minWidth: 60, display: 'flex', justifyContent: 'flex-end' }}>
-            <CloseButton onClick={onClose} title="Fermer (Esc)" colorIdle="var(--color-modal-text-faint)" />
+            <CloseButton onClick={onClose} title="Fermer (Esc)" />
           </div>
         }
       />
@@ -69,7 +71,7 @@ export function PresentationMode({ sections, onClose }: Props) {
             />
           </div>
 
-          <div style={{ width: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
+          <div style={{ width: 1, background: 'var(--color-border)', flexShrink: 0 }} />
 
           {/* Graphique */}
           <div style={{ flex: ui.section.chartFlex, minWidth: 0, overflow: 'hidden' }}>
@@ -88,13 +90,13 @@ export function PresentationMode({ sections, onClose }: Props) {
         <NavigationButton direction="next" disabled={ui.isLast} onClick={ui.next} />
       </div>
 
-      <div style={{ height: 1, background: 'var(--color-modal-border)', flexShrink: 0 }} />
+      <div style={{ height: 1, background: 'var(--color-border)', flexShrink: 0 }} />
 
       {/* ── Notes ── */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, padding: '10px 24px 16px' }}>
         <label style={{
           fontSize:      11,
-          color:         'var(--color-modal-text-faint)',
+          color:         'var(--color-subtle)',
           fontWeight:    600,
           marginBottom:  6,
           textTransform: 'uppercase',
@@ -109,10 +111,10 @@ export function PresentationMode({ sections, onClose }: Props) {
           placeholder="Observations, commentaires…"
           style={{
             flex:         1,
-            background:   'var(--color-modal-elevated)',
-            border:       '1px solid var(--color-modal-border-strong)',
+            background:   'var(--color-elevated)',
+            border:       '1px solid var(--color-border-strong)',
             borderRadius: 6,
-            color:        'var(--color-modal-text)',
+            color:        'var(--color-text)',
             fontSize:     13,
             padding:      '10px 12px',
             resize:       'none',
@@ -121,7 +123,7 @@ export function PresentationMode({ sections, onClose }: Props) {
             lineHeight:   1.6,
           }}
           onFocus={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-accent)' }}
-          onBlur={e =>  { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-modal-border-strong)' }}
+          onBlur={e =>  { (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-border-strong)' }}
         />
       </div>
     </div>

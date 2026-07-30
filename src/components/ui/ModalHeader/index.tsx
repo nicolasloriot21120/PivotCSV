@@ -1,15 +1,17 @@
 import type { ReactNode } from 'react'
 
 type Props = {
-  left:    ReactNode
-  center?: ReactNode
-  right:   ReactNode
-  height?: number
+  left:      ReactNode
+  center?:   ReactNode
+  right:     ReactNode
+  height?:   number
+  className?: string
 }
 
-export function ModalHeader({ left, center, right, height = 48 }: Props) {
+export function ModalHeader({ left, center, right, height = 48, className }: Props) {
   return (
     <div
+      className={className}
       style={{
         display:        'flex',
         alignItems:     'center',
@@ -17,7 +19,7 @@ export function ModalHeader({ left, center, right, height = 48 }: Props) {
         padding:        '0 20px',
         height,
         flexShrink:     0,
-        borderBottom:   '1px solid var(--color-modal-border)',
+        borderBottom:   '1px solid var(--color-border)',
       }}
     >
       {left}

@@ -36,14 +36,15 @@ export function NavigationButton({ direction, disabled, onClick }: Props) {
         background:     disabled
           ? 'transparent'
           : isHot
-            ? 'var(--color-overlay-button-hover)'
-            : 'var(--color-overlay-button)',
-        border:         `1px solid ${disabled ? 'transparent' : 'var(--color-modal-border-strong)'}`,
+            ? 'var(--color-elevated)'
+            : 'var(--color-surface)',
+        border:         `1px solid ${disabled ? 'transparent' : 'var(--color-border-strong)'}`,
+        boxShadow:      disabled ? 'none' : 'var(--shadow-card)',
         color:          disabled
-          ? 'var(--color-modal-text-disabled)'
+          ? 'var(--color-subtle)'
           : isHot
-            ? 'var(--color-text)'
-            : 'var(--color-modal-text-muted)',
+            ? 'var(--color-accent)'
+            : 'var(--color-muted)',
         transition:     'background 0.15s, color 0.15s',
       }}
     >
