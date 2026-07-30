@@ -1,10 +1,13 @@
-import { Sidebar }            from '@/components/ui/Sidebar'
-import { FileDropzone }       from '@/components/ui/FileDropzone'
-import { ThemePicker }        from '@/components/ui/ThemePicker'
-import type { ThemeOption }   from '@/components/ui/ThemePicker'
-import type { FileEntry }     from '@/types/app'
-import { FileEntryRow }       from './components/fileEntryRow/FileEntryRow'
-import styles                 from './styles.module.css'
+import { Sparkles }            from 'lucide-react'
+import { Sidebar }             from '@/components/ui/Sidebar'
+import { FileDropzone }        from '@/components/ui/FileDropzone'
+import { ThemePicker }         from '@/components/ui/ThemePicker'
+import type { ThemeOption }    from '@/components/ui/ThemePicker'
+import { LoadingSpinner }      from '@/components/ui/LoadingSpinner'
+import type { FileEntry }      from '@/types/app'
+import { FileEntryRow }        from './components/fileEntryRow/FileEntryRow'
+import { useSampleLoader }     from './hooks/useSampleLoader'
+import styles                  from './styles.module.css'
 
 type Props<T extends string = string> = {
   open:           boolean
@@ -20,6 +23,8 @@ type Props<T extends string = string> = {
 }
 
 export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile, themes, theme, onThemeChange }: Props<T>) {
+  const { loading: sampleLoading, loadSample } = useSampleLoader({ onFiles, onFileSelect })
+
   return (
     <Sidebar
       open={open}
@@ -43,6 +48,17 @@ export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFi
             label="Importer un CSV"
             hideList
           />
+          <button
+            onClick={loadSample}
+            disabled={sampleLoading}
+            className={styles.sampleButton}
+          >
+            {sampleLoading
+              ? <LoadingSpinner size={13} />
+              : <Sparkles size={13} />
+            }
+            {sampleLoading ? 'Chargement…' : 'Charger un exemple'}
+          </button>
         </div>
       }
     >

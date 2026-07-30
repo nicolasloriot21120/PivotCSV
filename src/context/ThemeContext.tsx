@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-export type ThemeId = 'dark' | 'light' | 'ocean' | 'ember' | 'forest'
+export type ThemeId = 'finex' | 'dark' | 'light' | 'ocean' | 'ember' | 'forest'
 
 export type ThemeDef = {
   id:      ThemeId
@@ -9,6 +9,7 @@ export type ThemeDef = {
 }
 
 export const THEMES: ThemeDef[] = [
+  { id: 'finex',  label: 'Finex',      swatches: ['#F7F3EC', '#A9541A', '#C9A358'] },
   { id: 'dark',   label: 'Nova Dark',  swatches: ['#08080F', '#6366F1', '#818CF8'] },
   { id: 'light',  label: 'Nova Light', swatches: ['#F8F9FC', '#4F46E5', '#6366F1'] },
   { id: 'ocean',  label: 'Ocean',      swatches: ['#040D18', '#0EA5E9', '#38BDF8'] },
@@ -18,11 +19,11 @@ export const THEMES: ThemeDef[] = [
 
 type ThemeCtx = { theme: ThemeId; setTheme: (t: ThemeId) => void }
 
-const Ctx = createContext<ThemeCtx>({ theme: 'dark', setTheme: () => {} })
+const Ctx = createContext<ThemeCtx>({ theme: 'finex', setTheme: () => {} })
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(() => {
-    return (localStorage.getItem('theme') as ThemeId) ?? 'dark'
+    return (localStorage.getItem('theme') as ThemeId) ?? 'finex'
   })
 
   const setTheme = (t: ThemeId) => {
@@ -32,7 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'dark') root.removeAttribute('data-theme')
+    if (theme === 'finex') root.removeAttribute('data-theme')
     else root.setAttribute('data-theme', theme)
   }, [theme])
 

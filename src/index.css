@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Couleurs (thème par défaut : Nova Dark) ── */
-  --color-base:          #08080F;
-  --color-surface:       #0F0F1A;
-  --color-elevated:      #16162A;
-  --color-border:        #ffffff14;
-  --color-border-strong: #ffffff28;
+  /* ── Couleurs (thème par défaut : Finex) ── */
+  --color-base:          #F7F3EC;
+  --color-surface:       #EDE8DF;
+  --color-elevated:      #E4DDD1;
+  --color-border:        rgba(28, 26, 20, 0.12);
+  --color-border-strong: rgba(28, 26, 20, 0.22);
 
-  --color-accent:    #6366F1;
-  --color-accent-hi: #818CF8;
-  --color-accent-lo: #4F46E5;
-  --color-violet:    #8B5CF6;
+  --color-accent:    #A9541A;
+  --color-accent-hi: #C9A358;
+  --color-accent-lo: #8B4315;
+  --color-violet:    #3A5F24;
 
-  --color-text:   #F1F5F9;
-  --color-muted:  #64748B;
-  --color-subtle: #334155;
+  --color-text:   #1C1A14;
+  --color-muted:  #6B6354;
+  --color-subtle: #DDD7CB;
 
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-danger:  #EF4444;
+  --color-success: #3A5F24;
+  --color-warning: #C9A358;
+  --color-danger:  #C0392B;
 
   /* ── Modaux / overlays sombres (constants, indépendants du thème) ── */
   --color-modal-bg:                   #0F172A;     /* slate-900 — fond principal */
@@ -41,9 +41,9 @@
   --color-overlay-button-hover:       rgba(51, 65, 85, 0.9);
 
   /* ── Ombres ── */
-  --shadow-glow:     0 0 24px #6366F140;
-  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #ffffff0a inset;
-  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #ffffff12 inset;
+  --shadow-glow:     0 0 24px #A9541A40;
+  --shadow-card:     0 4px 24px rgba(28, 26, 20, 0.10), 0 1px 0 #ffffff80 inset;
+  --shadow-elevated: 0 8px 40px rgba(28, 26, 20, 0.14), 0 1px 0 #ffffff inset;
 
   /* ── Rayons ── */
   --radius-sm: 6px;
@@ -53,6 +53,32 @@
 
   /* ── Typo ── */
   --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Thème : Nova Dark ── */
+[data-theme="dark"] {
+  --color-base:          #08080F;
+  --color-surface:       #0F0F1A;
+  --color-elevated:      #16162A;
+  --color-border:        #ffffff14;
+  --color-border-strong: #ffffff28;
+
+  --color-accent:    #6366F1;
+  --color-accent-hi: #818CF8;
+  --color-accent-lo: #4F46E5;
+  --color-violet:    #8B5CF6;
+
+  --color-text:   #F1F5F9;
+  --color-muted:  #64748B;
+  --color-subtle: #334155;
+
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger:  #EF4444;
+
+  --shadow-glow:     0 0 24px #6366F140;
+  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #ffffff0a inset;
+  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #ffffff12 inset;
 }
 
 /* ── Thème : Nova Light ── */

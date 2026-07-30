@@ -21,7 +21,14 @@
 /* ── Footer ── */
 
 .footer {
-  @apply px-3 py-3;
+  @apply px-3 py-3 flex flex-col gap-2;
+}
+
+.sampleButton {
+  @apply flex items-center justify-center gap-1.5 w-full py-2 rounded-[var(--radius-md)];
+  @apply text-xs font-medium text-muted border border-border;
+  @apply hover:text-accent hover:border-accent/40 transition-all;
+  @apply disabled:opacity-60 disabled:pointer-events-none;
 }
 
 /* ── Liste de fichiers ── */
