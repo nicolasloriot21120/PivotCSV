@@ -15,7 +15,6 @@ import styles                   from './styles.module.css'
 
 export function ReportPage() {
   const {
-    theme, setTheme, THEMES,
     sidebarOpen, setSidebarOpen,
     fileEntries, sections, draggingSection,
     canPresent, presentableSections,
@@ -38,9 +37,6 @@ export function ReportPage() {
         onFileSelect={handleFileSelect}
         onAddPivot={handleAddPivot}
         onRemoveFile={handleRemoveFile}
-        themes={THEMES}
-        theme={theme}
-        onThemeChange={setTheme}
       />
 
       <div className={styles.mainArea}>

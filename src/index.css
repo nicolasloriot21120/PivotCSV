@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Couleurs (thème par défaut : Finex) ── */
+  /* ── Couleurs ── */
   --color-base:          #F7F3EC;
-  --color-surface:       #EDE8DF;
-  --color-elevated:      #E4DDD1;
-  --color-border:        rgba(28, 26, 20, 0.12);
-  --color-border-strong: rgba(28, 26, 20, 0.22);
+  --color-surface:       #FFFFFF;
+  --color-elevated:      #EDE8DF;
+  --color-border:        rgba(28, 26, 20, 0.14);
+  --color-border-strong: rgba(28, 26, 20, 0.30);
 
-  --color-accent:    #A9541A;
-  --color-accent-hi: #C9A358;
-  --color-accent-lo: #8B4315;
-  --color-violet:    #3A5F24;
+  --color-accent:    #3A5F24;
+  --color-accent-hi: #5C8A3E;
+  --color-accent-lo: #162A14;
+  --color-violet:    #A9541A;
 
   --color-text:   #1C1A14;
   --color-muted:  #6B6354;
-  --color-subtle: #DDD7CB;
+  --color-subtle: #948C79;
 
   --color-success: #3A5F24;
-  --color-warning: #C9A358;
+  --color-warning: #A9541A;
   --color-danger:  #C0392B;
 
-  /* ── Modaux / overlays sombres (constants, indépendants du thème) ── */
+  /* ── Modaux / overlays sombres (constants) ── */
   --color-modal-bg:                   #0F172A;     /* slate-900 — fond principal */
   --color-modal-elevated:             #1E293B;     /* slate-800 — surface interne (input bg, hover bg) */
   --color-modal-backdrop:             rgba(0, 0, 0, 0.70);
@@ -41,9 +41,9 @@
   --color-overlay-button-hover:       rgba(51, 65, 85, 0.9);
 
   /* ── Ombres ── */
-  --shadow-glow:     0 0 24px #A9541A40;
-  --shadow-card:     0 4px 24px rgba(28, 26, 20, 0.10), 0 1px 0 #ffffff80 inset;
-  --shadow-elevated: 0 8px 40px rgba(28, 26, 20, 0.14), 0 1px 0 #ffffff inset;
+  --shadow-glow:     0 0 24px #3A5F2440;
+  --shadow-card:     0 4px 24px rgba(28, 26, 20, 0.10), 0 1px 0 #ffffffa0 inset;
+  --shadow-elevated: 0 8px 40px rgba(28, 26, 20, 0.16), 0 1px 0 #ffffff inset;
 
   /* ── Rayons ── */
   --radius-sm: 6px;
@@ -53,136 +53,6 @@
 
   /* ── Typo ── */
   --font-sans: 'Inter', system-ui, sans-serif;
-}
-
-/* ── Thème : Nova Dark ── */
-[data-theme="dark"] {
-  --color-base:          #08080F;
-  --color-surface:       #0F0F1A;
-  --color-elevated:      #16162A;
-  --color-border:        #ffffff14;
-  --color-border-strong: #ffffff28;
-
-  --color-accent:    #6366F1;
-  --color-accent-hi: #818CF8;
-  --color-accent-lo: #4F46E5;
-  --color-violet:    #8B5CF6;
-
-  --color-text:   #F1F5F9;
-  --color-muted:  #64748B;
-  --color-subtle: #334155;
-
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-danger:  #EF4444;
-
-  --shadow-glow:     0 0 24px #6366F140;
-  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #ffffff0a inset;
-  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #ffffff12 inset;
-}
-
-/* ── Thème : Nova Light ── */
-[data-theme="light"] {
-  --color-base:          #F8F9FC;
-  --color-surface:       #FFFFFF;
-  --color-elevated:      #F1F3F9;
-  --color-border:        #00000012;
-  --color-border-strong: #00000022;
-
-  --color-accent:    #4F46E5;
-  --color-accent-hi: #6366F1;
-  --color-accent-lo: #3730A3;
-  --color-violet:    #7C3AED;
-
-  --color-text:   #0F172A;
-  --color-muted:  #64748B;
-  --color-subtle: #CBD5E1;
-
-  --color-success: #16A34A;
-  --color-warning: #D97706;
-  --color-danger:  #DC2626;
-
-  --shadow-glow:     0 0 24px #4F46E520;
-  --shadow-card:     0 4px 24px #00000014, 0 1px 0 #ffffff80 inset;
-  --shadow-elevated: 0 8px 40px #00000020, 0 1px 0 #ffffff inset;
-}
-
-/* ── Thème : Ocean ── */
-[data-theme="ocean"] {
-  --color-base:          #040D18;
-  --color-surface:       #071525;
-  --color-elevated:      #0C1F35;
-  --color-border:        #ffffff10;
-  --color-border-strong: #ffffff20;
-
-  --color-accent:    #0EA5E9;
-  --color-accent-hi: #38BDF8;
-  --color-accent-lo: #0284C7;
-  --color-violet:    #6366F1;
-
-  --color-text:   #E0F2FE;
-  --color-muted:  #64748B;
-  --color-subtle: #1E3A5F;
-
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-danger:  #EF4444;
-
-  --shadow-glow:     0 0 24px #0EA5E940;
-  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #0EA5E910 inset;
-  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #0EA5E918 inset;
-}
-
-/* ── Thème : Ember ── */
-[data-theme="ember"] {
-  --color-base:          #0F0800;
-  --color-surface:       #1A1000;
-  --color-elevated:      #261800;
-  --color-border:        #ffffff10;
-  --color-border-strong: #ffffff20;
-
-  --color-accent:    #F97316;
-  --color-accent-hi: #FB923C;
-  --color-accent-lo: #EA580C;
-  --color-violet:    #F59E0B;
-
-  --color-text:   #FEF3E2;
-  --color-muted:  #78716C;
-  --color-subtle: #3D2B0A;
-
-  --color-success: #22C55E;
-  --color-warning: #FBBF24;
-  --color-danger:  #EF4444;
-
-  --shadow-glow:     0 0 24px #F9731640;
-  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #F9731610 inset;
-  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #F9731618 inset;
-}
-
-/* ── Thème : Forest ── */
-[data-theme="forest"] {
-  --color-base:          #030A04;
-  --color-surface:       #071209;
-  --color-elevated:      #0C1D0F;
-  --color-border:        #ffffff10;
-  --color-border-strong: #ffffff20;
-
-  --color-accent:    #22C55E;
-  --color-accent-hi: #4ADE80;
-  --color-accent-lo: #16A34A;
-  --color-violet:    #A3E635;
-
-  --color-text:   #ECFDF5;
-  --color-muted:  #6B7280;
-  --color-subtle: #14381E;
-
-  --color-success: #4ADE80;
-  --color-warning: #F59E0B;
-  --color-danger:  #EF4444;
-
-  --shadow-glow:     0 0 24px #22C55E40;
-  --shadow-card:     0 4px 24px #00000060, 0 1px 0 #22C55E10 inset;
-  --shadow-elevated: 0 8px 40px #00000080, 0 1px 0 #22C55E18 inset;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

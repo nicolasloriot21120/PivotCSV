@@ -1,15 +1,13 @@
 import { Sparkles }            from 'lucide-react'
 import { Sidebar }             from '@/components/ui/Sidebar'
 import { FileDropzone }        from '@/components/ui/FileDropzone'
-import { ThemePicker }         from '@/components/ui/ThemePicker'
-import type { ThemeOption }    from '@/components/ui/ThemePicker'
 import { LoadingSpinner }      from '@/components/ui/LoadingSpinner'
 import type { FileEntry }      from '@/types/app'
 import { FileEntryRow }        from './components/fileEntryRow/FileEntryRow'
 import { useSampleLoader }     from './hooks/useSampleLoader'
 import styles                  from './styles.module.css'
 
-type Props<T extends string = string> = {
+type Props = {
   open:           boolean
   onToggle:       () => void
   fileEntries:    FileEntry[]
@@ -17,12 +15,9 @@ type Props<T extends string = string> = {
   onFileSelect:   (file: File) => void
   onAddPivot:     (file: File) => void
   onRemoveFile:   (file: File) => void
-  themes:         ThemeOption<T>[]
-  theme:          T
-  onThemeChange:  (id: T) => void
 }
 
-export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile, themes, theme, onThemeChange }: Props<T>) {
+export function AppSidebar({ open, onToggle, fileEntries, onFiles, onFileSelect, onAddPivot, onRemoveFile }: Props) {
   const { loading: sampleLoading, loadSample } = useSampleLoader({ onFiles, onFileSelect })
 
   return (
@@ -35,7 +30,6 @@ export function AppSidebar<T extends string>({ open, onToggle, fileEntries, onFi
             <h1 className={styles.title}>PivotCSV</h1>
             <span className={styles.subtitle}>Analyse CSV</span>
           </div>
-          <ThemePicker themes={themes} value={theme} onChange={onThemeChange} />
         </div>
       }
       footer={

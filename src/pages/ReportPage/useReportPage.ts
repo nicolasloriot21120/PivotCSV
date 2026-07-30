@@ -1,5 +1,4 @@
 import { useState }            from 'react'
-import { useTheme, THEMES }    from '@/context/ThemeContext'
 import { usePivotComputation } from './hooks/usePivotComputation'
 import { useSections }         from './hooks/useSections'
 import { useFileEntries }      from './hooks/useFileEntries'
@@ -8,7 +7,6 @@ import { useSectionsDnD }      from './hooks/useSectionsDnD'
 import { usePersistence }      from './hooks/usePersistence'
 
 export function useReportPage() {
-  const { theme, setTheme }            = useTheme()
   const [sidebarOpen, setSidebarOpen]  = useState(true)
 
   const {
@@ -72,8 +70,6 @@ export function useReportPage() {
   }
 
   return {
-    // theme
-    theme, setTheme, THEMES,
     // layout
     sidebarOpen, setSidebarOpen,
     // data
