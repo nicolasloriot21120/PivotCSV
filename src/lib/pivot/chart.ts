@@ -63,7 +63,7 @@ export function toBarData(
   const valueField = config.values[0]
   const visRows = getVisible(rowKeys, collapsedRows)
 
-  if (!colKeys.length) {
+  if (!config.columns.length) {
     return {
       keys:    [valueField.field],
       barData: visRows.map(({ label, leaves }) => ({
@@ -118,7 +118,7 @@ export function toLineData(
   const valueField = config.values[0]
   const visRows    = getVisible(rowKeys, collapsedRows)
 
-  if (!colKeys.length) {
+  if (!config.columns.length) {
     return [{
       id:   valueField.field,
       data: visRows.map(({ label, leaves }) => ({
@@ -173,7 +173,7 @@ export function getSeriesLabels(
     return keys
   }
   // line chart
-  if (!data.colKeys.length) return [data.config.values[0]?.field ?? '']
+  if (!data.config.columns.length) return [data.config.values[0]?.field ?? '']
   if (transpose) return getVisible(data.rowKeys, collapsedRows).map(v => v.label)
   return getVisible(data.colKeys, collapsedCols).map(v => v.label)
 }
