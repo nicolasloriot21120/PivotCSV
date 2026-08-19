@@ -1,0 +1,45 @@
+Continue la Phase 2.5 du refacto qualité (migration Tailwind → CSS Modules).                                                                                                                
+                                                                                                                                                                                              
+  ## Avant de commencer, lis :            
+  1. ~/.claude/projects/-home-nicolas-depot-projets-PivotCSV/memory/MEMORY.md                                                                                                                 
+     (chargé auto au démarrage — vérifie qu'il l'est bien sinon lis-le)                                                                                                                       
+  2. CLAUDE.md (à la racine du projet, déjà chargé)
+  3. La PR #14 : `gh pr view 14` pour voir le résumé du travail déjà fait                                                                                                                     
+     - src/components/PivotSection/styles.module.css (cas complexe avec composes locaux)                                                                                                      
+     - src/components/PivotSection/components/ResultsToolbar.module.css (cas avec composes depuis shared)                                                                                     
+     - src/styles/shared.module.css (les patterns transverses déjà extraits)                                                                                                                  
+                                                                                                                                                                                              
+  ## État actuel                                                                                                                                                                              
+  - Branche `main` contient : Phase 1 + Phase 2 + cleanup PdfExport + PoC ReportPage                                                                                                          
+  - Branche `refacto/qualite-composants-phase2.5` (mergée ou non) contient : PivotSection + ResultsToolbar + ColorPickerPanel + FlexStepper migrés + shared.module.css créé                   
+  - Vérifie le statut de la PR #14 : si mergée → tirer une nouvelle branche depuis main ; sinon → continuer sur la même                                                                       
+                                                                                                                                                                                              
+  ## Composants restants à migrer (par ordre de priorité)                                                                                                                                     
+  1. AppSidebar (src/components/AppSidebar/)                                                                                                                                                  
+  2. PivotConfigurator + ses 5 sous-composants (src/components/PivotConfigurator/)                                                                                                            
+  3. PivotTable (src/components/ui/PivotTable/) — gros composant 299L, possiblement à découper en parallèle                                                                                   
+  4. PivotChart + ses 3 charts (src/components/ui/PivotChart/)                                                                                                                                
+  5. Composants UI : Button, Card, Badge, FileDropzone, Sidebar, ThemePicker                                                                                                                  
+                                                                                                                                                                                              
+  À NE PAS migrer (utilisent inline styles, pas Tailwind) :                                                                                                                                   
+  - PresentationMode et son écosystème (CloseButton, ModalHeader, LoadingSpinner, NavigationButton)                                                                                           
+                                                                                                                                                                                              
+  ## Conventions strictes (rappel — détails dans MEMORY.md)                                                                                                                                   
+  - 1 fichier styles.module.css co-localisé par composant                                                                                                                                     
+  - `@reference "<chemin vers src/index.css>"` en première ligne (Tailwind v4)                                                                                                                
+  - Classes camelCase                                                                                                                                                                         
+  - Hiérarchie via `composes` (base + variantes) plutôt que classes fourre-tout                                                                                                               
+  - Aucune chaîne Tailwind ne doit rester dans le JSX (sauf cas extrême type `className={dyn}`)                                                                                               
+  - Aucune couleur hardcodée — toujours var(--color-...) ou tokens du projet                                                                                                                  
+  - Pour `group-hover` Tailwind, utiliser sélecteur CSS natif `.parent:hover .child`                                                                                                          
+  - Si un pattern apparaît sur 3+ composants : extraire dans src/styles/shared.module.css                                                                                                     
+                                                                                                                                                                                              
+  ## Workflow                                                                                                                                                                                 
+  - 1 PR par dossier/groupe logique (pas une PR fleuve)                                                                                                                                       
+  - Commits atomiques                                                                                                                                                                         
+  - Cible PR : main                                                                                                                                                                           
+  - Format PR : voir CLAUDE.md (## Summary / ## Test plan avec checklist / Generated with Claude Code)                                                                                        
+  - Pas de Co-Authored-By                                                                                                                                                                     
+  - Vérifie après chaque migration : `npx tsc --noEmit && npx vite build`                                                                                                                     
+                                          
+  Démarre par AppSidebar.
